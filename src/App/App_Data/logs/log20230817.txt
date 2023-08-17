@@ -1,0 +1,28 @@
+[19:29:37 INF Quartz.Impl.StdSchedulerFactory] Default Quartz.NET properties loaded from embedded resource file
+[19:29:37 DBG Quartz.Simpl.TaskSchedulingThreadPool] TaskSchedulingThreadPool configured with max concurrency of 10 and TaskScheduler ThreadPoolTaskScheduler.
+[19:29:37 INF Quartz.Core.SchedulerSignalerImpl] Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
+[19:29:37 INF Quartz.Core.QuartzScheduler] Quartz Scheduler created
+[19:29:37 INF Quartz.Simpl.RAMJobStore] RAMJobStore initialized.
+[19:29:37 INF Quartz.Impl.StdSchedulerFactory] Quartz Scheduler 3.7.0.0 - 'DefaultQuartzScheduler' with instanceId 'NON_CLUSTERED' initialized
+[19:29:37 INF Quartz.Impl.StdSchedulerFactory] Using thread pool 'Quartz.Simpl.DefaultThreadPool', size: 10
+[19:29:37 INF Quartz.Impl.StdSchedulerFactory] Using job store 'Quartz.Simpl.RAMJobStore', supports persistence: False, clustered: False
+[19:29:37 INF Quartz.Core.QuartzScheduler] Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED started.
+[19:29:37 INF ] App running
+[19:29:40 WRN ] Service ISyncQueueService not found in this Job's context.
+[19:29:45 WRN ] Service ISyncQueueService not found in this Job's context.
+[19:29:50 WRN ] Service ISyncQueueService not found in this Job's context.
+[19:29:55 WRN ] Service ISyncQueueService not found in this Job's context.
+[19:32:19 INF Quartz.Impl.StdSchedulerFactory] Default Quartz.NET properties loaded from embedded resource file
+[19:32:19 DBG Quartz.Simpl.TaskSchedulingThreadPool] TaskSchedulingThreadPool configured with max concurrency of 10 and TaskScheduler ThreadPoolTaskScheduler.
+[19:32:19 INF Quartz.Core.SchedulerSignalerImpl] Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
+[19:32:19 INF Quartz.Core.QuartzScheduler] Quartz Scheduler created
+[19:32:19 INF Quartz.Simpl.RAMJobStore] RAMJobStore initialized.
+[19:32:19 INF Quartz.Impl.StdSchedulerFactory] Quartz Scheduler 3.7.0.0 - 'DefaultQuartzScheduler' with instanceId 'NON_CLUSTERED' initialized
+[19:32:19 INF Quartz.Impl.StdSchedulerFactory] Using thread pool 'Quartz.Simpl.DefaultThreadPool', size: 10
+[19:32:19 INF Quartz.Impl.StdSchedulerFactory] Using job store 'Quartz.Simpl.RAMJobStore', supports persistence: False, clustered: False
+[19:32:19 INF Quartz.Core.QuartzScheduler] Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED started.
+[19:32:19 INF ] App running
+[19:32:20 WRN ] Service ISyncQueueService not found in this Job's context.
+[19:32:25 WRN ] Service ISyncQueueService not found in this Job's context.
+[19:32:30 WRN ] Service ISyncQueueService not found in this Job's context.
+[19:32:35 WRN ] Service ISyncQueueService not found in this Job's context.
