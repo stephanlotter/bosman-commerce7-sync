@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<Versions> 
+    <AddVersion overwrite="true"> 
+        <Version>1.0</Version> 
+        <Changes></Changes> 
+        <InheritPrevRegistry /> 
+        <InheritPrevActions /> 
+        <Files dir="basedir"> 
+            <Folder source="versions\1.0\" insideonly="true"/> 
+        </Files> 
+    </AddVersion> 
+</Versions> 
