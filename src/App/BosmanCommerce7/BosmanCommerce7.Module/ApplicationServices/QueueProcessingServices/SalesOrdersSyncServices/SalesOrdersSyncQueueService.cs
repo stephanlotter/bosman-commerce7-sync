@@ -7,26 +7,20 @@
  *  
  */
 
-using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
-using BosmanCommerce7.Module.Models;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices.Models;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices {
   public class SalesOrdersSyncQueueService : SyncQueueServiceBase, ISalesOrdersSyncQueueService {
-    private readonly ISalesOrdersQueueRepository _salesOrdersQueueRepository;
     private readonly ISalesOrdersSyncService _salesOrdersSyncService;
 
-    public SalesOrdersSyncQueueService(ILogger<SalesOrdersSyncQueueService> logger,
-      IOptions<SalesOrdersSyncJobOptions> options,
-      ISalesOrdersQueueRepository salesOrdersQueueRepository,
-      ISalesOrdersSyncService salesOrdersSyncService) : base(logger) {
-      _salesOrdersQueueRepository = salesOrdersQueueRepository;
+    public SalesOrdersSyncQueueService(ILogger<SalesOrdersSyncQueueService> logger, ISalesOrdersSyncService salesOrdersSyncService) : base(logger) {
       _salesOrdersSyncService = salesOrdersSyncService;
     }
 
     protected override void ProcessQueue() {
-      // TODO: Implement this
+      var context = new SalesOrdersSyncContext();
+      _salesOrdersSyncService.Execute(context);
     }
 
   }

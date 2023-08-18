@@ -54,9 +54,14 @@ namespace BosmanCommerce7.Module.Models {
 
   public record SalesOrdersSyncJobOptions : JobOptionsBase {
 
+    public int FetchNumberOfDaysBack { get; init; }
+
+    public DateTime StartDate { get; init; }
+
   }
 
   public record SalesOrdersPostJobOptions : JobOptionsBase {
+
     public string? ShippingGeneralLedgerAccountCode { get; init; }
 
   }
