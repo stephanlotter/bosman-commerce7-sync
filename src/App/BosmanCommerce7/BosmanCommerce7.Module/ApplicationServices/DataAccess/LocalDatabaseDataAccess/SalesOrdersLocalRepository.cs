@@ -7,19 +7,24 @@
  */
 
 using System.Text;
+using BosmanCommerce7.Module.BusinessObjects;
 using BosmanCommerce7.Module.Extensions.DataAccess;
 using BosmanCommerce7.Module.Models;
-using BosmanCommerce7.Module.Models.LocalDatabase;
 using CSharpFunctionalExtensions;
 using Dapper;
+using DevExpress.ExpressApp.Core;
 using Microsoft.Extensions.Logging;
 
 namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess {
-  public class SalesOrdersQueueRepository : LocalDatabaseRepositoryBase, ISalesOrdersQueueRepository {
-    public SalesOrdersQueueRepository(ILogger<SalesOrdersQueueRepository> logger, ILocalDatabaseConnectionStringProvider connectionStringProvider) : base(logger, connectionStringProvider) {
+  public class SalesOrdersLocalRepository : LocalDatabaseRepositoryBase, ISalesOrdersLocalRepository {
+    private readonly IObjectSpaceFactory _objectSpaceFactory;
+
+    public SalesOrdersLocalRepository(ILogger<SalesOrdersLocalRepository> logger, ILocalDatabaseConnectionStringProvider connectionStringProvider, IObjectSpaceFactory objectSpaceFactory)
+      : base(logger, connectionStringProvider) {
+      _objectSpaceFactory = objectSpaceFactory;
     }
 
-    public Result<SalesOrdersQueueItemDto[]> LoadPendingQueueItems() {
+    public Result<SalesOrder[]> LoadPendingSalesOrders() {
       var sql = $@"
 select rmqi.OID,
        rmqi.SimpleCode,
@@ -34,14 +39,14 @@ select rmqi.OID,
       ";
       try {
         var data = ConnectionStringProvider.LocalDatabase.WrapInOpenConnection(connection => {
-          return connection.Query<SalesOrdersQueueItemDto>(sql).ToArray();
+          return connection.Query<SalesOrder>(sql).ToArray();
         });
 
         return Result.Success(data);
       }
       catch (Exception ex) {
         _logger.LogError(ex, "While LoadPendingQueueItems");
-        return Result.Failure<SalesOrdersQueueItemDto[]>(ex.Message);
+        return Result.Failure<SalesOrder[]>(ex.Message);
       }
 
     }

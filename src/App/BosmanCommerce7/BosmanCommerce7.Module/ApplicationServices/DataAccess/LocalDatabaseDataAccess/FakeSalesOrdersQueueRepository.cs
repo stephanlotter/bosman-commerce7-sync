@@ -7,18 +7,18 @@
  */
 
 using Bogus;
+using BosmanCommerce7.Module.BusinessObjects;
 using BosmanCommerce7.Module.Models;
-using BosmanCommerce7.Module.Models.LocalDatabase;
 using CSharpFunctionalExtensions;
 
 namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess {
-  public class FakeSalesOrdersQueueRepository : ISalesOrdersQueueRepository {
+  public class FakeSalesOrdersQueueRepository : ISalesOrdersLocalRepository {
 
-    public Result<SalesOrdersQueueItemDto[]> LoadPendingQueueItems() {
-      var result = new Faker<SalesOrdersQueueItemDto>()
-        .RuleFor(a => a.OID, f => ++f.IndexVariable)
-        .RuleFor(a => a.SimpleCode, f => $"I{f.IndexFaker:0000}")
-        .RuleFor(a => a.QueueItemStatus, f => QueueItemStatus.New)
+    public Result<SalesOrder[]> LoadPendingSalesOrders() {
+      var result = new Faker<SalesOrder>()
+        .RuleFor(a => a.Oid, f => ++f.IndexVariable)
+        .RuleFor(a => a.OrderNumber, f => f.IndexFaker)
+        .RuleFor(a => a.PostingStatus, f => SalesOrderPostingStatus.New)
         .RuleFor(a => a.RetryCount, 0);
 
       return Result.Success(result.Generate(2).ToArray());

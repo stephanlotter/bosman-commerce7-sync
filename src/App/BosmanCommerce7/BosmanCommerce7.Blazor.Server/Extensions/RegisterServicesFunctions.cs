@@ -17,11 +17,16 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
 
     public static void RegisterServices(IServiceCollection services) {
       RegisterApiServices(services);
+      RegisterLocalDatabaseServices(services);
       RegisterEvolutionServices(services);
       RegisterUtilityServices(services);
       RegisterSalesOrderServices(services);
       RegisterSalesOrderSyncServices(services);
       RegisterSalesOrderPostServices(services);
+    }
+
+    private static void RegisterLocalDatabaseServices(IServiceCollection services) {
+      services.AddTransient<ILocalObjectSpaceProvider, LocalObjectSpaceProvider>();
     }
 
     private static void RegisterApiServices(IServiceCollection services) {
@@ -41,8 +46,8 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
     }
 
     private static void RegisterSalesOrderServices(IServiceCollection services) {
-      services.AddTransient<ISalesOrdersQueueRepository, SalesOrdersQueueRepository>();
-      
+      services.AddTransient<ISalesOrdersLocalRepository, SalesOrdersLocalRepository>();
+
     }
 
     private static void RegisterSalesOrderSyncServices(IServiceCollection services) {

@@ -22,50 +22,25 @@ namespace BosmanCommerce7.Module.BusinessObjects {
 
     private string? _customerId;
     private string? _onlineId;
+    private string? _channel;
     private DateTime _orderDate;
     private int? _orderNumber;
     private string? _evolutionSalesOrderNumber;
     private double _orderValueInVat;
+    private string? _shipToName;
+    private string? _shipToPhoneNumber;
     private string? _shipToAddress1;
     private string? _shipToAddress2;
+    private readonly string? _shipToAddress3;
     private string? _shipToAddressCity;
     private string? _shipToAddressProvince;
     private string? _shipToAddressPostalCode;
     private string? _shipToAddressCountryCode;
-    private string? _lineNotes;
     private string? _orderJson;
     private SalesOrderPostingStatus _postingStatus;
     private int _retryCount;
-    private DateTime _retryAfter;
-    private DateTime _datePosted;
-
-    [ModelDefault("AllowEdit", "false")]
-    public SalesOrderPostingStatus PostingStatus {
-      get => _postingStatus;
-      set => SetPropertyValue(nameof(PostingStatus), ref _postingStatus, value);
-    }
-
-    [ModelDefault("AllowEdit", "false")]
-    public int RetryCount {
-      get => _retryCount;
-      set => SetPropertyValue(nameof(RetryCount), ref _retryCount, value);
-    }
-
-    [ModelDefault("DisplayFormat", "{0:yyyy/MM/dd HH:mm:ss}")]
-    [ModelDefault("EditMask", "yyyy/MM/dd HH:mm:ss")]
-    [ModelDefault("AllowEdit", "false")]
-    public DateTime RetryAfter {
-      get => _retryAfter;
-      set => SetPropertyValue(nameof(RetryAfter), ref _retryAfter, value);
-    }
-
-    [ModelDefault("DisplayFormat", "{0:yyyy/MM/dd HH:mm:ss}")]
-    [ModelDefault("EditMask", "yyyy/MM/dd HH:mm:ss")]
-    [ModelDefault("AllowEdit", "false")]
-    public DateTime DatePosted {
-      get => _datePosted;
-      set => SetPropertyValue(nameof(DatePosted), ref _datePosted, value);
-    }
+    private DateTime? _retryAfter;
+    private DateTime? _datePosted;
 
     [Size(40)]
     [ModelDefault("AllowEdit", "false")]
@@ -76,9 +51,16 @@ namespace BosmanCommerce7.Module.BusinessObjects {
 
     [Size(40)]
     [ModelDefault("AllowEdit", "false")]
+    [Indexed(Unique = true)]
     public string? OnlineId {
       get => _onlineId;
       set => SetPropertyValue(nameof(OnlineId), ref _onlineId, value);
+    }
+
+    [ModelDefault("AllowEdit", "false")]
+    public string? Channel {
+      get => _channel;
+      set => SetPropertyValue(nameof(Channel), ref _channel, value);
     }
 
     [ModelDefault("AllowEdit", "false")]
@@ -99,6 +81,18 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     public int? OrderNumber {
       get => _orderNumber;
       set => SetPropertyValue(nameof(OrderNumber), ref _orderNumber, value);
+    }
+
+    [ModelDefault("AllowEdit", "false")]
+    public string? ShipToName {
+      get => _shipToName;
+      set => SetPropertyValue(nameof(ShipToName), ref _shipToName, value);
+    }
+
+    [ModelDefault("AllowEdit", "false")]
+    public string? ShipToPhoneNumber {
+      get => _shipToPhoneNumber;
+      set => SetPropertyValue(nameof(ShipToPhoneNumber), ref _shipToPhoneNumber, value);
     }
 
     [ModelDefault("AllowEdit", "false")]
@@ -145,11 +139,32 @@ namespace BosmanCommerce7.Module.BusinessObjects {
       set => SetPropertyValue(nameof(OrderValueInVat), ref _orderValueInVat, value);
     }
 
-    [Size(-1)]
     [ModelDefault("AllowEdit", "false")]
-    public string? LineNotes {
-      get => _lineNotes;
-      set => SetPropertyValue(nameof(LineNotes), ref _lineNotes, value);
+    public SalesOrderPostingStatus PostingStatus {
+      get => _postingStatus;
+      set => SetPropertyValue(nameof(PostingStatus), ref _postingStatus, value);
+    }
+
+    [ModelDefault("AllowEdit", "false")]
+    public int RetryCount {
+      get => _retryCount;
+      set => SetPropertyValue(nameof(RetryCount), ref _retryCount, value);
+    }
+
+    [ModelDefault("DisplayFormat", "{0:yyyy/MM/dd HH:mm:ss}")]
+    [ModelDefault("EditMask", "yyyy/MM/dd HH:mm:ss")]
+    [ModelDefault("AllowEdit", "false")]
+    public DateTime? RetryAfter {
+      get => _retryAfter;
+      set => SetPropertyValue(nameof(RetryAfter), ref _retryAfter, value);
+    }
+
+    [ModelDefault("DisplayFormat", "{0:yyyy/MM/dd HH:mm:ss}")]
+    [ModelDefault("EditMask", "yyyy/MM/dd HH:mm:ss")]
+    [ModelDefault("AllowEdit", "false")]
+    public DateTime? DatePosted {
+      get => _datePosted;
+      set => SetPropertyValue(nameof(DatePosted), ref _datePosted, value);
     }
 
     [Size(-1)]
@@ -170,6 +185,11 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     public XPCollection<SalesOrderProcessingLog> SalesOrderProcessingLogs => GetCollection<SalesOrderProcessingLog>(nameof(SalesOrderProcessingLogs));
 
     public SalesOrder(Session session) : base(session) { }
+
+    public override void AfterConstruction() {
+      base.AfterConstruction();
+      PostingStatus = SalesOrderPostingStatus.New;
+    }
 
   }
 

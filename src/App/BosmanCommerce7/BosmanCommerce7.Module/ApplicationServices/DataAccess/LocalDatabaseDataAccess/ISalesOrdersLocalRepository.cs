@@ -6,14 +6,14 @@
  *  
  */
 
+using BosmanCommerce7.Module.BusinessObjects;
 using BosmanCommerce7.Module.Models;
-using BosmanCommerce7.Module.Models.LocalDatabase;
 using CSharpFunctionalExtensions;
 
 namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess {
-  public interface ISalesOrdersQueueRepository {
+  public interface ISalesOrdersLocalRepository {
 
-    Result<SalesOrdersQueueItemDto[]> LoadPendingQueueItems();
+    Result<SalesOrder[]> LoadPendingSalesOrders();
 
     Result UpdateStatus(int oid, QueueItemStatus queueItemStatus, string? syncStatusDescription = null);
 

@@ -9,10 +9,13 @@
 
 using BosmanCommerce7.Blazor.Server.Extensions;
 using BosmanCommerce7.Blazor.Server.Services;
+using BosmanCommerce7.Module.BusinessObjects;
 using BosmanCommerce7.Module.Extensions;
+using DevExpress.ExpressApp;
 using DevExpress.ExpressApp.ApplicationBuilder;
 using DevExpress.ExpressApp.Blazor.ApplicationBuilder;
 using DevExpress.ExpressApp.Blazor.Services;
+using DevExpress.ExpressApp.Core;
 using Microsoft.AspNetCore.Components.Server.Circuits;
 
 namespace BosmanCommerce7.Blazor.Server;
@@ -59,6 +62,7 @@ public class Startup {
           })
           .AddNonPersistent();
     });
+
   }
 
   // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -15,7 +15,6 @@ using DevExpress.ExpressApp;
 using DevExpress.ExpressApp.Blazor.DesignTime;
 using DevExpress.ExpressApp.Design;
 using DevExpress.ExpressApp.Utils;
-using Microsoft.Extensions.Hosting;
 using Serilog;
 
 namespace BosmanCommerce7.Blazor.Server;

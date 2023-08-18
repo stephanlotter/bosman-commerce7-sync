@@ -26,6 +26,7 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     private double _taxAmount;
     private string? _onlineTaxType;
     private double _unitPriceInVat;
+    private string? _lineNotes;
 
     [Association("SalesOrder-SalesOrderLine")]
     public SalesOrder? SalesOrder {
@@ -54,7 +55,6 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     }
 
     [ModelDefault("AllowEdit", "false")]
-    // productTitle + productVariantTitle
     public string? LineDescription {
       get => _lineDescription;
       set => SetPropertyValue(nameof(LineDescription), ref _lineDescription, value);
@@ -63,7 +63,6 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     [ModelDefault("DisplayFormat", "{0:n2}")]
     [ModelDefault("EditMask", "n2")]
     [ModelDefault("AllowEdit", "false")]
-    // quantity
     public double Quantity {
       get => _quantity;
       set => SetPropertyValue(nameof(Quantity), ref _quantity, value);
@@ -95,6 +94,13 @@ namespace BosmanCommerce7.Module.BusinessObjects {
 
     [ModelDefault("DisplayFormat", "{0:n2}")]
     public double LineValueInVat => Quantity * UnitPriceInVat;
+    
+    [Size(-1)]
+    [ModelDefault("AllowEdit", "false")]
+    public string? LineNotes {
+      get => _lineNotes;
+      set => SetPropertyValue(nameof(LineNotes), ref _lineNotes, value);
+    }
 
     public SalesOrderLine(Session session) : base(session) { }
 

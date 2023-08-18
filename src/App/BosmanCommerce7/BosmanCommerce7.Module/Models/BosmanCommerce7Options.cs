@@ -58,11 +58,13 @@ namespace BosmanCommerce7.Module.Models {
 
     public DateTime StartDate { get; init; }
 
+    public string? ShippingGeneralLedgerAccountCode { get; init; }
+
+    public string? ShippingTaxType { get; init; }
+
   }
 
   public record SalesOrdersPostJobOptions : JobOptionsBase {
-
-    public string? ShippingGeneralLedgerAccountCode { get; init; }
 
   }
 
