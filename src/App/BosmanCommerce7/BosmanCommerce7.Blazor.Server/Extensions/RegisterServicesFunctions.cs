@@ -25,8 +25,8 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
     }
 
     private static void RegisterApiServices(IServiceCollection services) {
-      services.AddTransient<ICommerce7RestClient, Commerce7RestClient>();
-      services.AddTransient<ICommerce7RestClientService, Commerce7RestClientService>();
+      services.AddTransient<ICommerce7RestClientFactory, Commerce7RestClientFactory>();
+      services.AddTransient<ICommerce7ApiClientService, Commerce7ApiClientService>();
 
       //services.AddTransient<IViewGroupRestClient, ViewGroupRestClient>();
       //services.AddTransient<IMaterialRestClient, MaterialRestClient>();

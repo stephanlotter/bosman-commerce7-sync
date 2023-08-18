@@ -12,10 +12,10 @@ using RestSharp;
 
 namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients {
 
-  public class Commerce7RestClient : ICommerce7RestClient {
+  public class Commerce7RestClientFactory : ICommerce7RestClientFactory {
     private readonly Commerce7ApiOptions _apiOptions;
 
-    public Commerce7RestClient(Commerce7ApiOptions apiOptions) {
+    public Commerce7RestClientFactory(Commerce7ApiOptions apiOptions) {
       _apiOptions = apiOptions;
 
     }

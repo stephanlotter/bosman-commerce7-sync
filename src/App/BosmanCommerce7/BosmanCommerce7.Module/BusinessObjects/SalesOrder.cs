@@ -24,6 +24,7 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     private string? _onlineId;
     private DateTime _orderDate;
     private int? _orderNumber;
+    private string? _evolutionSalesOrderNumber;
     private double _orderValueInVat;
     private string? _shipToAddress1;
     private string? _shipToAddress2;
@@ -78,6 +79,12 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     public string? OnlineId {
       get => _onlineId;
       set => SetPropertyValue(nameof(OnlineId), ref _onlineId, value);
+    }
+
+    [ModelDefault("AllowEdit", "false")]
+    public string? EvolutionSalesOrderNumber {
+      get => _evolutionSalesOrderNumber;
+      set => SetPropertyValue(nameof(EvolutionSalesOrderNumber), ref _evolutionSalesOrderNumber, value);
     }
 
     [ModelDefault("DisplayFormat", "{0:yyyy/MM/dd HH:mm:ss}")]

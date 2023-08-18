@@ -16,11 +16,10 @@ using Microsoft.Extensions.Logging;
 using RestSharp;
 using RestSharp.Authenticators;
 
-namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients
-{
-    public class Commerce7RestClientService : ICommerce7RestClientService {
-    private readonly ILogger<Commerce7RestClientService> _logger;
-    private readonly ICommerce7RestClient _commerce7RestClient;
+namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients {
+  public class Commerce7ApiClientService : ICommerce7ApiClientService {
+    private readonly ILogger<Commerce7ApiClientService> _logger;
+    private readonly ICommerce7RestClientFactory _commerce7RestClient;
     private readonly Commerce7ApiOptions _apiOptions;
 
     private bool _isAuthenticating;
@@ -29,7 +28,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients
 
     public bool MustAuthenticate => string.IsNullOrWhiteSpace(_token) || _tokenExpiryDate <= DateTime.Now;
 
-    public Commerce7RestClientService(ILogger<Commerce7RestClientService> logger, ICommerce7RestClient commerce7RestClient, Commerce7ApiOptions apiOptions) {
+    public Commerce7ApiClientService(ILogger<Commerce7ApiClientService> logger, ICommerce7RestClientFactory commerce7RestClient, Commerce7ApiOptions apiOptions) {
       _logger = logger;
       _commerce7RestClient = commerce7RestClient;
       _apiOptions = apiOptions;

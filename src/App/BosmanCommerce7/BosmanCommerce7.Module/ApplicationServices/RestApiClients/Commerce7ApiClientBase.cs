@@ -1,7 +1,8 @@
 ﻿/* 
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
- * Date created: 2023-08-17 * Author	: Stephan J Lotter
+ * Date created: 2023-08-17
+ * Author	: Stephan J Lotter
  * Notes	: 
  *  
  */
@@ -13,11 +14,12 @@ using Microsoft.Extensions.Logging;
 using RestSharp;
 
 namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients {
-  public abstract class Commerce7RestClientBase {
-    private readonly ICommerce7RestClientService _commerce7RestClientService;
+
+  public abstract class Commerce7ApiClientBase {
+    private readonly ICommerce7ApiClientService _commerce7RestClientService;
     protected ILogger Logger { get; }
 
-    public Commerce7RestClientBase(ILogger logger, ICommerce7RestClientService commerce7RestClientService) {
+    public Commerce7ApiClientBase(ILogger logger, ICommerce7ApiClientService commerce7RestClientService) {
       Logger = logger;
       _commerce7RestClientService = commerce7RestClientService;
     }

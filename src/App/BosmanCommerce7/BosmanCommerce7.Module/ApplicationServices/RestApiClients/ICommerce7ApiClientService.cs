@@ -10,7 +10,7 @@ using BosmanCommerce7.Module.Models.RestApi;
 using RestSharp;
 
 namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients {
-  public interface ICommerce7RestClientService {
+  public interface ICommerce7ApiClientService {
 
     Commerce7ApiResponseBase Execute(Commerce7ApiRequestBase apiRequest, Action<RestClientOptions>? configOptions = null, Action<RestRequest>? configRestRequest = null);
 
