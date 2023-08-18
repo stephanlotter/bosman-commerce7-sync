@@ -26,6 +26,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
     private readonly ISalesOrdersApiClient _apiClient;
     private readonly ILocalObjectSpaceProvider _localObjectSpaceProvider;
 
+    private readonly List<string> _processedOrders = new();
+
     public SalesOrdersSyncService(ILogger<SalesOrdersSyncService> logger,
       SalesOrdersSyncJobOptions salesOrdersSyncJobOptions,
       IValueStoreRepository valueStoreRepository,
@@ -101,9 +103,17 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
           foreach (dynamic salesOrder in response.SalesOrders!) {
             Logger.LogInformation("Sales order found: {orderNumber}", $"{salesOrder.orderNumber}");
 
-            var localSalesOrder = NewOrder(salesOrder.id);
+            var orderDate = (DateTime)salesOrder.orderSubmittedDate;
+            lastOrderDate = lastOrderDate > orderDate ? lastOrderDate : orderDate;
 
-            lastOrderDate = lastOrderDate > localSalesOrder.OrderDate ? lastOrderDate : localSalesOrder.OrderDate;
+            if (_processedOrders.Contains($"{salesOrder.id}")) {
+              Logger.LogWarning("Sales order already processed: {orderNumber} [id:{id}]", $"{salesOrder.orderNumber}", $"{salesOrder.id}");
+              continue;
+            }
+
+            _processedOrders.Add($"{salesOrder.id}");
+
+            var localSalesOrder = NewOrder(salesOrder.id);
 
             if (localSalesOrder.OnlineId == $"{salesOrder.id}") {
               Logger.LogWarning("Sales order already exists: {orderNumber} [id:{id}]", $"{salesOrder.orderNumber}", $"{salesOrder.id}");
@@ -113,18 +123,20 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
             localSalesOrder.CustomerId = salesOrder.customerId;
             localSalesOrder.OnlineId = salesOrder.id;
             localSalesOrder.Channel = salesOrder.channel;
-            localSalesOrder.OrderDate = salesOrder.orderSubmittedDate;
+            localSalesOrder.OrderDate = orderDate;
             localSalesOrder.OrderNumber = salesOrder.orderNumber;
 
-            localSalesOrder.ShipToName = BuildShipToName(salesOrder.shipTo.firstName, salesOrder.shipTo.lastName);
-            localSalesOrder.ShipToPhoneNumber = salesOrder.shipTo.phone;
+            if (salesOrder.shipTo != null) {
+              localSalesOrder.ShipToName = BuildShipToName(salesOrder.shipTo.firstName, salesOrder.shipTo.lastName);
+              localSalesOrder.ShipToPhoneNumber = salesOrder.shipTo.phone;
 
-            localSalesOrder.ShipToAddress1 = salesOrder.shipTo.address;
-            localSalesOrder.ShipToAddress2 = salesOrder.shipTo.address2;
-            localSalesOrder.ShipToAddressCity = salesOrder.shipTo.city;
-            localSalesOrder.ShipToAddressProvince = salesOrder.shipTo.stateCode;
-            localSalesOrder.ShipToAddressPostalCode = salesOrder.shipTo.zipCode;
-            localSalesOrder.ShipToAddressCountryCode = salesOrder.shipTo.countryCode;
+              localSalesOrder.ShipToAddress1 = salesOrder.shipTo.address;
+              localSalesOrder.ShipToAddress2 = salesOrder.shipTo.address2;
+              localSalesOrder.ShipToAddressCity = salesOrder.shipTo.city;
+              localSalesOrder.ShipToAddressProvince = salesOrder.shipTo.stateCode;
+              localSalesOrder.ShipToAddressPostalCode = salesOrder.shipTo.zipCode;
+              localSalesOrder.ShipToAddressCountryCode = salesOrder.shipTo.countryCode;
+            }
 
             localSalesOrder.OrderJson = JsonConvert.SerializeObject(salesOrder);
 
@@ -178,7 +190,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
         });
 
-        _valueStoreRepository.SetDateTimeValue(ValueStoreKey, lastOrderDate);
+        _valueStoreRepository.SetDateTimeValue(ValueStoreKey, lastOrderDate.Date);
 
         return Result.Success(BuildResult());
       }
