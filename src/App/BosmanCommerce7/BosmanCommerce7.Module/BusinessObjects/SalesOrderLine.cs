@@ -78,6 +78,7 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     }
 
     [ModelDefault("AllowEdit", "false")]
+    [Size(20)]
     public string? OnlineTaxType {
       get => _onlineTaxType;
       set => SetPropertyValue(nameof(OnlineTaxType), ref _onlineTaxType, value);

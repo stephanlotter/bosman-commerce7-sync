@@ -108,7 +108,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients
 
         var request = new Commerce7AuthenticateApiRequest { };
         var response = Execute(request, options => {
-          options.Authenticator = new HttpBasicAuthenticator(_apiOptions.ClientId!, _apiOptions.ClientSecret!);
+          options.Authenticator = new HttpBasicAuthenticator(_apiOptions.AppId!, _apiOptions.AppSecretKey!);
         },
         request => {
           request.AddParameter("application/x-www-form-urlencoded", $"grant_type=client_credentials", ParameterType.RequestBody);

@@ -24,8 +24,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients {
       if (_apiOptions == null) { return Result.Failure<RestClient>("Commerce7ApiOptions cannot be empty. Please define a Commerce7ApiOptions section in the appsettings.json file under BosmanCommerce7Options"); }
 
       if (string.IsNullOrWhiteSpace(_apiOptions.Endpoint)) { return Result.Failure<RestClient>("Endpoint cannot be empty. Please define the Endpoint in the appsettings.json file under BosmanCommerce7Options.Commerce7ApiOptions.Endpoint"); }
-      if (string.IsNullOrWhiteSpace(_apiOptions.ClientId)) { return Result.Failure<RestClient>("ClientId cannot be empty. Please define the ClientId in the appsettings.json file under BosmanCommerce7Options.Commerce7ApiOptions.ClientId"); }
-      if (string.IsNullOrWhiteSpace(_apiOptions.ClientSecret)) { return Result.Failure<RestClient>("ClientSecret cannot be empty. Please define the ClientSecret in the appsettings.json file under BosmanCommerce7Options.Commerce7ApiOptions.ClientSecret"); }
+      if (string.IsNullOrWhiteSpace(_apiOptions.TenantId)) { return Result.Failure<RestClient>("TenantId cannot be empty. Please define the TenantId in the appsettings.json file under BosmanCommerce7Options.Commerce7ApiOptions.TenantId"); }
+      if (string.IsNullOrWhiteSpace(_apiOptions.AppId)) { return Result.Failure<RestClient>("AppId cannot be empty. Please define the AppId in the appsettings.json file under BosmanCommerce7Options.Commerce7ApiOptions.AppId"); }
+      if (string.IsNullOrWhiteSpace(_apiOptions.AppSecretKey)) { return Result.Failure<RestClient>("AppSecretKey cannot be empty. Please define the AppSecretKey in the appsettings.json file under BosmanCommerce7Options.Commerce7ApiOptions.AppSecretKey"); }
 
       var options = new RestClientOptions(_apiOptions.Endpoint!) { };
 

@@ -8,10 +8,11 @@
  */
 
 namespace BosmanCommerce7.Module.Models {
-
-  public enum SalesOrderLineType {
-    Inventory = 1,
-    GeneralLedger = 2
+  public enum SalesOrderPostingStatus {
+    New,
+    Posted,
+    Retrying,
+    Failed
   }
 
 }

@@ -7,6 +7,8 @@
  *  
  */
 
+using System.ComponentModel;
+using BosmanCommerce7.Module.Models;
 using DevExpress.ExpressApp.Model;
 using DevExpress.Persistent.Base;
 using DevExpress.Xpo;
@@ -15,6 +17,7 @@ namespace BosmanCommerce7.Module.BusinessObjects {
 
   [DefaultClassOptions]
   [NavigationItem(true)]
+  [DefaultProperty(nameof(OrderNumber))]
   public class SalesOrder : XPObject {
 
     private string? _customerId;
@@ -30,6 +33,38 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     private string? _shipToAddressCountryCode;
     private string? _lineNotes;
     private string? _orderJson;
+    private SalesOrderPostingStatus _postingStatus;
+    private int _retryCount;
+    private DateTime _retryAfter;
+    private DateTime _datePosted;
+
+    [ModelDefault("AllowEdit", "false")]
+    public SalesOrderPostingStatus PostingStatus {
+      get => _postingStatus;
+      set => SetPropertyValue(nameof(PostingStatus), ref _postingStatus, value);
+    }
+
+    [ModelDefault("AllowEdit", "false")]
+    public int RetryCount {
+      get => _retryCount;
+      set => SetPropertyValue(nameof(RetryCount), ref _retryCount, value);
+    }
+
+    [ModelDefault("DisplayFormat", "{0:yyyy/MM/dd HH:mm:ss}")]
+    [ModelDefault("EditMask", "yyyy/MM/dd HH:mm:ss")]
+    [ModelDefault("AllowEdit", "false")]
+    public DateTime RetryAfter {
+      get => _retryAfter;
+      set => SetPropertyValue(nameof(RetryAfter), ref _retryAfter, value);
+    }
+
+    [ModelDefault("DisplayFormat", "{0:yyyy/MM/dd HH:mm:ss}")]
+    [ModelDefault("EditMask", "yyyy/MM/dd HH:mm:ss")]
+    [ModelDefault("AllowEdit", "false")]
+    public DateTime DatePosted {
+      get => _datePosted;
+      set => SetPropertyValue(nameof(DatePosted), ref _datePosted, value);
+    }
 
     [Size(40)]
     [ModelDefault("AllowEdit", "false")]
@@ -121,6 +156,11 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     [Aggregated]
     [ModelDefault("AllowEdit", "false")]
     public XPCollection<SalesOrderLine> SalesOrderLines => GetCollection<SalesOrderLine>(nameof(SalesOrderLines));
+
+    [Association("SalesOrder-SalesOrderProcessingLog")]
+    [Aggregated]
+    [ModelDefault("AllowEdit", "false")]
+    public XPCollection<SalesOrderProcessingLog> SalesOrderProcessingLogs => GetCollection<SalesOrderProcessingLog>(nameof(SalesOrderProcessingLogs));
 
     public SalesOrder(Session session) : base(session) { }
 
