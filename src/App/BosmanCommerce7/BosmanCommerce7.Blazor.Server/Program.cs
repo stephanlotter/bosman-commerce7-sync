@@ -15,6 +15,7 @@ using DevExpress.ExpressApp;
 using DevExpress.ExpressApp.Blazor.DesignTime;
 using DevExpress.ExpressApp.Design;
 using DevExpress.ExpressApp.Utils;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 
 namespace BosmanCommerce7.Blazor.Server;
@@ -64,11 +65,15 @@ public class Program : IDesignTimeApplicationFactory {
   }
 
   public static IHostBuilder CreateHostBuilder(string[] args) {
-    return Host
+    var hostBuilder = Host
       .CreateDefaultBuilder(args)
       .ConfigureWebHostDefaults(webBuilder => {
         webBuilder.UseStartup<Startup>();
       });
+
+    hostBuilder.UseSerilog();
+
+    return hostBuilder;
   }
 
   XafApplication IDesignTimeApplicationFactory.Create() {
@@ -82,7 +87,7 @@ public class Program : IDesignTimeApplicationFactory {
   }
 
   private static void StartHostedServices(IServiceProvider serviceProvider) {
-    var options = ServiceProviderFunctions.GetBosmanCommerce7Options(serviceProvider);
+    var options = ServiceProviderFunctions.GetApplicationOptions(serviceProvider);
     var logger = serviceProvider.GetService<ILogger<Program>>();
 
     QuartzApplicationFunctions.StartJobs(new QuartzStartJobContext {

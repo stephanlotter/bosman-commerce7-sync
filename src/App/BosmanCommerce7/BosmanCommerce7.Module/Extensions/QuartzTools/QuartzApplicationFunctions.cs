@@ -89,7 +89,7 @@ namespace BosmanCommerce7.Module.Extensions.QuartzTools {
 
     public ILogger Logger { get; init; } = default!;
 
-    public BosmanCommerce7Options Options { get; init; } = default!;
+    public ApplicationOptions Options { get; init; } = default!;
 
   }
 

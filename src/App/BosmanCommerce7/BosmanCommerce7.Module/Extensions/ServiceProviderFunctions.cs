@@ -13,8 +13,8 @@ using Microsoft.Extensions.DependencyInjection;
 namespace BosmanCommerce7.Module.Extensions {
   public static class ServiceProviderFunctions {
 
-    public static BosmanCommerce7Options GetBosmanCommerce7Options(IServiceProvider serviceProvider) {
-      var service = serviceProvider.GetService<BosmanCommerce7Options>() ?? throw new Exception($"{nameof(BosmanCommerce7Options)} not defined in appsettings.json.");
+    public static ApplicationOptions GetApplicationOptions(IServiceProvider serviceProvider) {
+      var service = serviceProvider.GetService<ApplicationOptions>() ?? throw new Exception($"{nameof(ApplicationOptions)} not defined in appsettings.json.");
       return service;
     }
 

@@ -49,7 +49,7 @@ public class Startup {
       builder.ObjectSpaceProviders
           .AddXpo((serviceProvider, options) => {
 
-            var o = ServiceProviderFunctions.GetBosmanCommerce7Options(serviceProvider);
+            var o = ServiceProviderFunctions.GetApplicationOptions(serviceProvider);
             string? connectionString = o.ConnectionStrings.LocalDatabase;
 
             ArgumentNullException.ThrowIfNull(connectionString);

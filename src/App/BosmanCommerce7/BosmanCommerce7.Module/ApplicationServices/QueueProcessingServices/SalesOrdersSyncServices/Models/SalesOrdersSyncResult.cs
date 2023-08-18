@@ -7,13 +7,7 @@
  *  
  */
 
-using BosmanCommerce7.Module.Models.LocalDatabase;
-
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices.Models {
-  public record SalesOrdersSyncResult {
-
-    public SalesOrdersQueueItemDto SalesOrdersQueueItem { get; init; } = default!;
-
-  }
+  public record SalesOrdersSyncResult { }
 
 }

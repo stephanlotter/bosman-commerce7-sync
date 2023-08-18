@@ -1,7 +1,8 @@
 ﻿/* 
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
- * Date created: 2023-08-17 * Author	: Stephan J Lotter
+ * Date created: 2023-08-17
+ * Author	: Stephan J Lotter
  * Notes	: 
  *  
  */
@@ -10,7 +11,7 @@ using RestSharp;
 
 namespace BosmanCommerce7.Module.Models.RestApi {
 
-  public abstract record Commerce7ApiRequestBase {
+  public abstract record ApiRequestBase {
 
     public virtual object? Data { get; }
 

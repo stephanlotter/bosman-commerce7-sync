@@ -10,7 +10,7 @@ using CSharpFunctionalExtensions;
 using RestSharp;
 
 namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients {
-  public interface ICommerce7RestClientFactory {
+  public interface IRestClientFactory {
 
     Result<RestClient> NewRestClient(Action<RestClientOptions>? configOptions = null);
 

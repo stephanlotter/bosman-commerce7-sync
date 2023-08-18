@@ -25,12 +25,10 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
     }
 
     private static void RegisterApiServices(IServiceCollection services) {
-      services.AddTransient<ICommerce7RestClientFactory, Commerce7RestClientFactory>();
-      services.AddTransient<ICommerce7ApiClientService, Commerce7ApiClientService>();
+      services.AddTransient<IRestClientFactory, RestClientFactory>();
+      services.AddTransient<IApiClientService, ApiClientService>();
 
-      //services.AddTransient<IViewGroupRestClient, ViewGroupRestClient>();
-      //services.AddTransient<IMaterialRestClient, MaterialRestClient>();
-      //services.AddTransient<IItemMasterRestClient, ItemMasterRestClient>();
+      services.AddTransient<ISalesOrdersApiClient, SalesOrdersApiClient>();
     }
 
     private static void RegisterEvolutionServices(IServiceCollection services) {
@@ -64,15 +62,15 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
         services.AddSingleton(instance.GetType(), instance);
       }
 
-      var options = new BosmanCommerce7Options();
+      var options = new ApplicationOptions();
 
-      AddConfig("BosmanCommerce7Options", options);
+      AddConfig("ApplicationOptions", options);
 
       services.AddSingleton<ILocalDatabaseConnectionStringProvider>(options.ConnectionStrings);
       services.AddSingleton<IEvolutionDatabaseConnectionStringProvider>(options.ConnectionStrings);
       services.AddSingleton(options.SalesOrdersSyncJobOptions);
       services.AddSingleton(options.SalesOrdersPostJobOptions);
-      services.AddSingleton(options.Commerce7ApiOptions);
+      services.AddSingleton(options.ApiOptions);
 
     }
 

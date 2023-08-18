@@ -8,11 +8,11 @@
  */
 
 namespace BosmanCommerce7.Module.Models {
-  public record BosmanCommerce7Options {
+  public record ApplicationOptions {
 
     public string AppDataFolder { get; init; } = @"..\App_Data";
 
-    public Commerce7ApiOptions Commerce7ApiOptions { get; init; } = default!;
+    public ApiOptions ApiOptions { get; init; } = default!;
 
     public ConnectionStrings ConnectionStrings { get; init; } = default!;
 
@@ -30,7 +30,7 @@ namespace BosmanCommerce7.Module.Models {
 
   }
 
-  public record Commerce7ApiOptions {
+  public record ApiOptions {
 
     public string? Endpoint { get; set; }
 

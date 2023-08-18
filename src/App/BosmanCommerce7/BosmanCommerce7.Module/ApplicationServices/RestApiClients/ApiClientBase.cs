@@ -15,26 +15,25 @@ using RestSharp;
 
 namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients {
 
-  public abstract class Commerce7ApiClientBase {
-    private readonly ICommerce7ApiClientService _commerce7RestClientService;
+  public abstract class ApiClientBase {
+    private readonly IApiClientService _apiClientService;
     protected ILogger Logger { get; }
 
-    public Commerce7ApiClientBase(ILogger logger, ICommerce7ApiClientService commerce7RestClientService) {
+    public ApiClientBase(ILogger logger, IApiClientService apiClientService) {
       Logger = logger;
-      _commerce7RestClientService = commerce7RestClientService;
+      _apiClientService = apiClientService;
     }
 
-    protected Result<T> SendRequest<T>(
-      Commerce7ApiRequestBase apiRequest,
-      Func<dynamic, Result<T>> onSuccess,
-      Action<RestRequest>? configRestRequest = null) {
-      var response = _commerce7RestClientService.Execute(apiRequest, configRestRequest: configRestRequest);
-      if (response is Commerce7ApiResponseBase.Failure f) {
+    protected Result<T> SendRequest<T>(ApiRequestBase apiRequest, Func<dynamic, Result<T>> onSuccess, Action<RestRequest>? configRestRequest = null) {
+
+      var response = _apiClientService.Execute(apiRequest, configRestRequest: configRestRequest);
+
+      if (response is ApiResponseBase.Failure f) {
         Logger.LogError("{error}", f.FullErrorMessage);
         return Result.Failure<T>(f.FullErrorMessage);
       }
 
-      var successResponse = response as Commerce7ApiResponseBase.Success;
+      var successResponse = response as ApiResponseBase.Success;
 
       if (apiRequest.DeserializeBody && IsResponseBodyEmpty(successResponse!)) { return Result.Failure<T>("Response body empty."); }
 
@@ -46,11 +45,11 @@ namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients {
       return onSuccess(data);
     }
 
-    protected bool IsResponseBodyEmpty(Commerce7ApiResponseBase responseBase) {
+    protected bool IsResponseBodyEmpty(ApiResponseBase responseBase) {
       return string.IsNullOrWhiteSpace(responseBase.ResonseBody);
     }
 
-    protected Result<T> Deserialize<T>(Result<Commerce7ApiResponseBase.Success> response) {
+    protected Result<T> Deserialize<T>(Result<ApiResponseBase.Success> response) {
       try {
         var value = response.Value;
         var data = JsonFunctions.Deserialize<T>(value.ResonseBody ?? "");

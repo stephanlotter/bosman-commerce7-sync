@@ -10,17 +10,17 @@ using System.Text;
 using BosmanCommerce7.Module.Extensions;
 
 namespace BosmanCommerce7.Module.Models.RestApi {
-  public abstract record Commerce7ApiResponseBase {
+  public abstract record ApiResponseBase {
 
     public string? ResonseBody { get; init; }
 
     public byte[]? ResponseRawBytes { get; init; }
 
-    public record Success : Commerce7ApiResponseBase {
+    public record Success : ApiResponseBase {
 
     }
 
-    public record Failure : Commerce7ApiResponseBase {
+    public record Failure : ApiResponseBase {
 
       public string? Uri { get; init; }
 

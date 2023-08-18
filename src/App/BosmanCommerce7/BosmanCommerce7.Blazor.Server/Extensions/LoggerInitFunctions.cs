@@ -39,7 +39,7 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
 
       var regEx = new Regex(pattern.Replace("\r", "").Replace("\n", ""));
 
-      var options = ServiceProviderFunctions.GetBosmanCommerce7Options(serviceProvider);
+      var options = ServiceProviderFunctions.GetApplicationOptions(serviceProvider);
       var logFile = Path.Combine(options.InAppDataFolder("logs"), "log.txt");
 
       const string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3} {SourceContext}] {Message:lj}{NewLine}{Exception}";

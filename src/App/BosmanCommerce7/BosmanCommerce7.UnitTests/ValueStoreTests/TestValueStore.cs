@@ -9,9 +9,6 @@
 
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
 using BosmanCommerce7.Module.Models;
-using FakeItEasy;
-using FluentAssertions;
-using Microsoft.Extensions.Logging;
 
 namespace BosmanCommerce7.UnitTests.ValueStoreTests {
   public class TestValueStore {

@@ -12,7 +12,7 @@ namespace BosmanCommerce7.Module.Extensions {
   public static class JsonFunctions {
 
     public static string? Serialize(object? data) {
-      if (data is string) { return $"{data}"; }
+      if (data is string) { return $"{data ?? ""}"; }
 
       var settings = new JsonSerializerSettings {
         NullValueHandling = NullValueHandling.Ignore

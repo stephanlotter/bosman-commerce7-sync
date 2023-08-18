@@ -14,13 +14,13 @@ using Microsoft.Extensions.Logging;
 namespace BosmanCommerce7.Module.ApplicationServices.AppDataServices {
   public class AppDataFileManager : IAppDataFileManager {
     private readonly ILogger<AppDataFileManager> _logger;
-    private readonly BosmanCommerce7Options _BosmanCommerce7Options;
+    private readonly ApplicationOptions _applicationOptions;
 
-    public string RootFolder => _BosmanCommerce7Options.AppDataFolder;
+    public string RootFolder => _applicationOptions.AppDataFolder;
 
-    public AppDataFileManager(ILogger<AppDataFileManager> logger, BosmanCommerce7Options BosmanCommerce7Options) {
+    public AppDataFileManager(ILogger<AppDataFileManager> logger, ApplicationOptions applicationOptions) {
       _logger = logger;
-      _BosmanCommerce7Options = BosmanCommerce7Options;
+      _applicationOptions = applicationOptions;
     }
 
     public Result<T?> LoadJson<T>(string subfolderName, string filename) {
@@ -82,7 +82,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.AppDataServices {
     }
 
     private string BuildFilename(string subfolderName, string filename) {
-      var path = _BosmanCommerce7Options.InAppDataFolder(subfolderName);
+      var path = _applicationOptions.InAppDataFolder(subfolderName);
       var file = Path.Combine(path, filename);
       return file;
     }
