@@ -12,6 +12,7 @@ using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOr
 using BosmanCommerce7.Module.Models;
 using BosmanCommerce7.Module.Models.LocalDatabase;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices {
   public class SalesOrdersSyncQueueService : SyncQueueServiceBase, ISalesOrdersSyncQueueService {
@@ -20,6 +21,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
     private readonly ISalesOrdersSyncService _salesOrdersSyncService;
 
     public SalesOrdersSyncQueueService(ILogger<SalesOrdersSyncQueueService> logger,
+      IOptions<SalesOrdersSyncJobOptions> options,
       IEvolutionInventoryRepository evolutionInventoryRepository,
       ISalesOrdersQueueRepository salesOrdersQueueRepository,
       ISalesOrdersSyncService salesOrdersSyncService) : base(logger) {

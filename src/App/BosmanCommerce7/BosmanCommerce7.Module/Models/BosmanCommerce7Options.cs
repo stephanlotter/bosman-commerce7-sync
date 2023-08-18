@@ -32,9 +32,11 @@ namespace BosmanCommerce7.Module.Models {
 
     public string? Endpoint { get; set; }
 
-    public string? ClientId { get; set; }
+    public string? TenantId { get; set; }
 
-    public string? ClientSecret { get; set; }
+    public string? AppId { get; set; }
+
+    public string? AppSecretKey { get; set; }
 
   }
 
@@ -49,6 +51,7 @@ namespace BosmanCommerce7.Module.Models {
   }
 
   public record SalesOrdersSyncJobOptions : JobOptionsBase {
+    public string? ShippingGeneralLedgerAccountCode { get; init; }
 
   }
 
