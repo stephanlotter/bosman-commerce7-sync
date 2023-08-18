@@ -15,5 +15,7 @@ namespace BosmanCommerce7.Module.Extensions.QuartzTools {
 
     public const string SalesOrdersSyncJob = nameof(SalesOrdersSyncJob);
 
+    public const string SalesOrdersPostJob = nameof(SalesOrdersPostJob);
+
   }
 }

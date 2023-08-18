@@ -20,6 +20,8 @@ namespace BosmanCommerce7.Module.Models {
 
     public SalesOrdersSyncJobOptions SalesOrdersSyncJobOptions { get; init; } = default!;
 
+    public SalesOrdersPostJobOptions SalesOrdersPostJobOptions { get; init; } = default!;
+
     public string InAppDataFolder(string path) {
       var p = Path.Combine(AppDataFolder, path);
       if (!Directory.Exists(p)) { Directory.CreateDirectory(p); }
@@ -51,6 +53,10 @@ namespace BosmanCommerce7.Module.Models {
   }
 
   public record SalesOrdersSyncJobOptions : JobOptionsBase {
+
+  }
+
+  public record SalesOrdersPostJobOptions : JobOptionsBase {
     public string? ShippingGeneralLedgerAccountCode { get; init; }
 
   }

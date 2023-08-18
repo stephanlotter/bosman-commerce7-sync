@@ -7,6 +7,8 @@
  */
 
 using BosmanCommerce7.Module.ApplicationServices.AppDataServices;
+using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices;
 using BosmanCommerce7.Module.ApplicationServices.RestApiClients;
 using BosmanCommerce7.Module.Models;
 
@@ -17,6 +19,9 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
       RegisterApiServices(services);
       RegisterEvolutionServices(services);
       RegisterUtilityServices(services);
+      RegisterSalesOrderServices(services);
+      RegisterSalesOrderSyncServices(services);
+      RegisterSalesOrderPostServices(services);
     }
 
     private static void RegisterApiServices(IServiceCollection services) {
@@ -34,6 +39,22 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
 
     private static void RegisterUtilityServices(IServiceCollection services) {
       services.AddTransient<IAppDataFileManager, AppDataFileManager>();
+      services.AddTransient<IValueStoreRepository, ValueStoreRepository>();
+    }
+
+    private static void RegisterSalesOrderServices(IServiceCollection services) {
+      services.AddTransient<ISalesOrdersQueueRepository, SalesOrdersQueueRepository>();
+      
+    }
+
+    private static void RegisterSalesOrderSyncServices(IServiceCollection services) {
+      services.AddTransient<ISalesOrdersSyncQueueService, SalesOrdersSyncQueueService>();
+      services.AddTransient<ISalesOrdersSyncService, SalesOrdersSyncService>();
+    }
+
+    private static void RegisterSalesOrderPostServices(IServiceCollection services) {
+      services.AddTransient<ISalesOrdersPostQueueService, SalesOrdersPostQueueService>();
+      services.AddTransient<ISalesOrdersPostService, SalesOrdersPostService>();
     }
 
     public static void RegisterConfig(IServiceCollection services, IConfiguration configuration) {

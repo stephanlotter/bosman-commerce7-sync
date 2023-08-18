@@ -10,6 +10,7 @@ using BosmanCommerce7.Module.Models;
 using Microsoft.Extensions.Logging;
 
 namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess {
+
   public abstract class LocalDatabaseRepositoryBase : SqlServerRepositoryBase {
     protected ILocalDatabaseConnectionStringProvider ConnectionStringProvider { get; }
 

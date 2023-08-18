@@ -31,5 +31,4 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     public TaxMapping(Session session) : base(session) { }
 
   }
-
 }
