@@ -19,7 +19,7 @@ namespace BosmanCommerce7.Module.Controllers {
     private readonly IServiceProvider? _serviceProvider;
 
     public FetchNowActionController() {
-      TargetObjectType = typeof(SalesOrder);
+      TargetObjectType = typeof(OnlineSalesOrder);
       TargetViewType = ViewType.ListView;
       TargetViewNesting = Nesting.Root;
     }

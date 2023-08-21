@@ -32,8 +32,8 @@ public class Startup {
   public void ConfigureServices(IServiceCollection services) {
     services.AddSingleton(typeof(Microsoft.AspNetCore.SignalR.HubConnectionHandler<>), typeof(ProxyHubConnectionHandler<>));
 
-    RegisterServicesFunctions.RegisterServices(services);
     RegisterServicesFunctions.RegisterConfig(services, Configuration);
+    RegisterServicesFunctions.RegisterServices(services);
 
     services.AddRazorPages();
     services.AddServerSideBlazor();

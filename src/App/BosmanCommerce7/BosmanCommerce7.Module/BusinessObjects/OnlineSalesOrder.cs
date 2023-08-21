@@ -8,6 +8,7 @@
  */
 
 using System.ComponentModel;
+using BosmanCommerce7.Module.Extensions;
 using BosmanCommerce7.Module.Models;
 using DevExpress.ExpressApp.Model;
 using DevExpress.Persistent.Base;
@@ -18,7 +19,7 @@ namespace BosmanCommerce7.Module.BusinessObjects {
   [DefaultClassOptions]
   [NavigationItem(true)]
   [DefaultProperty(nameof(OrderNumber))]
-  public class SalesOrder : XPObject {
+  public class OnlineSalesOrder : XPObject {
 
     private string? _customerId;
     private string? _onlineId;
@@ -78,6 +79,7 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     }
 
     [ModelDefault("AllowEdit", "false")]
+    [Indexed(Unique = true)]
     public int? OrderNumber {
       get => _orderNumber;
       set => SetPropertyValue(nameof(OrderNumber), ref _orderNumber, value);
@@ -145,7 +147,6 @@ namespace BosmanCommerce7.Module.BusinessObjects {
       set => SetPropertyValue(nameof(ProjectCode), ref _projectCode, value);
     }
 
-
     [ModelDefault("AllowEdit", "false")]
     public SalesOrderPostingStatus PostingStatus {
       get => _postingStatus;
@@ -181,21 +182,41 @@ namespace BosmanCommerce7.Module.BusinessObjects {
       set => SetPropertyValue(nameof(OrderJson), ref _orderJson, value);
     }
 
-    [Association("SalesOrder-SalesOrderLine")]
+    [Association("OnlineSalesOrder-OnlineSalesOrderLine")]
     [Aggregated]
     [ModelDefault("AllowEdit", "false")]
-    public XPCollection<SalesOrderLine> SalesOrderLines => GetCollection<SalesOrderLine>(nameof(SalesOrderLines));
+    public XPCollection<OnlineSalesOrderLine> SalesOrderLines => GetCollection<OnlineSalesOrderLine>(nameof(SalesOrderLines));
 
-    [Association("SalesOrder-SalesOrderProcessingLog")]
+    [Association("OnlineSalesOrder-OnlineSalesOrderProcessingLog")]
     [Aggregated]
     [ModelDefault("AllowEdit", "false")]
-    public XPCollection<SalesOrderProcessingLog> SalesOrderProcessingLogs => GetCollection<SalesOrderProcessingLog>(nameof(SalesOrderProcessingLogs));
+    public XPCollection<OnlineSalesOrderProcessingLog> SalesOrderProcessingLogs => GetCollection<OnlineSalesOrderProcessingLog>(nameof(SalesOrderProcessingLogs));
 
-    public SalesOrder(Session session) : base(session) { }
+    public OnlineSalesOrder(Session session) : base(session) { }
 
     public override void AfterConstruction() {
       base.AfterConstruction();
       PostingStatus = SalesOrderPostingStatus.New;
+      RetryAfter = DateTime.Now;
+    }
+
+    public void PostLog(string shortDescription, Exception ex) {
+      PostLog(shortDescription, ExceptionFunctions.GetMessages(ex));
+    }
+
+    public void PostLog(string shortDescription, string? details = null) {
+      if (shortDescription.Length > 100) {
+        shortDescription = shortDescription[..100];
+        details = shortDescription + "\r\n" + (details ?? "");
+      }
+
+      var log = new OnlineSalesOrderProcessingLog(Session) {
+        ShortDescription = shortDescription,
+        Details = details
+      };
+
+      log.Save();
+      SalesOrderProcessingLogs.Add(log);
     }
 
   }

@@ -19,7 +19,7 @@ namespace BosmanCommerce7.Module.Controllers {
     private readonly IServiceProvider? _serviceProvider;
 
     public PostNowActionController() {
-      TargetObjectType = typeof(SalesOrder);
+      TargetObjectType = typeof(OnlineSalesOrder);
       TargetViewType = ViewType.ListView;
       TargetViewNesting = Nesting.Root;
     }
@@ -30,7 +30,7 @@ namespace BosmanCommerce7.Module.Controllers {
     }
 
     protected override void CreateActions() {
-      var criteria = "PostingStatus".InCriteriaOperator(QueueItemStatus.New, SalesOrderPostingStatus.Retrying, QueueItemStatus.Failed).ToCriteriaString();
+      var criteria = "PostingStatus".InCriteriaOperator(SalesOrderPostingStatus.New, SalesOrderPostingStatus.Retrying, SalesOrderPostingStatus.Failed).ToCriteriaString();
       var action = NewAction("Post now", (s, e) => { Execute(); },
         selectionDependencyType: SelectionDependencyType.Independent,
         targetObjectsCriteria: criteria);
@@ -40,13 +40,13 @@ namespace BosmanCommerce7.Module.Controllers {
       View.CommitChangesIfEditState();
 
       var userHasSelectedSalesOrders = View.SelectedObjects.Count > 0;
-      var selectedSalesOrders = userHasSelectedSalesOrders ? View.SelectedObjects.Cast<SalesOrder>().ToList() : new List<SalesOrder>();
+      var selectedSalesOrders = userHasSelectedSalesOrders ? View.SelectedObjects.Cast<OnlineSalesOrder>().ToList() : new List<OnlineSalesOrder>();
 
       var criteria = userHasSelectedSalesOrders
         ? "Oid".InCriteriaOperator(selectedSalesOrders.Select(a => a.Oid))
-        : "PostingStatus".InCriteriaOperator(QueueItemStatus.New, SalesOrderPostingStatus.Retrying).ToCriteriaString();
+        : "PostingStatus".InCriteriaOperator(SalesOrderPostingStatus.New, SalesOrderPostingStatus.Retrying);
 
-      var salesOrders = ObjectSpace.GetObjects<SalesOrder>(criteria).ToList();
+      var salesOrders = ObjectSpace.GetObjects<OnlineSalesOrder>(criteria).ToList();
 
       // TODO: Implement posting of sales orders
 

@@ -10,7 +10,9 @@ using BosmanCommerce7.Module.ApplicationServices.AppDataServices;
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices;
 using BosmanCommerce7.Module.ApplicationServices.RestApiClients;
+using BosmanCommerce7.Module.Extensions.EvolutionSdk;
 using BosmanCommerce7.Module.Models;
+using Microsoft.Extensions.Options;
 
 namespace BosmanCommerce7.Blazor.Server.Extensions {
   public static class RegisterServicesFunctions {
@@ -37,7 +39,9 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
     }
 
     private static void RegisterEvolutionServices(IServiceCollection services) {
-      //services.AddTransient<IEvolutionInventoryRepository, EvolutionInventoryRepository>();
+      services.AddSingleton<IEvolutionCompanyDescriptor, EvolutionCompanyDescriptor>(serviceProvider => Instance(serviceProvider));
+      services.AddTransient<IEvolutionSdk, EvolutionSdk>();
+      services.AddTransient<IPostToEvolutionSalesOrderService, PostToEvolutionSalesOrderService>();
     }
 
     private static void RegisterUtilityServices(IServiceCollection services) {
@@ -46,8 +50,6 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
     }
 
     private static void RegisterSalesOrderServices(IServiceCollection services) {
-      services.AddTransient<ISalesOrdersLocalRepository, SalesOrdersLocalRepository>();
-
     }
 
     private static void RegisterSalesOrderSyncServices(IServiceCollection services) {
@@ -78,6 +80,17 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
       services.AddSingleton(options.SalesOrdersPostJobOptions);
       services.AddSingleton(options.ApiOptions);
 
+    }
+
+    private static EvolutionCompanyDescriptor Instance(IServiceProvider serviceProvider) {
+      var options = serviceProvider.GetService<IEvolutionDatabaseConnectionStringProvider>();
+      var companyDatabaseConnectionString = options!.EvolutionCompany;
+      var commonDatabaseConnectionString = options!.EvolutionCommon;
+
+      if (string.IsNullOrWhiteSpace(companyDatabaseConnectionString)) { throw new Exception("EvolutionCompanyConnectionString is null or empty"); }
+      if (string.IsNullOrWhiteSpace(commonDatabaseConnectionString)) { throw new Exception("CommonDatabaseConnectionString is null or empty"); }
+
+      return new EvolutionCompanyDescriptor(companyDatabaseConnectionString, commonDatabaseConnectionString);
     }
 
   }

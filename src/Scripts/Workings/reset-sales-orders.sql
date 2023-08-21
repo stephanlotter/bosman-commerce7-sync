@@ -1,7 +1,7 @@
 use BosmanCommerce7;
 
-select * from SalesOrder s order by s.OrderDate desc;
-select * from SalesOrderLine order by SalesOrder;
+select * from OnlineSalesOrder s order by s.OrderDate desc;
+select * from OnlineSalesOrderLine order by OnlineSalesOrder;
 
 /*
 delete from SalesOrderLine

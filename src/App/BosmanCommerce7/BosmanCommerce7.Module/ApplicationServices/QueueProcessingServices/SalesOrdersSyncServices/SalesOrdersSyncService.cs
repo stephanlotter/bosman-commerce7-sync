@@ -15,6 +15,7 @@ using BosmanCommerce7.Module.Extensions;
 using BosmanCommerce7.Module.Models;
 using CSharpFunctionalExtensions;
 using CSharpFunctionalExtensions.ValueTasks;
+using DevExpress.Data.Filtering;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -96,13 +97,18 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
         }
 
         _localObjectSpaceProvider.WrapInObjectSpaceTransaction(objectSpace => {
-          SalesOrder NewOrder(dynamic id) {
-            var order = objectSpace.FindObject<SalesOrder>("OnlineId".IsEqualToOperator($"{id}"));
-            return order ?? objectSpace.CreateObject<SalesOrder>();
+          OnlineSalesOrder NewOrder(dynamic id, dynamic orderNumber) {
+            var criteria = CriteriaOperator.Or("OnlineId".IsEqualToOperator($"{id}"), "OrderNumber".IsEqualToOperator($"{orderNumber}"));
+            var orders = objectSpace.GetObjects<OnlineSalesOrder>(criteria);
+            if (orders.Count > 1) {
+              Logger.LogWarning("Multiple sales orders found:[Order number:{orderNumber}][id:{id}]", $"{orderNumber}", $"{id}");
+            }
+            var order = orders.FirstOrDefault();
+            return order ?? objectSpace.CreateObject<OnlineSalesOrder>();
           }
 
-          SalesOrderLine NewLine(SalesOrder localSalesOrder) {
-            var localSalesOrderLine = objectSpace.CreateObject<SalesOrderLine>();
+          OnlineSalesOrderLine NewLine(OnlineSalesOrder localSalesOrder) {
+            var localSalesOrderLine = objectSpace.CreateObject<OnlineSalesOrderLine>();
             localSalesOrder.SalesOrderLines.Add(localSalesOrderLine);
             return localSalesOrderLine;
           }
@@ -120,7 +126,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
             _processedOrders.Add($"{salesOrder.id}");
 
-            var localSalesOrder = NewOrder(salesOrder.id);
+            var localSalesOrder = NewOrder(salesOrder.id, salesOrder.orderNumber);
 
             if (localSalesOrder.OnlineId == $"{salesOrder.id}") {
               Logger.LogWarning("Sales order already exists: {orderNumber} [id:{id}]", $"{salesOrder.orderNumber}", $"{salesOrder.id}");

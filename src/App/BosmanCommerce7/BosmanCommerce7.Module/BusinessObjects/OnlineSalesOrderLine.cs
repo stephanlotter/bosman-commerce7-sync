@@ -15,9 +15,9 @@ using DevExpress.Xpo;
 namespace BosmanCommerce7.Module.BusinessObjects {
   [DefaultClassOptions]
   [NavigationItem(false)]
-  public class SalesOrderLine : XPObject {
+  public class OnlineSalesOrderLine : XPObject {
 
-    private SalesOrder? _salesOrder;
+    private OnlineSalesOrder? _onlineSalesOrder;
     private string? _onlineId;
     private SalesOrderLineType _lineType;
     private string? _sku;
@@ -28,10 +28,10 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     private double _unitPriceInVat;
     private string? _lineNotes;
 
-    [Association("SalesOrder-SalesOrderLine")]
-    public SalesOrder? SalesOrder {
-      get => _salesOrder;
-      set => SetPropertyValue(nameof(SalesOrder), ref _salesOrder, value);
+    [Association("OnlineSalesOrder-OnlineSalesOrderLine")]
+    public OnlineSalesOrder? OnlineSalesOrder {
+      get => _onlineSalesOrder;
+      set => SetPropertyValue(nameof(OnlineSalesOrder), ref _onlineSalesOrder, value);
     }
 
     [Size(40)]
@@ -102,7 +102,7 @@ namespace BosmanCommerce7.Module.BusinessObjects {
       set => SetPropertyValue(nameof(LineNotes), ref _lineNotes, value);
     }
 
-    public SalesOrderLine(Session session) : base(session) { }
+    public OnlineSalesOrderLine(Session session) : base(session) { }
 
   }
 

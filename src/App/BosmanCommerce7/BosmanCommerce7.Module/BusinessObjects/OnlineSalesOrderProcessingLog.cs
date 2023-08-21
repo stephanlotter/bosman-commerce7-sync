@@ -14,16 +14,16 @@ using DevExpress.Xpo;
 namespace BosmanCommerce7.Module.BusinessObjects {
   [DefaultClassOptions]
   [NavigationItem(true)]
-  public class SalesOrderProcessingLog : XPObject {
-    private SalesOrder? _SalesOrder;
+  public class OnlineSalesOrderProcessingLog : XPObject {
+    private OnlineSalesOrder? _onlineSalesOrder;
     private DateTime _entryDate;
     private string? _shortDescription;
     private string? _details;
 
-    [Association("SalesOrder-SalesOrderProcessingLog")]
-    public SalesOrder? SalesOrder {
-      get => _SalesOrder;
-      set => SetPropertyValue(nameof(SalesOrder), ref _SalesOrder, value);
+    [Association("OnlineSalesOrder-OnlineSalesOrderProcessingLog")]
+    public OnlineSalesOrder? OnlineSalesOrder {
+      get => _onlineSalesOrder;
+      set => SetPropertyValue(nameof(OnlineSalesOrder), ref _onlineSalesOrder, value);
     }
 
     [ModelDefault("DisplayFormat", "{0:yyyy/MM/dd HH:mm:ss}")]
@@ -47,7 +47,7 @@ namespace BosmanCommerce7.Module.BusinessObjects {
       set => SetPropertyValue(nameof(Details), ref _details, value);
     }
 
-    public SalesOrderProcessingLog(Session session) : base(session) { }
+    public OnlineSalesOrderProcessingLog(Session session) : base(session) { }
 
     public override void AfterConstruction() {
       base.AfterConstruction();
