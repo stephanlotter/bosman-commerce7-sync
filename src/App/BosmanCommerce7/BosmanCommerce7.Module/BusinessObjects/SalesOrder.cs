@@ -27,6 +27,7 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     private int? _orderNumber;
     private string? _evolutionSalesOrderNumber;
     private double _orderValueInVat;
+    private string? _projectCode;
     private string? _shipToName;
     private string? _shipToPhoneNumber;
     private string? _shipToAddress1;
@@ -138,6 +139,13 @@ namespace BosmanCommerce7.Module.BusinessObjects {
       get => _orderValueInVat;
       set => SetPropertyValue(nameof(OrderValueInVat), ref _orderValueInVat, value);
     }
+
+    [ModelDefault("AllowEdit", "false")]
+    public string? ProjectCode {
+      get => _projectCode;
+      set => SetPropertyValue(nameof(ProjectCode), ref _projectCode, value);
+    }
+
 
     [ModelDefault("AllowEdit", "false")]
     public SalesOrderPostingStatus PostingStatus {

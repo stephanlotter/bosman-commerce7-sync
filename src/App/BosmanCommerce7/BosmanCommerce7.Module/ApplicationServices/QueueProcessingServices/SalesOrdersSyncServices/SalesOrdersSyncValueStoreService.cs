@@ -40,6 +40,16 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
       return _valueStoreRepository.GetValue("sales-orders-sync-shipping-tax-type");
     }
 
+    public Result<string?> GetChannelProjectCode(string? channel) {
+      if (string.IsNullOrWhiteSpace(channel)) { return Result.Failure<string?>("Channel provided is empty."); }
+      var keyName = $"sales-orders-sync-{channel.ToLower()}-channel-project-code";
+      return _valueStoreRepository
+        .GetValue(keyName)
+        .Bind(p => string.IsNullOrWhiteSpace(p)
+            ? Result.Failure<string?>($"No project code mapping found for channel: '{channel}'. Please add a record to ValueStore for key: {keyName}")
+            : Result.Success<string?>(p));
+    }
+
   }
 
 }

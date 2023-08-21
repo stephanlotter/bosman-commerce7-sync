@@ -41,36 +41,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
       _localObjectSpaceProvider = localObjectSpaceProvider;
     }
 
-    private Result<SalesOrdersSyncParameters> LoadParameters() {
-
-      Result<SalesOrdersSyncParameters> GetResult<T>(SalesOrdersSyncParameters p, Func<Result<T?>> getValue, Func<SalesOrdersSyncParameters, T?, Result<SalesOrdersSyncParameters>> onFound) {
-        return getValue().Bind(value => onFound(p, value));
-      }
-
-      Result<SalesOrdersSyncParameters> ParameterNotDefined(string keyName) {
-        var error = $"{keyName} is not defined in ValueStore table";
-        Logger.LogError("{error}", error);
-        return Result.Failure<SalesOrdersSyncParameters>(error);
-      }
-
-      var parameters = new SalesOrdersSyncParameters { };
-
-      return GetResult(parameters,
-      _salesOrdersSyncValueStoreService.GetShippingGeneralLedgerAccountCode, (p, v) => {
-        if (string.IsNullOrWhiteSpace(v)) { return ParameterNotDefined("sales-orders-sync-shipping-general-ledger-account-code"); }
-        return p with { ShippingGeneralLedgerAccountCode = v };
-      })
-
-      .Bind(pa => GetResult(pa, _salesOrdersSyncValueStoreService.GetShippingTaxType, (p, v) => {
-        if (string.IsNullOrWhiteSpace(v)) { return ParameterNotDefined("sales-orders-sync-shipping-tax-type"); }
-        return p with { ShippingTaxType = v };
-      }))
-
-      .Bind(pa => GetResult(pa, _salesOrdersSyncValueStoreService.GetFetchNumberOfDaysBack, (p, v) => p with { FetchNumberOfDaysBack = v ?? 3 }))
-
-      ;
-    }
-
     public Result<SalesOrdersSyncResult> Execute(SalesOrdersSyncContext context) {
       var parametersResult = LoadParameters();
       if (parametersResult.IsFailure) { return Result.Failure<SalesOrdersSyncResult>(parametersResult.Error); }
@@ -119,6 +89,12 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
           return 0d;
         }
 
+        Result<string?> MapChannelToProjectCode(string? channel) {
+          return _salesOrdersSyncValueStoreService
+            .GetChannelProjectCode(channel)
+            .OnFailureCompensate(error => Result.Failure<string?>($"Unable to map channel to project code: {error}"));
+        }
+
         _localObjectSpaceProvider.WrapInObjectSpaceTransaction(objectSpace => {
           SalesOrder NewOrder(dynamic id) {
             var order = objectSpace.FindObject<SalesOrder>("OnlineId".IsEqualToOperator($"{id}"));
@@ -151,11 +127,16 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
               continue;
             }
 
+            var channelProjectCode = MapChannelToProjectCode(salesOrder.channel);
+
+            if (channelProjectCode.IsFailure) { throw new Exception(channelProjectCode.Error); }
+
             localSalesOrder.CustomerId = salesOrder.customerId;
             localSalesOrder.OnlineId = salesOrder.id;
             localSalesOrder.Channel = salesOrder.channel;
             localSalesOrder.OrderDate = orderDate;
             localSalesOrder.OrderNumber = salesOrder.orderNumber;
+            localSalesOrder.ProjectCode = channelProjectCode.Value;
 
             if (salesOrder.shipTo != null) {
               localSalesOrder.ShipToName = BuildShipToName(salesOrder.shipTo.firstName, salesOrder.shipTo.lastName);
@@ -236,14 +217,34 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
     }
 
-    public record SalesOrdersSyncParameters {
+    private Result<SalesOrdersSyncParameters> LoadParameters() {
 
-      public double FetchNumberOfDaysBack { get; init; }
+      Result<SalesOrdersSyncParameters> GetResult<T>(SalesOrdersSyncParameters p, Func<Result<T?>> getValue, Func<SalesOrdersSyncParameters, T?, Result<SalesOrdersSyncParameters>> onFound) {
+        return getValue().Bind(value => onFound(p, value));
+      }
 
-      public string? ShippingGeneralLedgerAccountCode { get; init; }
+      Result<SalesOrdersSyncParameters> ParameterNotDefined(string keyName) {
+        var error = $"{keyName} is not defined in ValueStore table";
+        Logger.LogError("{error}", error);
+        return Result.Failure<SalesOrdersSyncParameters>(error);
+      }
 
-      public string? ShippingTaxType { get; init; }
+      var parameters = new SalesOrdersSyncParameters { };
 
+      return GetResult(parameters,
+      _salesOrdersSyncValueStoreService.GetShippingGeneralLedgerAccountCode, (p, v) => {
+        if (string.IsNullOrWhiteSpace(v)) { return ParameterNotDefined("sales-orders-sync-shipping-general-ledger-account-code"); }
+        return p with { ShippingGeneralLedgerAccountCode = v };
+      })
+
+      .Bind(pa => GetResult(pa, _salesOrdersSyncValueStoreService.GetShippingTaxType, (p, v) => {
+        if (string.IsNullOrWhiteSpace(v)) { return ParameterNotDefined("sales-orders-sync-shipping-tax-type"); }
+        return p with { ShippingTaxType = v };
+      }))
+
+      .Bind(pa => GetResult(pa, _salesOrdersSyncValueStoreService.GetFetchNumberOfDaysBack, (p, v) => p with { FetchNumberOfDaysBack = v ?? 3 }))
+
+      ;
     }
 
   }
