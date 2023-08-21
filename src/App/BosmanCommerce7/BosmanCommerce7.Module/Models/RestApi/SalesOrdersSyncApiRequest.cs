@@ -15,6 +15,7 @@ namespace BosmanCommerce7.Module.Models.RestApi {
     public SalesOrdersSyncApiRequest(DateTime orderSubmittedDate) {
       Resource = $"/order?orderSubmittedDate=gt:{orderSubmittedDate:yyyy-MM-dd}";
       Method = Method.Get;
+      IsPagedResponse = true;
     }
 
   }

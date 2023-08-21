@@ -42,6 +42,11 @@ if exists(select 1 from ValueStore where lower(KeyName) = lower(@keyName))
         .Bind(v => Result.Success<DateTime?>(DateTime.TryParse(v, out DateTime r) ? r : null));
     }
 
+    public Result<int?> GetIntValue(string keyName, int? defaultValue = null) {
+      return GetValue(keyName, $"{defaultValue}")
+        .Bind(v => Result.Success<int?>(int.TryParse(v, out int r) ? r : null));
+    }
+
     public Result<string?> GetValue(string keyName, string? defaultValue = null) {
       const string sql = @"
 if exists(select 1 from ValueStore where lower(KeyName) = lower(@keyName))

@@ -18,6 +18,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDat
 
     Result<DateTime?> GetDateTimeValue(string keyName, DateTime? defaultValue = null);
 
+    Result<int?> GetIntValue(string keyName, int? defaultValue = null);
+
     Result<bool> KeyExists(string keyName);
 
     Result SetValue(string keyName, string? keyValue);

@@ -24,25 +24,35 @@ namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients {
       _apiClientService = apiClientService;
     }
 
-    protected Result<T> SendRequest<T>(ApiRequestBase apiRequest, Func<dynamic, Result<T>> onSuccess, Action<RestRequest>? configRestRequest = null) {
+    protected Result<T> SendRequest<T>(ApiRequestBase apiRequest, Func<dynamic, (Result<T> result, ApiRequestPaginationStatus paginationStatus)> onSuccess, Action<RestRequest>? configRestRequest = null) {
+      while (true) {
+        if (apiRequest.IsPagedResponse) {
+          apiRequest = apiRequest with { CurrentPage = apiRequest.CurrentPage + 1 };
+        }
 
-      var response = _apiClientService.Execute(apiRequest, configRestRequest: configRestRequest);
+        var response = _apiClientService.Execute(apiRequest, configRestRequest: configRestRequest);
 
-      if (response is ApiResponseBase.Failure f) {
-        Logger.LogError("{error}", f.FullErrorMessage);
-        return Result.Failure<T>(f.FullErrorMessage);
+        if (response is ApiResponseBase.Failure f) {
+          Logger.LogError("{error}", f.FullErrorMessage);
+          return Result.Failure<T>(f.FullErrorMessage);
+        }
+
+        var successResponse = response as ApiResponseBase.Success;
+
+        if (apiRequest.DeserializeBody && IsResponseBodyEmpty(successResponse!)) { return Result.Failure<T>("Response body empty."); }
+
+        dynamic data = new { };
+
+        if (apiRequest.DeserializeBody) {
+          var dataResult = Deserialize<dynamic>(successResponse!);
+          if (dataResult.IsFailure) { return Result.Failure<T>(dataResult.Error); }
+          data = dataResult.Value;
+        }
+
+        (Result<T> result, ApiRequestPaginationStatus paginationStatus) r = onSuccess(data);
+
+        if (r.result.IsFailure || r.paginationStatus == ApiRequestPaginationStatus.Completed) { return r.result; }
       }
-
-      var successResponse = response as ApiResponseBase.Success;
-
-      if (apiRequest.DeserializeBody && IsResponseBodyEmpty(successResponse!)) { return Result.Failure<T>("Response body empty."); }
-
-      if (!apiRequest.DeserializeBody) { return onSuccess(new { }); }
-
-      var dataResult = Deserialize<dynamic>(successResponse!);
-      if (dataResult.IsFailure) { return Result.Failure<T>(dataResult.Error); }
-      var data = dataResult.Value;
-      return onSuccess(data);
     }
 
     protected bool IsResponseBodyEmpty(ApiResponseBase responseBase) {

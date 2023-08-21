@@ -24,16 +24,18 @@ namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients {
     }
 
     public ApiResponseBase Execute(ApiRequestBase apiRequest, Action<RestClientOptions>? configOptions = null, Action<RestRequest>? configRestRequest = null) {
+      var requestResource = apiRequest.GetResource();
+
       var json = JsonFunctions.Serialize(apiRequest.Data);
       var useJson = apiRequest.Data != null && !string.IsNullOrWhiteSpace(json) && json != "null";
-      _logger.LogInformation("Send Commerce7 request {method}:{resource}{json}", apiRequest.Method, apiRequest.Resource, $":\r\n{json}" ?? "");
+
+      _logger.LogInformation("Send Commerce7 request {method}:{resource}{json}", apiRequest.Method, requestResource, $":\r\n{json}" ?? "");
 
       try {
 
         var result = _restClient.NewRestClient(configOptions)
           .Bind(client => {
             var method = apiRequest.Method;
-            var requestResource = apiRequest.Resource;
             var request = new RestRequest(requestResource, method);
 
             if (useJson) { request.AddJsonBody(json!); }
@@ -42,7 +44,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients {
 
             var response = client.Execute(request);
 
-            _logger.LogDebug("{0} Commerce7 response status code {1}", apiRequest.Resource, response.StatusCode);
+            _logger.LogDebug("{0} Commerce7 response status code {1}", requestResource, response.StatusCode);
 
             if (!response.IsSuccessful) {
               return Result.Success((ApiResponseBase)new ApiResponseBase.Failure {
@@ -68,12 +70,12 @@ namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients {
 
       }
       catch (Exception ex) {
-        _logger.LogError(ex, "While sending HTTP request: {resource}", apiRequest.Resource);
+        _logger.LogError(ex, "While sending HTTP request: {resource}", requestResource);
         return new ApiResponseBase.Failure { ErrorException = ex };
       }
 
       ApiResponseBase ReturnFailure(Result<ApiResponseBase> result) {
-        _logger.LogError("While sending HTTP request: {resource}", apiRequest.Resource);
+        _logger.LogError("While sending HTTP request: {resource}", requestResource);
         _logger.LogError("{error}", result.Error);
         return new ApiResponseBase.Failure { ErrorMessage = result.Error, StatusCode = "Error" };
       }

@@ -20,17 +20,22 @@ namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients {
     }
 
     public Result<SalesOrdersSyncResponse> GetSalesOrders(DateTime orderSubmittedDate) {
+
+      SalesOrdersSyncResponse apiResponse = new();
+      var list = new List<dynamic>();
+
       return SendRequest(new SalesOrdersSyncApiRequest(orderSubmittedDate), data => {
         if (data == null) {
-          return Result.Failure<SalesOrdersSyncResponse>("Response body not valid JSON.");
+          return (Result.Failure<SalesOrdersSyncResponse>("Response body not valid JSON."), ApiRequestPaginationStatus.Completed);
         }
 
-        var apiResponse = new SalesOrdersSyncResponse {
-          SalesOrders = data!.orders == null ? null : data!.orders
-        };
+        var totalRecords = (int)data!.total;
 
-        return Result.Success(apiResponse);
+        foreach (var order in data!.orders) { list.Add(order); }
 
+        apiResponse = apiResponse with { SalesOrders = list.ToArray() };
+
+        return (Result.Success(apiResponse), list.Count < totalRecords ? ApiRequestPaginationStatus.MorePages : ApiRequestPaginationStatus.Completed);
       });
     }
 

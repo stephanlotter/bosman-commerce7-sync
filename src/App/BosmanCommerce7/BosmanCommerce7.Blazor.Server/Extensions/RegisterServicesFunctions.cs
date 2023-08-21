@@ -53,6 +53,7 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
     private static void RegisterSalesOrderSyncServices(IServiceCollection services) {
       services.AddTransient<ISalesOrdersSyncQueueService, SalesOrdersSyncQueueService>();
       services.AddTransient<ISalesOrdersSyncService, SalesOrdersSyncService>();
+      services.AddTransient<ISalesOrdersSyncValueStoreService, SalesOrdersSyncValueStoreService>();
     }
 
     private static void RegisterSalesOrderPostServices(IServiceCollection services) {

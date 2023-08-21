@@ -15,11 +15,22 @@ namespace BosmanCommerce7.Module.Models.RestApi {
 
     public virtual object? Data { get; }
 
-    public string Resource { get; init; } = default!;
+    protected string Resource { get; init; } = default!;
 
     public Method Method { get; init; } = Method.Post;
 
     public bool DeserializeBody { get; init; } = true;
+
+    public bool IsPagedResponse { get; init; }
+
+    public int CurrentPage { get; init; }
+
+    public string GetResource() {
+      if (IsPagedResponse) {
+        return $"{Resource}&page={CurrentPage}";
+      }
+      return Resource;
+    }
 
   }
 

@@ -9,7 +9,7 @@
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices.Models {
   public record SalesOrdersSyncResponse {
 
-    public dynamic? SalesOrders { get; init; }
+    public dynamic[]? SalesOrders { get; init; }
 
   }
 

@@ -14,15 +14,16 @@ using BosmanCommerce7.Module.BusinessObjects;
 using BosmanCommerce7.Module.Extensions;
 using BosmanCommerce7.Module.Models;
 using CSharpFunctionalExtensions;
+using CSharpFunctionalExtensions.ValueTasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices {
+
   public class SalesOrdersSyncService : SyncServiceBase, ISalesOrdersSyncService {
-    private const string ValueStoreKey = "sales-orders-sync-last-synced";
 
     private readonly SalesOrdersSyncJobOptions _salesOrdersSyncJobOptions;
-    private readonly IValueStoreRepository _valueStoreRepository;
+    private readonly ISalesOrdersSyncValueStoreService _salesOrdersSyncValueStoreService;
     private readonly ISalesOrdersApiClient _apiClient;
     private readonly ILocalObjectSpaceProvider _localObjectSpaceProvider;
 
@@ -30,31 +31,60 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
     public SalesOrdersSyncService(ILogger<SalesOrdersSyncService> logger,
       SalesOrdersSyncJobOptions salesOrdersSyncJobOptions,
-      IValueStoreRepository valueStoreRepository,
+      ISalesOrdersSyncValueStoreService salesOrdersSyncValueStoreService,
       ISalesOrdersApiClient apiClient,
       ILocalObjectSpaceProvider localObjectSpaceProvider)
       : base(logger) {
       _salesOrdersSyncJobOptions = salesOrdersSyncJobOptions;
-      _valueStoreRepository = valueStoreRepository;
+      _salesOrdersSyncValueStoreService = salesOrdersSyncValueStoreService;
       _apiClient = apiClient;
       _localObjectSpaceProvider = localObjectSpaceProvider;
     }
 
-    public Result<SalesOrdersSyncResult> Execute(SalesOrdersSyncContext context) {
-      if (string.IsNullOrWhiteSpace(_salesOrdersSyncJobOptions.ShippingGeneralLedgerAccountCode)) {
-        Logger.LogError("ShippingGeneralLedgerAccountCode is not configured in appsettings.json");
-        return Result.Failure<SalesOrdersSyncResult>("ShippingGeneralLedgerAccountCode is not configured in appsettings.json");
+    private Result<SalesOrdersSyncParameters> LoadParameters() {
+
+      Result<SalesOrdersSyncParameters> GetResult<T>(SalesOrdersSyncParameters p, Func<Result<T?>> getValue, Func<SalesOrdersSyncParameters, T?, Result<SalesOrdersSyncParameters>> onFound) {
+        return getValue().Bind(value => onFound(p, value));
       }
 
+      Result<SalesOrdersSyncParameters> ParameterNotDefined(string keyName) {
+        var error = $"{keyName} is not defined in ValueStore table";
+        Logger.LogError("{error}", error);
+        return Result.Failure<SalesOrdersSyncParameters>(error);
+      }
+
+      var parameters = new SalesOrdersSyncParameters { };
+
+      return GetResult(parameters,
+      _salesOrdersSyncValueStoreService.GetShippingGeneralLedgerAccountCode, (p, v) => {
+        if (string.IsNullOrWhiteSpace(v)) { return ParameterNotDefined("sales-orders-sync-shipping-general-ledger-account-code"); }
+        return p with { ShippingGeneralLedgerAccountCode = v };
+      })
+
+      .Bind(pa => GetResult(pa, _salesOrdersSyncValueStoreService.GetShippingTaxType, (p, v) => {
+        if (string.IsNullOrWhiteSpace(v)) { return ParameterNotDefined("sales-orders-sync-shipping-tax-type"); }
+        return p with { ShippingTaxType = v };
+      }))
+
+      .Bind(pa => GetResult(pa, _salesOrdersSyncValueStoreService.GetFetchNumberOfDaysBack, (p, v) => p with { FetchNumberOfDaysBack = v ?? 3 }))
+
+      ;
+    }
+
+    public Result<SalesOrdersSyncResult> Execute(SalesOrdersSyncContext context) {
+      var parametersResult = LoadParameters();
+      if (parametersResult.IsFailure) { return Result.Failure<SalesOrdersSyncResult>(parametersResult.Error); }
+      var parameters = parametersResult.Value;
+
       try {
-        var lastSynced = _valueStoreRepository.GetDateTimeValue(ValueStoreKey, _salesOrdersSyncJobOptions.StartDate);
+        var lastSynced = _salesOrdersSyncValueStoreService.GetSalesOrdersSyncLastSynced();
 
         if (lastSynced.IsFailure) {
           Logger.LogError("Unable to execute SalesOrdersSyncService: {error}", lastSynced.Error);
           return Result.Failure<SalesOrdersSyncResult>(lastSynced.Error);
         }
 
-        var orderSubmittedDate = (lastSynced.Value ?? DateTime.Now).AddDays(-_salesOrdersSyncJobOptions.FetchNumberOfDaysBack).Date;
+        var orderSubmittedDate = (lastSynced.Value ?? DateTime.Now).AddDays(-parameters.FetchNumberOfDaysBack).Date;
 
         Logger.LogInformation("Fetching sales orders since: {orderSubmittedDate}", $"{orderSubmittedDate:yyyy-MM-dd HH:mm:ss}");
 
@@ -66,9 +96,10 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
         }
 
         var response = salesOrdersResult.Value;
+
         var lastOrderDate = DateTime.MinValue;
 
-        if (response.SalesOrders == null || response.SalesOrders!.Count == 0) {
+        if (response.SalesOrders == null || response.SalesOrders!.Length == 0) {
           Logger.LogInformation("No sales orders found since: {orderSubmittedDate}", $"{orderSubmittedDate:yyyy-MM-dd HH:mm:ss}");
           return Result.Success(BuildResult());
         }
@@ -171,12 +202,12 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
                 localSalesOrderLine.OnlineId = shipping.id;
                 localSalesOrderLine.LineType = SalesOrderLineType.GeneralLedger;
 
-                localSalesOrderLine.Sku = _salesOrdersSyncJobOptions.ShippingGeneralLedgerAccountCode;
+                localSalesOrderLine.Sku = parameters.ShippingGeneralLedgerAccountCode;
                 localSalesOrderLine.LineDescription = shipping.title;
 
                 localSalesOrderLine.Quantity = 1;
                 localSalesOrderLine.TaxAmount = ConvertCurrencyValue(shipping.tax);
-                localSalesOrderLine.OnlineTaxType = _salesOrdersSyncJobOptions.ShippingTaxType;
+                localSalesOrderLine.OnlineTaxType = parameters.ShippingTaxType;
                 localSalesOrderLine.UnitPriceInVat = ConvertCurrencyValue(shipping.price);
 
                 localSalesOrder.Save();
@@ -190,7 +221,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
         });
 
-        _valueStoreRepository.SetDateTimeValue(ValueStoreKey, lastOrderDate.Date);
+        _salesOrdersSyncValueStoreService.UpdateSalesOrdersSyncLastSynced(lastOrderDate.Date);
 
         return Result.Success(BuildResult());
       }
@@ -202,6 +233,16 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
       SalesOrdersSyncResult BuildResult() {
         return new SalesOrdersSyncResult { };
       }
+
+    }
+
+    public record SalesOrdersSyncParameters {
+
+      public double FetchNumberOfDaysBack { get; init; }
+
+      public string? ShippingGeneralLedgerAccountCode { get; init; }
+
+      public string? ShippingTaxType { get; init; }
 
     }
 
