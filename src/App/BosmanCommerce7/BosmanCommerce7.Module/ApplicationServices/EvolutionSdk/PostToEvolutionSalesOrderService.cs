@@ -7,11 +7,13 @@
  *  
  */
 
+using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices;
 using BosmanCommerce7.Module.BusinessObjects;
 using BosmanCommerce7.Module.Extensions.EvolutionSdk;
 using BosmanCommerce7.Module.Models;
 using BosmanCommerce7.Module.Models.EvolutionSdk;
+using BosmanCommerce7.Module.Models.LocalDatabase;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Pastel.Evolution;
@@ -21,25 +23,31 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
     private readonly ILogger<PostToEvolutionSalesOrderService> _logger;
     private readonly IEvolutionSdk _evolutionSdk;
     private readonly ISalesOrdersPostValueStoreService _salesOrdersPostValueStoreService;
+    private readonly IWarehouseRepository _warehouseRepository;
     private readonly IEvolutionCustomerRepository _evolutionCustomerRepository;
     private readonly IEvolutionProjectRepository _evolutionProjectRepository;
     private readonly IEvolutionDeliveryMethodRepository _evolutionDeliveryMethodRepository;
     private readonly IEvolutionSalesRepresentativeRepository _evolutionSalesRepresentativeRepository;
+    private readonly IEvolutionInventoryItemRepository _evolutionInventoryItemRepository;
 
     public PostToEvolutionSalesOrderService(ILogger<PostToEvolutionSalesOrderService> logger,
       IEvolutionSdk evolutionSdk,
       ISalesOrdersPostValueStoreService salesOrdersPostValueStoreService,
+      IWarehouseRepository warehouseRepository,
       IEvolutionCustomerRepository evolutionCustomerRepository,
       IEvolutionProjectRepository evolutionProjectRepository,
       IEvolutionDeliveryMethodRepository evolutionDeliveryMethodRepository,
-      IEvolutionSalesRepresentativeRepository evolutionSalesRepresentativeRepository) {
+      IEvolutionSalesRepresentativeRepository evolutionSalesRepresentativeRepository,
+      IEvolutionInventoryItemRepository evolutionInventoryItemRepository) {
       _logger = logger;
       _evolutionSdk = evolutionSdk;
       _salesOrdersPostValueStoreService = salesOrdersPostValueStoreService;
+      _warehouseRepository = warehouseRepository;
       _evolutionCustomerRepository = evolutionCustomerRepository;
       _evolutionProjectRepository = evolutionProjectRepository;
       _evolutionDeliveryMethodRepository = evolutionDeliveryMethodRepository;
       _evolutionSalesRepresentativeRepository = evolutionSalesRepresentativeRepository;
+      _evolutionInventoryItemRepository = evolutionInventoryItemRepository;
     }
 
     public Result<OnlineSalesOrder> Post(PostToEvolutionSalesOrderContext context, OnlineSalesOrder onlineSalesOrder) {
@@ -104,17 +112,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
         TaxMode = TaxMode.Inclusive
       });
 
-      Result<SalesOrder> RepositoryGet<T>(SalesOrder salesOrder, object parameters, Func<object, Result<T>> get, Action<T> onSuccess) {
-        return get(parameters).Bind(result => {
-          onSuccess(result);
-          return Result.Success(salesOrder);
-        });
-      }
-
-      Result<SalesOrder> RepositoryGetFromCode<T>(SalesOrder salesOrder, string? parameters, Func<string, Result<T>> get, Action<T> onSuccess) {
-        return parameters != null ? RepositoryGet(salesOrder, parameters, p => get((string)p), onSuccess) : Result.Failure<SalesOrder>("Parameters may not be null");
-      }
-
       Address AddCustomerNameToAddress(Address deliveryAddress) {
         if (!onlineSalesOrder.IsStoreOrder || string.IsNullOrWhiteSpace(onlineSalesOrder.ShipToName)) { return deliveryAddress; }
 
@@ -162,6 +159,22 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
           return Result.Failure<SalesOrder>($"Sku on line with Oid {onlineSalesOrderLine.Oid} is blank");
         }
 
+        NewSalesOrderLine()
+          .Bind(salesOrderLine => RepositoryGetFromCode(salesOrderLine, onlineSalesOrderLine.Sku, _evolutionInventoryItemRepository.Get, inventoryItem => salesOrderLine.InventoryItem = inventoryItem))
+          .Bind(salesOrderLine => {
+            return _warehouseRepository.FindWarehouseCode(new FindWarehouseCodeDescriptor {
+              IsStoreOrder = onlineSalesOrder.IsStoreOrder,
+              PostalCode = onlineSalesOrder.ShipToAddressPostalCode
+            }).Bind(warehouseCode => {
+
+              // Add Evo repo to find warehouse using RepositoryGetFromCode
+
+              return Result.Success(salesOrderLine);
+            });
+          })
+
+          ;
+
         //var findInventoryItem = genericSalesOrderLineDto.ItemCode.FindInventoryItem();
         //if (findInventoryItem.IsFailure) {
         //  return Result.Fail<OrderDetail>(findInventoryItem.Error);
@@ -193,11 +206,33 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
         return Result.Failure<SalesOrder>(message);
       }
 
+      Result<OrderDetail> NewSalesOrderLine() => Result.Success(new OrderDetail {
+        TaxMode = TaxMode.Inclusive
+      });
+
     }
 
     private Result<SalesOrder> AddSalesOrderGeneralLedgerLine(PostToEvolutionSalesOrderContext context, SalesOrder salesOrder, OnlineSalesOrder onlineSalesOrder, OnlineSalesOrderLine onlineSalesOrderLine) {
       // Add line note if not null
       return Result.Success(salesOrder);
+    }
+
+    private Result<SalesOrder> RepositoryGet<T>(SalesOrder salesOrder, object parameters, Func<object, Result<T>> get, Action<T> onSuccess) {
+      return get(parameters).Bind(result => {
+        onSuccess(result);
+        return Result.Success(salesOrder);
+      });
+    }
+
+    private Result<SalesOrder> RepositoryGetFromCode<T>(SalesOrder salesOrder, string? parameters, Func<string, Result<T>> get, Action<T> onSuccess) {
+      return parameters != null ? RepositoryGet(salesOrder, parameters, p => get((string)p), onSuccess) : Result.Failure<SalesOrder>("Parameters may not be null");
+    }
+
+    private Result<OrderDetail> RepositoryGetFromCode<T>(OrderDetail salesOrderLine, string? parameters, Func<string, Result<T>> get, Action<T> onSuccess) {
+      return parameters != null ? get(parameters).Bind(result => {
+        onSuccess(result);
+        return Result.Success(salesOrderLine);
+      }) : Result.Failure<OrderDetail>("Parameters may not be null");
     }
 
   }

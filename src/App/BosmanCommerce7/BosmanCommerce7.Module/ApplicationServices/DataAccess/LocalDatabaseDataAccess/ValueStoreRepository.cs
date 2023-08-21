@@ -14,6 +14,7 @@ using Dapper;
 using Microsoft.Extensions.Logging;
 
 namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess {
+
   public class ValueStoreRepository : LocalDatabaseRepositoryBase, IValueStoreRepository {
 
     public ValueStoreRepository(ILogger<ValueStoreRepository> logger, ILocalDatabaseConnectionStringProvider connectionStringProvider) : base(logger, connectionStringProvider) {

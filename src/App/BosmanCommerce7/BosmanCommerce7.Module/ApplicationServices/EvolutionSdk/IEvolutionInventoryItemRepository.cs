@@ -11,9 +11,9 @@ using CSharpFunctionalExtensions;
 using Pastel.Evolution;
 
 namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
-  public interface IEvolutionProjectRepository {
+  public interface IEvolutionInventoryItemRepository {
 
-    Result<Project> Get(string? code);
+    Result<InventoryItem> Get(string? code);
 
   }
 

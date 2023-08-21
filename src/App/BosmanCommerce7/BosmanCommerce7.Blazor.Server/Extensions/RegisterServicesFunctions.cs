@@ -49,11 +49,13 @@ namespace BosmanCommerce7.Blazor.Server.Extensions
       services.AddTransient<IEvolutionProjectRepository, EvolutionProjectRepository>();
       services.AddTransient<IEvolutionSalesRepresentativeRepository, EvolutionSalesRepresentativeRepository>();
       services.AddTransient<IEvolutionDeliveryMethodRepository, EvolutionDeliveryMethodRepository>();
+      services.AddTransient<IEvolutionInventoryItemRepository, EvolutionInventoryItemRepository>();
     }
 
     private static void RegisterUtilityServices(IServiceCollection services) {
       services.AddTransient<IAppDataFileManager, AppDataFileManager>();
       services.AddTransient<IValueStoreRepository, ValueStoreRepository>();
+      services.AddTransient<IWarehouseRepository, WarehouseRepository>();
     }
 
     private static void RegisterSalesOrderServices(IServiceCollection services) {
