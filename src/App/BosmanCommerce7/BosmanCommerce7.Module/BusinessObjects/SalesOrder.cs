@@ -32,7 +32,6 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     private string? _shipToPhoneNumber;
     private string? _shipToAddress1;
     private string? _shipToAddress2;
-    private readonly string? _shipToAddress3;
     private string? _shipToAddressCity;
     private string? _shipToAddressProvince;
     private string? _shipToAddressPostalCode;
