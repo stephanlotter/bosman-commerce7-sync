@@ -32,14 +32,21 @@ namespace BosmanCommerce7.Module.Controllers {
     protected override void CreateActions() {
       var criteria = "PostingStatus".InCriteriaOperator(QueueItemStatus.New, SalesOrderPostingStatus.Retrying, QueueItemStatus.Failed).ToCriteriaString();
       var action = NewAction("Post now", (s, e) => { Execute(); },
-        selectionDependencyType: SelectionDependencyType.RequireMultipleObjects,
+        selectionDependencyType: SelectionDependencyType.Independent,
         targetObjectsCriteria: criteria);
     }
 
     private void Execute() {
       View.CommitChangesIfEditState();
 
-      var salesOrders = View.SelectedObjects.Cast<SalesOrder>();
+      var userHasSelectedSalesOrders = View.SelectedObjects.Count > 0;
+      var selectedSalesOrders = userHasSelectedSalesOrders ? View.SelectedObjects.Cast<SalesOrder>().ToList() : new List<SalesOrder>();
+
+      var criteria = userHasSelectedSalesOrders
+        ? "Oid".InCriteriaOperator(selectedSalesOrders.Select(a => a.Oid))
+        : "PostingStatus".InCriteriaOperator(QueueItemStatus.New, SalesOrderPostingStatus.Retrying).ToCriteriaString();
+
+      var salesOrders = ObjectSpace.GetObjects<SalesOrder>(criteria).ToList();
 
       // TODO: Implement posting of sales orders
 
