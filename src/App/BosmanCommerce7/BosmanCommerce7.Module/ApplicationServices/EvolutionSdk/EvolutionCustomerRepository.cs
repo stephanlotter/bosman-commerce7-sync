@@ -9,13 +9,12 @@
 
 using BosmanCommerce7.Module.Models.EvolutionSdk;
 using CSharpFunctionalExtensions;
-using Dapper;
 using Pastel.Evolution;
 
 namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
   public class EvolutionCustomerRepository : EvolutionRepositoryBase, IEvolutionCustomerRepository {
 
-    public Result<Customer> GetCustomer(CustomerDescriptor customerDescriptor) {
+    public Result<Customer> Get(CustomerDescriptor customerDescriptor) {
       int? id = GetId("SELECT DCLink FROM Client WHERE ucARwcEmail = @EmailAddress", new { customerDescriptor.EmailAddress });
 
       if (id == null) {

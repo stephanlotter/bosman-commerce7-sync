@@ -47,6 +47,8 @@ namespace BosmanCommerce7.Blazor.Server.Extensions
       services.AddTransient<IPostToEvolutionSalesOrderService, PostToEvolutionSalesOrderService>();
       services.AddTransient<IEvolutionCustomerRepository, EvolutionCustomerRepository>();
       services.AddTransient<IEvolutionProjectRepository, EvolutionProjectRepository>();
+      services.AddTransient<IEvolutionSalesRepresentativeRepository, EvolutionSalesRepresentativeRepository>();
+      services.AddTransient<IEvolutionDeliveryMethodRepository, EvolutionDeliveryMethodRepository>();
     }
 
     private static void RegisterUtilityServices(IServiceCollection services) {
@@ -66,6 +68,7 @@ namespace BosmanCommerce7.Blazor.Server.Extensions
     private static void RegisterSalesOrderPostServices(IServiceCollection services) {
       services.AddTransient<ISalesOrdersPostQueueService, SalesOrdersPostQueueService>();
       services.AddTransient<ISalesOrdersPostService, SalesOrdersPostService>();
+      services.AddTransient<ISalesOrdersPostValueStoreService, SalesOrdersPostValueStoreService>();
     }
 
     public static void RegisterConfig(IServiceCollection services, IConfiguration configuration) {

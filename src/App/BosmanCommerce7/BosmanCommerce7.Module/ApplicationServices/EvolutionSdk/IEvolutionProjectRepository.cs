@@ -13,7 +13,7 @@ using Pastel.Evolution;
 namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
   public interface IEvolutionProjectRepository {
 
-    Result<Project> GetProject(string? projectCode);
+    Result<Project> Get(string? projectCode);
 
   }
 

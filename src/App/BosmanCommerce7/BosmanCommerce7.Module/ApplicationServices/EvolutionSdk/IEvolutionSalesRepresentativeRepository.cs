@@ -7,13 +7,13 @@
  *  
  */
 
-using BosmanCommerce7.Module.BusinessObjects;
 using CSharpFunctionalExtensions;
+using Pastel.Evolution;
 
 namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
-  public interface IPostToEvolutionSalesOrderService {
+  public interface IEvolutionSalesRepresentativeRepository {
 
-    Result<OnlineSalesOrder> Post(PostToEvolutionSalesOrderContext context, OnlineSalesOrder onlineSalesOrder);
+    Result<SalesRepresentative> Get(string? code);
 
   }
 }

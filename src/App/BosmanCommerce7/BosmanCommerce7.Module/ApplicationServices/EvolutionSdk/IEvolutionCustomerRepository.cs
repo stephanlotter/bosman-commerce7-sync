@@ -14,7 +14,7 @@ using Pastel.Evolution;
 namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
   public interface IEvolutionCustomerRepository {
 
-    Result<Customer> GetCustomer(CustomerDescriptor customerDescriptor);
+    Result<Customer> Get(CustomerDescriptor customerDescriptor);
 
   }
 

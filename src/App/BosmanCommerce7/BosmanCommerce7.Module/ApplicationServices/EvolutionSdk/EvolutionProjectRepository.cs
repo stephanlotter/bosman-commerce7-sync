@@ -13,7 +13,7 @@ using Pastel.Evolution;
 namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
   public class EvolutionProjectRepository : EvolutionRepositoryBase, IEvolutionProjectRepository {
 
-    public Result<Project> GetProject(string? projectCode) {
+    public Result<Project> Get(string? projectCode) {
       int? id = GetId("select p.ProjectLink from Project p where lower(p.ProjectCode)=lower(@projectCode)", new { projectCode });
 
       if (id == null) {

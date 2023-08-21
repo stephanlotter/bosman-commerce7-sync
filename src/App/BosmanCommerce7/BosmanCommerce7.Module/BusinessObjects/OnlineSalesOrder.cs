@@ -13,6 +13,7 @@ using BosmanCommerce7.Module.Models;
 using DevExpress.ExpressApp.Model;
 using DevExpress.Persistent.Base;
 using DevExpress.Xpo;
+using Pastel.Evolution;
 
 namespace BosmanCommerce7.Module.BusinessObjects {
 
@@ -238,12 +239,23 @@ namespace BosmanCommerce7.Module.BusinessObjects {
       SalesOrderProcessingLogs.Add(log);
     }
 
-    internal void ResetPostingStatus() {
+    public void ResetPostingStatus() {
       RetryAfter = DateTime.Now;
       RetryCount = 0;
       PostingStatus = SalesOrderPostingStatus.New;
       LastErrorMessage = null;
     }
+
+    public Address ShipToAddress() {
+      return new Address(
+          ShipToAddress1 ?? "",
+          ShipToAddress2 ?? "",
+          ShipToAddressCity ?? "",
+          ShipToAddressProvince ?? "",
+          ShipToAddressCountryCode ?? "",
+          ShipToAddressPostalCode ?? "");
+    }
+
   }
 
 }

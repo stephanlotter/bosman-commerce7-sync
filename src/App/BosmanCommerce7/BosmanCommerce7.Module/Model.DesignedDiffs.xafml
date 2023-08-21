@@ -4,7 +4,7 @@
     <SchemaModule Name="SystemModule" Version="23.1.4.0" IsNewNode="True" />
   </SchemaModules>
   <Views>
-    <ListView Id="SalesOrder_ListView">
+    <ListView Id="OnlineSalesOrder_ListView">
       <Columns>
         <ColumnInfo Id="CustomerOnlineId" Index="-1" />
         <ColumnInfo Id="OnlineId" Index="-1" />
@@ -26,19 +26,21 @@
         <ColumnInfo Id="DatePosted" Index="7" Width="83" />
         <ColumnInfo Id="RetryAfter" Index="8" Width="76" />
         <ColumnInfo Id="RetryCount" Index="9" Width="83" />
+        <ColumnInfo Id="LastErrorMessage" Width="118" />
       </Columns>
     </ListView>
-    <ListView Id="SalesOrder_SalesOrderLines_ListView">
+    <ListView Id="OnlineSalesOrder_SalesOrderLines_ListView">
       <Columns>
         <ColumnInfo Id="OnlineId" Index="-1" />
         <ColumnInfo Id="OnlineTaxType" Index="-1" />
-        <ColumnInfo Id="LineType" Index="0" />
-        <ColumnInfo Id="Sku" Index="1" SortIndex="0" SortOrder="Ascending" />
+        <ColumnInfo Id="LineType" Index="0" SortIndex="0" SortOrder="Ascending" />
+        <ColumnInfo Id="Sku" Index="1" SortIndex="1" SortOrder="Ascending" />
         <ColumnInfo Id="LineDescription" Index="2" SortIndex="-1" SortOrder="None" />
         <ColumnInfo Id="Quantity" Index="3" />
         <ColumnInfo Id="TaxAmount" Index="4" />
         <ColumnInfo Id="UnitPriceInVat" Index="5" />
         <ColumnInfo Id="LineValueInVat" Index="6" />
+        <ColumnInfo Id="Oid" Index="7" />
       </Columns>
     </ListView>
   </Views>
