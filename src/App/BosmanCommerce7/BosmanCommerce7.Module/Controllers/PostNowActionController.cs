@@ -48,7 +48,12 @@ namespace BosmanCommerce7.Module.Controllers {
 
       var salesOrders = ObjectSpace.GetObjects<OnlineSalesOrder>(criteria).ToList();
 
+      foreach (var salesOrder in salesOrders) {
+        salesOrder.ResetPostingStatus();
+
       // TODO: Implement posting of sales orders
+      }
+
 
       View.CommitChangesIfEditState();
     }

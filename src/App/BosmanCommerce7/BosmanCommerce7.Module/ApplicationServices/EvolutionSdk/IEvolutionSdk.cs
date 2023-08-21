@@ -7,9 +7,10 @@
  *  
  */
 
+using BosmanCommerce7.Module.Models.EvolutionSdk;
 using CSharpFunctionalExtensions;
 
-namespace BosmanCommerce7.Module.Extensions.EvolutionSdk {
+namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
   public interface IEvolutionSdk {
 
     DatabaseConnection? Connection { get; }

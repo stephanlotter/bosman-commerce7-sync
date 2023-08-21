@@ -6,7 +6,7 @@
   <Views>
     <ListView Id="SalesOrder_ListView">
       <Columns>
-        <ColumnInfo Id="CustomerId" Index="-1" />
+        <ColumnInfo Id="CustomerOnlineId" Index="-1" />
         <ColumnInfo Id="OnlineId" Index="-1" />
         <ColumnInfo Id="ProjectCode" Index="-1" Width="88" />
         <ColumnInfo Id="ShipToAddress1" Index="-1" />

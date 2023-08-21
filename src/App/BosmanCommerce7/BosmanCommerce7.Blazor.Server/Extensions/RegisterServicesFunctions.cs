@@ -8,14 +8,17 @@
 
 using BosmanCommerce7.Module.ApplicationServices.AppDataServices;
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
+using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices;
 using BosmanCommerce7.Module.ApplicationServices.RestApiClients;
-using BosmanCommerce7.Module.Extensions.EvolutionSdk;
 using BosmanCommerce7.Module.Models;
+using BosmanCommerce7.Module.Models.EvolutionSdk;
 using Microsoft.Extensions.Options;
 
-namespace BosmanCommerce7.Blazor.Server.Extensions {
-  public static class RegisterServicesFunctions {
+namespace BosmanCommerce7.Blazor.Server.Extensions
+{
+    public static class RegisterServicesFunctions {
 
     public static void RegisterServices(IServiceCollection services) {
       RegisterApiServices(services);
@@ -42,6 +45,8 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
       services.AddSingleton<IEvolutionCompanyDescriptor, EvolutionCompanyDescriptor>(serviceProvider => Instance(serviceProvider));
       services.AddTransient<IEvolutionSdk, EvolutionSdk>();
       services.AddTransient<IPostToEvolutionSalesOrderService, PostToEvolutionSalesOrderService>();
+      services.AddTransient<IEvolutionCustomerRepository, EvolutionCustomerRepository>();
+      services.AddTransient<IEvolutionProjectRepository, EvolutionProjectRepository>();
     }
 
     private static void RegisterUtilityServices(IServiceCollection services) {

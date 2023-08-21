@@ -9,7 +9,7 @@
 
 using BosmanCommerce7.Module.Extensions.QuartzTools;
 
-namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices {
+namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices {
   public interface ISalesOrdersPostQueueService : ISyncQueueService {
 
   }

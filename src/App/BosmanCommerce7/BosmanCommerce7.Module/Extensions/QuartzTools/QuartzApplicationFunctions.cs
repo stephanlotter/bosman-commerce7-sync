@@ -6,14 +6,16 @@
  *  
  */
 
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices;
 using BosmanCommerce7.Module.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Quartz;
 
-namespace BosmanCommerce7.Module.Extensions.QuartzTools {
-  public static class QuartzApplicationFunctions {
+namespace BosmanCommerce7.Module.Extensions.QuartzTools
+{
+    public static class QuartzApplicationFunctions {
 
     private static IScheduler? _scheduler;
 

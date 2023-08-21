@@ -9,7 +9,7 @@
 
 using System.Data.SqlClient;
 
-namespace BosmanCommerce7.Module.Extensions.EvolutionSdk {
+namespace BosmanCommerce7.Module.Models.EvolutionSdk {
   public class DatabaseConnection : IDatabaseConnection {
 
     public SqlConnection Connection { get; }

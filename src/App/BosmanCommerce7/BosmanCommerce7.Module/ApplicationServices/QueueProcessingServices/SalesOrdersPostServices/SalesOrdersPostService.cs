@@ -8,16 +8,16 @@
  */
 
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
-using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices.Models;
+using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices.Models;
 using BosmanCommerce7.Module.BusinessObjects;
 using BosmanCommerce7.Module.Extensions;
-using BosmanCommerce7.Module.Extensions.EvolutionSdk;
 using BosmanCommerce7.Module.Models;
 using CSharpFunctionalExtensions;
 using DevExpress.Data.Filtering;
 using Microsoft.Extensions.Logging;
 
-namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices {
+namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices {
   public class SalesOrdersPostService : SyncServiceBase, ISalesOrdersPostService {
     private readonly ILocalObjectSpaceProvider _localObjectSpaceProvider;
     private readonly IPostToEvolutionSalesOrderService _postToEvolutionSalesOrderService;
@@ -47,6 +47,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
         foreach (var onlineSalesOrder in olineSalesOrders) {
           try {
+            Logger.LogInformation("Start posting online sales order. Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
             _postToEvolutionSalesOrderService
               .Post(postToEvolutionSalesOrderContext, onlineSalesOrder)
               .OnFailureCompensate(err => {
@@ -73,11 +74,12 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
           }
           catch (Exception ex) {
-            Logger.LogError(ex, "Error posting sales order Online Id {OnlineId}", onlineSalesOrder.OnlineId);
+            Logger.LogError(ex, "Error posting online sales order number {OrderNumber}", onlineSalesOrder.OrderNumber);
             onlineSalesOrder.PostLog("Error posting sales order", ex);
           }
           finally {
             onlineSalesOrder.Save();
+            Logger.LogInformation("End posting online sales order. Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
           }
         }
 

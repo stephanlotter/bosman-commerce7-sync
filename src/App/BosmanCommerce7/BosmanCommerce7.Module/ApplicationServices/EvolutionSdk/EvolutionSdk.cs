@@ -8,10 +8,11 @@
  */
 
 using System.Text.RegularExpressions;
+using BosmanCommerce7.Module.Models.EvolutionSdk;
 using CSharpFunctionalExtensions;
 using Pastel.Evolution;
 
-namespace BosmanCommerce7.Module.Extensions.EvolutionSdk {
+namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
 
   public class EvolutionSdk : IEvolutionSdk {
     private readonly IEvolutionCompanyDescriptor _companyDescriptor;

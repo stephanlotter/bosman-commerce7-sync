@@ -22,6 +22,7 @@ namespace BosmanCommerce7.Module.BusinessObjects {
   public class OnlineSalesOrder : XPObject {
 
     private string? _customerId;
+    private string? _emailAddress;
     private string? _onlineId;
     private string? _channel;
     private DateTime _orderDate;
@@ -37,6 +38,7 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     private string? _shipToAddressProvince;
     private string? _shipToAddressPostalCode;
     private string? _shipToAddressCountryCode;
+    private string? _lastErrorMessage;
     private string? _orderJson;
     private SalesOrderPostingStatus _postingStatus;
     private int _retryCount;
@@ -45,9 +47,15 @@ namespace BosmanCommerce7.Module.BusinessObjects {
 
     [Size(40)]
     [ModelDefault("AllowEdit", "false")]
-    public string? CustomerId {
+    public string? CustomerOnlineId {
       get => _customerId;
-      set => SetPropertyValue(nameof(CustomerId), ref _customerId, value);
+      set => SetPropertyValue(nameof(CustomerOnlineId), ref _customerId, value);
+    }
+
+    [ModelDefault("AllowEdit", "false")]
+    public string? EmailAddress {
+      get => _emailAddress;
+      set => SetPropertyValue(nameof(EmailAddress), ref _emailAddress, value);
     }
 
     [Size(40)]
@@ -175,12 +183,21 @@ namespace BosmanCommerce7.Module.BusinessObjects {
       set => SetPropertyValue(nameof(DatePosted), ref _datePosted, value);
     }
 
+    [ModelDefault("AllowEdit", "false")]
+    public string? LastErrorMessage {
+      get => _lastErrorMessage;
+      set => SetPropertyValue(nameof(LastErrorMessage), ref _lastErrorMessage, value);
+    }
+
     [Size(-1)]
     [ModelDefault("AllowEdit", "false")]
     public string? OrderJson {
       get => _orderJson;
       set => SetPropertyValue(nameof(OrderJson), ref _orderJson, value);
     }
+
+    [Browsable(false)]
+    public bool IsStoreOrder => Channel?.Equals("web", StringComparison.InvariantCultureIgnoreCase) ?? false;
 
     [Association("OnlineSalesOrder-OnlineSalesOrderLine")]
     [Aggregated]
@@ -210,6 +227,8 @@ namespace BosmanCommerce7.Module.BusinessObjects {
         details = shortDescription + "\r\n" + (details ?? "");
       }
 
+      LastErrorMessage = shortDescription;
+
       var log = new OnlineSalesOrderProcessingLog(Session) {
         ShortDescription = shortDescription,
         Details = details
@@ -219,6 +238,12 @@ namespace BosmanCommerce7.Module.BusinessObjects {
       SalesOrderProcessingLogs.Add(log);
     }
 
+    internal void ResetPostingStatus() {
+      RetryAfter = DateTime.Now;
+      RetryCount = 0;
+      PostingStatus = SalesOrderPostingStatus.New;
+      LastErrorMessage = null;
+    }
   }
 
 }

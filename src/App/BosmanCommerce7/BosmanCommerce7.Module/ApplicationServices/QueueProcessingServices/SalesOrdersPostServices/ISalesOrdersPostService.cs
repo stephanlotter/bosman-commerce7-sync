@@ -7,10 +7,10 @@
  *  
  */
 
-using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices.Models;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices.Models;
 using CSharpFunctionalExtensions;
 
-namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices {
+namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices {
   public interface ISalesOrdersPostService {
     Result<SalesOrdersPostResult> Execute(SalesOrdersPostContext context);
   }

@@ -7,7 +7,7 @@
  *  
  */
 
-namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices.Models {
+namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices.Models {
   public record SalesOrdersPostResult {
 
   }

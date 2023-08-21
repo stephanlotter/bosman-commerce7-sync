@@ -7,10 +7,10 @@
  *  
  */
 
-using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices.Models;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices.Models;
 using Microsoft.Extensions.Logging;
 
-namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices {
+namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices {
   public class SalesOrdersPostQueueService : SyncQueueServiceBase, ISalesOrdersPostQueueService {
     private readonly ISalesOrdersPostService _salesOrdersPostService;
 

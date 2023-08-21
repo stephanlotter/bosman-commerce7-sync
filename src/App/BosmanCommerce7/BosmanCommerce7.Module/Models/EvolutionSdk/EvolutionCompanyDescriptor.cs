@@ -7,7 +7,7 @@
  *  
  */
 
-namespace BosmanCommerce7.Module.Extensions.EvolutionSdk {
+namespace BosmanCommerce7.Module.Models.EvolutionSdk {
   public class EvolutionCompanyDescriptor : IEvolutionCompanyDescriptor {
 
     public string BranchCode { get; }

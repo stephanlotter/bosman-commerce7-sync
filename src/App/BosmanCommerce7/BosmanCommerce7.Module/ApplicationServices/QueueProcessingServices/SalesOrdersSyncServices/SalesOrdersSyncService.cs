@@ -137,7 +137,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
             if (channelProjectCode.IsFailure) { throw new Exception(channelProjectCode.Error); }
 
-            localSalesOrder.CustomerId = salesOrder.customerId;
+
+            localSalesOrder.CustomerOnlineId = salesOrder.customerId;
+            localSalesOrder.EmailAddress = salesOrder.customer.emails.Count > 0 ? salesOrder.customer.emails[0]?.email : null;
             localSalesOrder.OnlineId = salesOrder.id;
             localSalesOrder.Channel = salesOrder.channel;
             localSalesOrder.OrderDate = orderDate;
