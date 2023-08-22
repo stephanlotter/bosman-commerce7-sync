@@ -9,10 +9,10 @@
 
 namespace BosmanCommerce7.Module.Models {
   public enum SalesOrderPostingStatus {
-    New,
-    Posted,
-    Retrying,
-    Failed
+    New = 0,
+    Retrying = 10,
+    Posted = 100,
+    Failed = 200
   }
 
 }

@@ -54,7 +54,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
                 Logger.LogError("Error posting sales order Online Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
                 Logger.LogError("{error}", err);
 
-                onlineSalesOrder.PostLog("Error posting sales order", err);
+                onlineSalesOrder.PostLog(err);
 
                 if (onlineSalesOrder.RetryCount < 6) {
                   onlineSalesOrder.PostingStatus = SalesOrderPostingStatus.Retrying;
@@ -78,7 +78,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
           }
           catch (Exception ex) {
             Logger.LogError(ex, "Error posting online sales order number {OrderNumber}", onlineSalesOrder.OrderNumber);
-            onlineSalesOrder.PostLog("Error posting sales order", ex);
+            onlineSalesOrder.PostLog(ex.Message, ex);
           }
           finally {
             onlineSalesOrder.Save();
