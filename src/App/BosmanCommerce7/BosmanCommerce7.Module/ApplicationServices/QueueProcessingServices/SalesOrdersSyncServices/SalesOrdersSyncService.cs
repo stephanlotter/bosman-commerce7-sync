@@ -159,7 +159,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
               localSalesOrder.ShipToAddressCountryCode = salesOrder.shipTo.countryCode;
             }
 
-            localSalesOrder.OrderJson = JsonConvert.SerializeObject(salesOrder);
+            localSalesOrder.OrderJson = JsonConvert.SerializeObject(salesOrder, Formatting.Indented);
 
             foreach (var item in salesOrder.items) {
               var localSalesOrderLine = NewLine(localSalesOrder);

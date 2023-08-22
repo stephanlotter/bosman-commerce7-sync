@@ -29,10 +29,12 @@ select s.OID,
        s.ProjectCode,
        s.CustomerOnlineId
     from OnlineSalesOrder s
+    where 1=1
+        and s.LastErrorMessage like 'Inv%'
     order by s.OrderDate desc;
 select *
     from OnlineSalesOrderLine
-    order by OnlineSalesOrder;
+    order by Sku;
 
 /*
 update OnlineSalesOrder set RetryAfter = getdate(),
@@ -43,6 +45,7 @@ update OnlineSalesOrder set RetryAfter = getdate(),
 
 /*
 delete from OnlineSalesOrderLine
+delete from OnlineSalesOrderProcessingLog
 delete from OnlineSalesOrder
 update ValueStore set KeyValue='2023-08-01'  where KeyName='sales-orders-sync-last-synced'
 */

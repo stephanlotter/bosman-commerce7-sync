@@ -41,7 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Pastel.Evolution">
-      <HintPath>..\..\..\EvolutionSdk\Pastel.Evolution.dll</HintPath>
+      <HintPath>..\..\..\EvolutionSdk\CurrentVersion\Pastel.Evolution.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>

@@ -1,5 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Application Title="Bosman Commerce7 Sync">
+  <BOModel>
+    <Class Name="BosmanCommerce7.Module.BusinessObjects.OnlineSalesOrder">
+      <OwnMembers>
+        <Member Name="OrderJson" RowCount="15" />
+      </OwnMembers>
+    </Class>
+    <Class Name="BosmanCommerce7.Module.BusinessObjects.OnlineSalesOrderProcessingLog">
+      <OwnMembers>
+        <Member Name="Details" RowCount="10" />
+      </OwnMembers>
+    </Class>
+  </BOModel>
   <NavigationItems>
     <Items>
       <Item Id="Default">
@@ -21,7 +33,58 @@
     <SchemaModule Name="SystemModule" Version="23.1.4.0" IsNewNode="True" />
   </SchemaModules>
   <Views>
-    <ListView Id="OnlineSalesOrder_ListView">
+    <DetailView Id="OnlineSalesOrder_DetailView" FreezeLayout="True" AllowDelete="False" AllowEdit="False" AllowNew="False">
+      <Layout IsNewNode="True" Removed="True">
+        <LayoutGroup Id="Main" Index="0" ShowCaption="False" RelativeSize="100" IsNewNode="True">
+          <LayoutGroup Id="SimpleEditors" Index="0" ShowCaption="False" RelativeSize="31.118314424635333" Direction="Horizontal" IsNewNode="True">
+            <LayoutGroup Id="OnlineSalesOrder_col1" ShowCaption="False" Index="0" RelativeSize="50" IsNewNode="True">
+              <LayoutGroup Id="Item2" ShowCaption="True" Caption="Customer" CaptionLocation="Top" Index="0" RelativeSize="100" IsNewNode="True">
+                <LayoutItem Id="CustomerOnlineId" ViewItem="CustomerOnlineId" Index="0" RelativeSize="9.27536231884058" IsNewNode="True" />
+                <LayoutItem Id="EmailAddress" ViewItem="EmailAddress" Index="1" RelativeSize="6.956521739130435" IsNewNode="True" />
+                <LayoutItem Id="ShipToName" ViewItem="ShipToName" Index="2" RelativeSize="6.956521739130435" IsNewNode="True" />
+                <LayoutItem Id="ShipToAddress1" ViewItem="ShipToAddress1" Index="3" RelativeSize="6.956521739130435" IsNewNode="True" />
+                <LayoutItem Id="ShipToAddress2" ViewItem="ShipToAddress2" Index="4" RelativeSize="6.956521739130435" IsNewNode="True" />
+                <LayoutItem Id="ShipToAddressCity" ViewItem="ShipToAddressCity" Index="5" RelativeSize="6.956521739130435" IsNewNode="True" />
+                <LayoutItem Id="ShipToAddressProvince" ViewItem="ShipToAddressProvince" Index="6" RelativeSize="6.956521739130435" IsNewNode="True" />
+                <LayoutItem Id="ShipToAddressCountryCode" ViewItem="ShipToAddressCountryCode" Index="7" RelativeSize="6.956521739130435" IsNewNode="True" />
+                <LayoutItem Id="ShipToAddressPostalCode" ViewItem="ShipToAddressPostalCode" Index="8" RelativeSize="6.956521739130435" IsNewNode="True" />
+                <LayoutItem Id="ShipToPhoneNumber" ViewItem="ShipToPhoneNumber" Index="9" RelativeSize="35.072463768115945" IsNewNode="True" />
+              </LayoutGroup>
+            </LayoutGroup>
+            <LayoutGroup Id="OnlineSalesOrder_col2" ShowCaption="False" Index="1" RelativeSize="50" IsNewNode="True">
+              <LayoutGroup Id="Item4" ShowCaption="True" Caption="Order" CaptionLocation="Top" Index="0" RelativeSize="56.510416666666664" IsNewNode="True">
+                <LayoutItem Id="OrderNumber" ViewItem="OrderNumber" Index="0" RelativeSize="17.391304347826086" IsNewNode="True" />
+                <LayoutItem Id="OrderValueInVat" ViewItem="OrderValueInVat" Index="1" RelativeSize="13.043478260869565" IsNewNode="True" />
+                <LayoutItem Id="OrderDate" ViewItem="OrderDate" Index="2" RelativeSize="13.043478260869565" IsNewNode="True" />
+                <LayoutItem Id="OnlineId" ViewItem="OnlineId" Index="3" RelativeSize="13.043478260869565" IsNewNode="True" />
+                <LayoutItem Id="Channel" ViewItem="Channel" Index="4" RelativeSize="13.043478260869565" IsNewNode="True" />
+                <LayoutItem Id="ProjectCode" ViewItem="ProjectCode" Index="5" RelativeSize="13.043478260869565" IsNewNode="True" />
+                <LayoutItem Id="EvolutionSalesOrderNumber" ViewItem="EvolutionSalesOrderNumber" Index="6" RelativeSize="17.391304347826086" IsNewNode="True" />
+              </LayoutGroup>
+              <LayoutGroup Id="Item3" ShowCaption="True" Caption="Status" CaptionLocation="Top" Index="1" RelativeSize="43.489583333333336" IsNewNode="True">
+                <LayoutItem Id="PostingStatus" ViewItem="PostingStatus" Index="0" RelativeSize="23.529411764705884" IsNewNode="True" />
+                <LayoutItem Id="DatePosted" ViewItem="DatePosted" Index="1" RelativeSize="17.647058823529413" IsNewNode="True" />
+                <LayoutItem Id="RetryAfter" ViewItem="RetryAfter" Index="2" RelativeSize="17.647058823529413" IsNewNode="True" />
+                <LayoutItem Id="RetryCount" ViewItem="RetryCount" Index="3" RelativeSize="17.647058823529413" IsNewNode="True" />
+                <LayoutItem Id="LastErrorMessage" ViewItem="LastErrorMessage" Index="4" RelativeSize="23.529411764705884" IsNewNode="True" />
+              </LayoutGroup>
+            </LayoutGroup>
+          </LayoutGroup>
+          <TabbedGroup Id="Tabs" Index="1" RelativeSize="68.88168557536467" IsNewNode="True">
+            <LayoutGroup Id="SalesOrderLines" Index="0" ShowCaption="True" RelativeSize="100" IsNewNode="True">
+              <LayoutItem Id="SalesOrderLines" ViewItem="SalesOrderLines" ShowCaption="False" Index="0" RelativeSize="100" IsNewNode="True" />
+            </LayoutGroup>
+            <LayoutGroup Id="SalesOrderProcessingLogs" Index="1" ShowCaption="True" RelativeSize="100" IsNewNode="True">
+              <LayoutItem Id="SalesOrderProcessingLogs" ViewItem="SalesOrderProcessingLogs" ShowCaption="False" Index="0" RelativeSize="100" IsNewNode="True" />
+            </LayoutGroup>
+            <LayoutGroup Id="Item1" ShowCaption="True" CaptionLocation="Top" Direction="Vertical" Index="2" RelativeSize="100" Caption="Json" IsNewNode="True">
+              <LayoutItem Id="OrderJson" ViewItem="OrderJson" Index="0" RelativeSize="100" ShowCaption="False" IsNewNode="True" />
+            </LayoutGroup>
+          </TabbedGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <ListView Id="OnlineSalesOrder_ListView" AllowDelete="False" AllowLink="False" AllowNew="False">
       <Columns>
         <ColumnInfo Id="CustomerOnlineId" Index="-1" />
         <ColumnInfo Id="EmailAddress" Index="-1" />
@@ -46,8 +109,16 @@
         <ColumnInfo Id="DatePosted" Index="8" />
         <ColumnInfo Id="RetryCount" Index="9" />
       </Columns>
+      <Filters CurrentFilterId="NewAndRetrying">
+        <Filter Id="NewAndRetrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New# Or [PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="0" Caption="New and Retrying" IsNewNode="True" />
+        <Filter Id="New" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New#" Index="1" IsNewNode="True" />
+        <Filter Id="Retrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="2" IsNewNode="True" />
+        <Filter Id="Posted" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Posted#" Index="3" IsNewNode="True" />
+        <Filter Id="Failed" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Failed#" Index="4" IsNewNode="True" />
+        <Filter Id="All" Index="5" IsNewNode="True" />
+      </Filters>
     </ListView>
-    <ListView Id="OnlineSalesOrder_SalesOrderLines_ListView">
+    <ListView Id="OnlineSalesOrder_SalesOrderLines_ListView" AllowDelete="False" AllowLink="False" AllowNew="False">
       <Columns>
         <ColumnInfo Id="OnlineId" Index="-1" />
         <ColumnInfo Id="OnlineTaxType" Index="-1" />
@@ -61,6 +132,52 @@
         <ColumnInfo Id="Oid" Index="7" />
       </Columns>
     </ListView>
+    <ListView Id="OnlineSalesOrder_SalesOrderProcessingLogs_ListView" AllowDelete="False" AllowLink="False" AllowNew="False" />
+    <DetailView Id="OnlineSalesOrderLine_DetailView" FreezeLayout="True" AllowDelete="False" AllowEdit="False" AllowNew="False">
+      <Layout IsNewNode="True" Removed="True">
+        <LayoutGroup Id="Main" Index="0" ShowCaption="False" RelativeSize="100" IsNewNode="True">
+          <LayoutGroup Id="SimpleEditors" Index="0" ShowCaption="False" RelativeSize="10.850202429149798" Direction="Horizontal" IsNewNode="True">
+            <LayoutGroup Id="OnlineSalesOrderLine_col1" ShowCaption="False" Index="0" RelativeSize="50" IsNewNode="True">
+              <LayoutItem Id="Sku" ViewItem="Sku" Index="0" RelativeSize="23.880597014925375" IsNewNode="True" />
+              <LayoutItem Id="LineDescription" ViewItem="LineDescription" Index="1" RelativeSize="17.91044776119403" IsNewNode="True" />
+              <LayoutItem Id="Quantity" ViewItem="Quantity" Index="2" RelativeSize="17.91044776119403" IsNewNode="True" />
+              <LayoutItem Id="UnitPriceInVat" ViewItem="UnitPriceInVat" Index="3" RelativeSize="17.91044776119403" IsNewNode="True" />
+              <LayoutItem Id="LineValueInVat" ViewItem="LineValueInVat" Index="4" RelativeSize="22.388059701492537" IsNewNode="True" />
+            </LayoutGroup>
+            <LayoutGroup Id="OnlineSalesOrderLine_col2" ShowCaption="False" Index="1" RelativeSize="50" IsNewNode="True">
+              <LayoutItem Id="LineType" ViewItem="LineType" Index="0" RelativeSize="23.880597014925375" IsNewNode="True" />
+              <LayoutItem Id="OnlineTaxType" ViewItem="OnlineTaxType" Index="1" RelativeSize="17.91044776119403" IsNewNode="True" />
+              <LayoutItem Id="TaxAmount" ViewItem="TaxAmount" Index="2" RelativeSize="17.91044776119403" IsNewNode="True" />
+              <LayoutItem Id="OnlineId" ViewItem="OnlineId" Index="3" RelativeSize="17.91044776119403" IsNewNode="True" />
+              <LayoutItem Id="Oid" ViewItem="Oid" Index="4" RelativeSize="22.388059701492537" IsNewNode="True" />
+            </LayoutGroup>
+          </LayoutGroup>
+          <LayoutGroup Id="SizeableEditors" Index="1" ShowCaption="False" RelativeSize="89.1497975708502" IsNewNode="True">
+            <LayoutItem Id="LineNotes" ViewItem="LineNotes" ShowCaption="" Index="0" RelativeSize="100" IsNewNode="True" />
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <ListView Id="OnlineSalesOrderLine_ListView" AllowDelete="False" AllowEdit="True" AllowLink="False" AllowNew="False" />
+    <DetailView Id="OnlineSalesOrderProcessingLog_DetailView" AllowDelete="False" AllowEdit="False" AllowNew="False" FreezeLayout="True">
+      <Layout IsNewNode="True" Removed="True">
+        <LayoutGroup Id="Main" Index="0" ShowCaption="False" RelativeSize="100" IsNewNode="True">
+          <LayoutGroup Id="SimpleEditors" Index="0" ShowCaption="False" RelativeSize="3.076923076923077" IsNewNode="True">
+            <LayoutGroup Id="OnlineSalesOrderProcessingLog" Index="0" ShowCaption="False" Caption="OnlineSalesOrderProcessingLog" RelativeSize="100" IsNewNode="True">
+              <LayoutItem Id="ShortDescription" ViewItem="ShortDescription" ShowCaption="" Index="0" RelativeSize="100" IsNewNode="True" />
+            </LayoutGroup>
+          </LayoutGroup>
+          <LayoutGroup Id="SizeableEditors" Index="1" ShowCaption="False" RelativeSize="96.92307692307692" Caption="Details" IsNewNode="True">
+            <LayoutItem Id="Details" ViewItem="Details" ShowCaption="" Index="0" RelativeSize="97.3266499582289" IsNewNode="True" />
+            <LayoutGroup Id="Autoa9d18be1-5214-4adf-9681-b24837cf6d4f" ShowCaption="False" Caption="" Direction="Horizontal" Index="1" RelativeSize="2.6733500417710943" IsNewNode="True">
+              <LayoutItem Id="EntryDate" ViewItem="EntryDate" Index="0" RelativeSize="50" IsNewNode="True" />
+              <LayoutItem Id="Oid" ViewItem="Oid" Index="1" RelativeSize="50" IsNewNode="True" />
+            </LayoutGroup>
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <ListView Id="OnlineSalesOrderProcessingLog_ListView" AllowDelete="False" AllowLink="False" AllowNew="False" />
     <DetailView Id="TaxMapping_DetailView" FreezeLayout="True">
       <Layout IsNewNode="True" Removed="True">
         <LayoutGroup Id="Main" Index="0" ShowCaption="False" RelativeSize="100" IsNewNode="True">
