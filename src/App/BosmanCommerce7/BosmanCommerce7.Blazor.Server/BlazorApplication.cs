@@ -29,7 +29,7 @@ public class BosmanCommerce7BlazorApplication : BlazorApplication {
 #endif
   }
 
-  private void BosmanCommerce7BlazorApplication_DatabaseVersionMismatch(object sender, DatabaseVersionMismatchEventArgs e) {
+  private void BosmanCommerce7BlazorApplication_DatabaseVersionMismatch(object? sender, DatabaseVersionMismatchEventArgs e) {
 #if EASYTEST
         e.Updater.Update();
         e.Handled = true;

@@ -1,0 +1,1 @@
+nssm status BosmanCommerce7

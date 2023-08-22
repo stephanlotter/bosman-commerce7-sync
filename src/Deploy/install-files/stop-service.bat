@@ -1,0 +1,1 @@
+nssm stop BosmanCommerce7

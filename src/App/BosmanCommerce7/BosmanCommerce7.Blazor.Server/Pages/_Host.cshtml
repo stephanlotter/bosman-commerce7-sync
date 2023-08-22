@@ -16,10 +16,10 @@
     <component type="typeof(BootstrapThemeLink)" render-mode="Static" />
 </head>
 <body>
-    @{
-        string userAgent = Request.Headers["User-Agent"];
-        bool isIE = userAgent.Contains("MSIE") || userAgent.Contains("Trident");
-    }
+  @{
+    string? userAgent = Request.Headers["User-Agent"];
+    bool isIE = (userAgent?.Contains("MSIE") ?? false) || (userAgent?.Contains("Trident") ?? false);
+  }
     @if(isIE) {
         <link href="css/site.css" rel="stylesheet" />
         <div class="d-flex flex-column justify-content-center align-items-center h-100">

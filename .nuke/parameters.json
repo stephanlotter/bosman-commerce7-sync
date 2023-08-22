@@ -1,0 +1,4 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "src/App/BosmanCommerce7/BosmanCommerce7.sln"
+}
