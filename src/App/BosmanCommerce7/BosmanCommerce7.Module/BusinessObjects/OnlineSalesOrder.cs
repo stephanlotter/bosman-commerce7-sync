@@ -266,9 +266,14 @@ namespace BosmanCommerce7.Module.BusinessObjects {
         value.Split(',').ToList().ForEach(x => list.Add(Normalize(x)));
       }
 
+      if (IsStoreOrder) { Add(ShipToName); }
+
       Add(ShipToAddress1);
       Add(ShipToAddress2);
       Add(ShipToAddressCity);
+
+      if (IsStoreOrder) { Add(ShipToPhoneNumber); }
+
       Add(ShipToAddressProvince);
       Add(ShipToAddressCountryCode);
 

@@ -103,8 +103,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
 
         .Bind(salesOrder => {
           var deliveryAddress = onlineSalesOrder.ShipToAddress();
-          deliveryAddress = AddCustomerNameToAddress(deliveryAddress);
-          deliveryAddress = AddPhoneNumberToAddress(deliveryAddress);
           salesOrder.DeliverTo = deliveryAddress;
           return Result.Success(salesOrder);
         })
