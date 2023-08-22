@@ -84,11 +84,15 @@
         </LayoutGroup>
       </Layout>
     </DetailView>
-    <ListView Id="OnlineSalesOrder_ListView" AllowDelete="False" AllowLink="False" AllowNew="False">
+    <ListView Id="OnlineSalesOrder_ListView" AllowDelete="False" AllowLink="False" AllowNew="False" IsFooterVisible="True">
       <Columns>
+        <ColumnInfo Id="Channel" Index="-1" />
         <ColumnInfo Id="CustomerOnlineId" Index="-1" />
         <ColumnInfo Id="EmailAddress" Index="-1" />
+        <ColumnInfo Id="EvolutionSalesOrderNumber" Index="-1" />
         <ColumnInfo Id="OnlineId" Index="-1" />
+        <ColumnInfo Id="OrderDate" Index="-1" />
+        <ColumnInfo Id="OrderValueInVat" Index="-1" />
         <ColumnInfo Id="ProjectCode" Index="-1" />
         <ColumnInfo Id="ShipToAddress1" Index="-1" />
         <ColumnInfo Id="ShipToAddress2" Index="-1" />
@@ -98,16 +102,16 @@
         <ColumnInfo Id="ShipToAddressProvince" Index="-1" />
         <ColumnInfo Id="ShipToName" Index="-1" />
         <ColumnInfo Id="ShipToPhoneNumber" Index="-1" />
-        <ColumnInfo Id="RetryAfter" Index="0" SortIndex="0" SortOrder="Ascending" />
-        <ColumnInfo Id="OrderNumber" Index="1" SortIndex="-1" SortOrder="None" />
-        <ColumnInfo Id="EvolutionSalesOrderNumber" Index="2" />
-        <ColumnInfo Id="PostingStatus" Index="3" SortIndex="-1" SortOrder="None" />
-        <ColumnInfo Id="LastErrorMessage" Index="4" />
-        <ColumnInfo Id="OrderDate" Index="5" />
-        <ColumnInfo Id="OrderValueInVat" Index="6" />
-        <ColumnInfo Id="Channel" Index="7" />
-        <ColumnInfo Id="DatePosted" Index="8" />
-        <ColumnInfo Id="RetryCount" Index="9" />
+        <ColumnInfo Id="OrderNumber" Index="0" SortIndex="-1" SortOrder="None" Width="100">
+          <Summary>
+            <ColumnSummaryItem Id="NumberOfRows" SummaryType="Count" IsNewNode="True" />
+          </Summary>
+        </ColumnInfo>
+        <ColumnInfo Id="RetryAfter" Index="1" SortIndex="0" SortOrder="Ascending" Width="150" />
+        <ColumnInfo Id="PostingStatus" Index="2" SortIndex="-1" SortOrder="None" Width="100" />
+        <ColumnInfo Id="LastErrorMessage" Index="3" />
+        <ColumnInfo Id="DatePosted" Index="4" Width="150" />
+        <ColumnInfo Id="RetryCount" Index="5" Width="90" />
       </Columns>
       <Filters CurrentFilterId="NewAndRetrying">
         <Filter Id="NewAndRetrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New# Or [PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="0" Caption="New and Retrying" IsNewNode="True" />

@@ -43,6 +43,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
     }
 
     public Result<SalesOrdersSyncResult> Execute(SalesOrdersSyncContext context) {
+      var errorCount = 0;
+
       var parametersResult = LoadParameters();
       if (parametersResult.IsFailure) { return Result.Failure<SalesOrdersSyncResult>(parametersResult.Error); }
       var parameters = parametersResult.Value;
@@ -72,22 +74,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
         if (response.SalesOrders == null || response.SalesOrders!.Length == 0) {
           Logger.LogInformation("No sales orders found since: {orderSubmittedDate}", $"{orderSubmittedDate:yyyy-MM-dd HH:mm:ss}");
-          return Result.Success(BuildResult());
-        }
-
-        string BuildShipToName(string firstName, string lastName) {
-          return $"{(firstName ?? "").Trim()} {(lastName ?? "").Trim()}".Trim();
-        }
-
-        string BuildLineDescription(string productTitle, string productVariantTitle) {
-          return $"{(productTitle ?? "").Trim()} {(productVariantTitle ?? "").Trim()}".Trim();
-        }
-
-        double ConvertCurrencyValue(dynamic amount) {
-          if (double.TryParse($"{amount}", out var result)) {
-            return result / 100d;
-          }
-          return 0d;
+          return Result.Success(BuildResult("No new orders"));
         }
 
         Result<string?> MapChannelToProjectCode(string? channel) {
@@ -96,24 +83,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
             .OnFailureCompensate(error => Result.Failure<string?>($"Unable to map channel to project code: {error}"));
         }
 
-        string NormalizeItemCode(string? code) => (code ?? "").Trim().ToUpper();
-
         _localObjectSpaceProvider.WrapInObjectSpaceTransaction(objectSpace => {
-          OnlineSalesOrder NewOrder(dynamic id, dynamic orderNumber) {
-            var criteria = CriteriaOperator.Or("OnlineId".IsEqualToOperator($"{id}"), "OrderNumber".IsEqualToOperator($"{orderNumber}"));
-            var orders = objectSpace.GetObjects<OnlineSalesOrder>(criteria);
-            if (orders.Count > 1) {
-              Logger.LogWarning("Multiple sales orders found:[Order number:{orderNumber}][id:{id}]", $"{orderNumber}", $"{id}");
-            }
-            var order = orders.FirstOrDefault();
-            return order ?? objectSpace.CreateObject<OnlineSalesOrder>();
-          }
-
-          OnlineSalesOrderLine NewLine(OnlineSalesOrder localSalesOrder) {
-            var localSalesOrderLine = objectSpace.CreateObject<OnlineSalesOrderLine>();
-            localSalesOrder.SalesOrderLines.Add(localSalesOrderLine);
-            return localSalesOrderLine;
-          }
 
           foreach (dynamic salesOrder in response.SalesOrders!) {
             Logger.LogInformation("Sales order found: {orderNumber}", $"{salesOrder.orderNumber}");
@@ -148,7 +118,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
             localSalesOrder.ProjectCode = channelProjectCode.Value;
 
             if (salesOrder.shipTo != null) {
-              localSalesOrder.ShipToName = BuildShipToName(salesOrder.shipTo.firstName, salesOrder.shipTo.lastName);
+              localSalesOrder.ShipToName = BuildShipToName($"{salesOrder.shipTo.firstName}", $"{salesOrder.shipTo.lastName}");
               localSalesOrder.ShipToPhoneNumber = salesOrder.shipTo.phone;
 
               localSalesOrder.ShipToAddress1 = salesOrder.shipTo.address;
@@ -167,8 +137,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
               localSalesOrderLine.OnlineId = item.id;
               localSalesOrderLine.LineType = SalesOrderLineType.Inventory;
 
-              localSalesOrderLine.Sku = NormalizeItemCode(item.sku);
-              localSalesOrderLine.LineDescription = BuildLineDescription(item.productTitle, item.productVariantTitle);
+              localSalesOrderLine.Sku = NormalizeItemCode($"{item.sku}");
+              localSalesOrderLine.LineDescription = BuildLineDescription($"{item.productTitle}", $"{item.productVariantTitle}");
 
               localSalesOrderLine.Quantity = item.quantity;
               localSalesOrderLine.TaxAmount = ConvertCurrencyValue(item.tax);
@@ -209,19 +179,36 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
             localSalesOrder.Save();
           }
 
+          OnlineSalesOrder NewOrder(dynamic id, dynamic orderNumber) {
+            var criteria = CriteriaOperator.Or("OnlineId".IsEqualToOperator($"{id}"), "OrderNumber".IsEqualToOperator($"{orderNumber}"));
+            var orders = objectSpace.GetObjects<OnlineSalesOrder>(criteria);
+            if (orders.Count > 1) {
+              Logger.LogWarning("Multiple sales orders found:[Order number:{orderNumber}][id:{id}]", $"{orderNumber}", $"{id}");
+            }
+            var order = orders.FirstOrDefault();
+            return order ?? objectSpace.CreateObject<OnlineSalesOrder>();
+          }
+
+          OnlineSalesOrderLine NewLine(OnlineSalesOrder localSalesOrder) {
+            var localSalesOrderLine = objectSpace.CreateObject<OnlineSalesOrderLine>();
+            localSalesOrder.SalesOrderLines.Add(localSalesOrderLine);
+            return localSalesOrderLine;
+          }
+
         });
 
         _salesOrdersSyncValueStoreService.UpdateSalesOrdersSyncLastSynced(lastOrderDate.Date);
 
-        return Result.Success(BuildResult());
+        return errorCount == 0 ? Result.Success(BuildResult()) : Result.Failure<SalesOrdersSyncResult>($"Completed with {errorCount} errors.");
+
       }
       catch (Exception ex) {
         Logger.LogError("Unable to execute SalesOrdersSyncService: {error}", ex);
         return Result.Failure<SalesOrdersSyncResult>(ex.Message);
       }
 
-      SalesOrdersSyncResult BuildResult() {
-        return new SalesOrdersSyncResult { };
+      SalesOrdersSyncResult BuildResult(string? message = null) {
+        return new SalesOrdersSyncResult { Message = message };
       }
 
     }
@@ -255,6 +242,23 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
       ;
     }
+
+    private static string BuildShipToName(string? firstName, string? lastName) {
+      return $"{(firstName ?? "").Trim()} {(lastName ?? "").Trim()}".Trim();
+    }
+
+    private static string BuildLineDescription(string? productTitle, string? productVariantTitle) {
+      return $"{(productTitle ?? "").Trim()} {(productVariantTitle ?? "").Trim()}".Trim();
+    }
+
+    private static double ConvertCurrencyValue(dynamic amount) {
+      if (double.TryParse($"{amount}", out var result)) {
+        return result / 100d;
+      }
+      return 0d;
+    }
+
+    private static string NormalizeItemCode(string? code) => (code ?? "").Trim().ToUpper();
 
   }
 

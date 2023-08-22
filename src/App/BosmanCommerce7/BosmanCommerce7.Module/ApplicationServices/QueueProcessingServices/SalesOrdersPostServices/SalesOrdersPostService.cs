@@ -30,11 +30,19 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
     }
 
     public Result<SalesOrdersPostResult> Execute(SalesOrdersPostContext context) {
+        var errorCount = 0;
+
       _localObjectSpaceProvider.WrapInObjectSpaceTransaction(objectSpace => {
 
-        var criteriaPostingStatus = "PostingStatus".InCriteriaOperator(SalesOrderPostingStatus.New, SalesOrderPostingStatus.Retrying);
-        var criteriaRetryAfter = CriteriaOperator.Or("RetryAfter".IsNullOperator(), "RetryAfter".PropertyLessThan(DateTime.Now));
-        var olineSalesOrders = objectSpace.GetObjects<OnlineSalesOrder>(CriteriaOperator.And(criteriaPostingStatus, criteriaRetryAfter)).ToList();
+        CriteriaOperator? criteria = context.Criteria;
+
+        if (criteria is null) {
+          var criteriaPostingStatus = "PostingStatus".InCriteriaOperator(SalesOrderPostingStatus.New, SalesOrderPostingStatus.Retrying);
+          var criteriaRetryAfter = CriteriaOperator.Or("RetryAfter".IsNullOperator(), "RetryAfter".PropertyLessThan(DateTime.Now));
+          criteria = CriteriaOperator.And(criteriaPostingStatus, criteriaRetryAfter);
+        }
+
+        var olineSalesOrders = objectSpace.GetObjects<OnlineSalesOrder>(criteria).ToList();
 
         if (!olineSalesOrders.Any()) {
           Logger.LogDebug("No sales orders to post");
@@ -45,12 +53,15 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
           ObjectSpace = objectSpace
         };
 
+
         foreach (var onlineSalesOrder in olineSalesOrders) {
           try {
             Logger.LogInformation("Start posting online sales order. Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
+
             _postToEvolutionSalesOrderService
               .Post(postToEvolutionSalesOrderContext, onlineSalesOrder)
               .OnFailureCompensate(err => {
+                errorCount++;
                 Logger.LogError("Error posting sales order Online Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
                 Logger.LogError("{error}", err);
 
@@ -72,7 +83,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
                   onlineSalesOrder.PostingStatus = SalesOrderPostingStatus.Failed;
                 }
 
-                return Result.Success(onlineSalesOrder);
+                return Result.Failure<OnlineSalesOrder>(err);
               });
 
           }
@@ -88,7 +99,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
       });
 
-      return Result.Success(BuildResult());
+      return errorCount == 0 ? Result.Success(BuildResult()) : Result.Failure<SalesOrdersPostResult>($"Completed with {errorCount} errors.");
 
       SalesOrdersPostResult BuildResult() {
         return new SalesOrdersPostResult { };

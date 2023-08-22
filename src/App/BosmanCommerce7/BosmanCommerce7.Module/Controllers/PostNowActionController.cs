@@ -7,9 +7,12 @@
  *  
  */
 
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices.Models;
 using BosmanCommerce7.Module.BusinessObjects;
 using BosmanCommerce7.Module.Extensions;
 using BosmanCommerce7.Module.Models;
+using CSharpFunctionalExtensions;
 using DevExpress.ExpressApp;
 using DevExpress.ExpressApp.Actions;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,25 +40,22 @@ namespace BosmanCommerce7.Module.Controllers {
     }
 
     private void Execute() {
-      View.CommitChangesIfEditState();
-
       var userHasSelectedSalesOrders = View.SelectedObjects.Count > 0;
       var selectedSalesOrders = userHasSelectedSalesOrders ? View.SelectedObjects.Cast<OnlineSalesOrder>().ToList() : new List<OnlineSalesOrder>();
 
       var criteria = userHasSelectedSalesOrders
-        ? "Oid".InCriteriaOperator(selectedSalesOrders.Select(a => a.Oid))
-        : "PostingStatus".InCriteriaOperator(SalesOrderPostingStatus.New, SalesOrderPostingStatus.Retrying);
+        ? "Oid".MapArrayToInOperator(selectedSalesOrders.Select(a => a.Oid).ToArray())
+        : null;
 
-      var salesOrders = ObjectSpace.GetObjects<OnlineSalesOrder>(criteria).ToList();
+      var service = _serviceProvider!.GetService<ISalesOrdersPostService>();
+      var context = new SalesOrdersPostContext(criteria);
 
-      foreach (var salesOrder in salesOrders) {
-        salesOrder.ResetPostingStatus();
+      service!
+        .Execute(context)
+        .Tap(() => { ShowSuccessMessage(); })
+        .TapError(ShowErrorMessage);
 
-      // TODO: Implement posting of sales orders
-      }
-
-
-      View.CommitChangesIfEditState();
+      View.RefreshView();
     }
 
     protected override void ExecutePopup(object sender, PopupWindowShowActionExecuteEventArgs args) {

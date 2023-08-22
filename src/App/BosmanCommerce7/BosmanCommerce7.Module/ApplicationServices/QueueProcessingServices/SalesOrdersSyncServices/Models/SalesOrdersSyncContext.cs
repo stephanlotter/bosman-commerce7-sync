@@ -8,8 +8,7 @@
  */
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices.Models {
-  public record SalesOrdersSyncContext {
 
-  }
+  public record SalesOrdersSyncContext { }
 
 }

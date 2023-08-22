@@ -120,26 +120,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
         });
       }
 
-      Address AddCustomerNameToAddress(Address deliveryAddress) {
-        if (!onlineSalesOrder.IsStoreOrder || string.IsNullOrWhiteSpace(onlineSalesOrder.ShipToName)) { return deliveryAddress; }
-
-        deliveryAddress = deliveryAddress
-          .MoveEmptyLineToBottom()
-          .TryAddValueToTop(onlineSalesOrder.ShipToName);
-
-        return deliveryAddress;
-      }
-
-      Address AddPhoneNumberToAddress(Address deliveryAddress) {
-        if (!onlineSalesOrder.IsStoreOrder || string.IsNullOrWhiteSpace(onlineSalesOrder.ShipToPhoneNumber)) { return deliveryAddress; }
-
-        deliveryAddress = deliveryAddress
-          .MoveEmptyLineToBottom()
-          .WriteToFirstEmptySpace(onlineSalesOrder.ShipToPhoneNumber);
-
-        return deliveryAddress;
-      }
-
     }
 
     private Result<SalesOrder> AddSalesOrderLines(PostToEvolutionSalesOrderContext context, SalesOrder salesOrder, OnlineSalesOrder onlineSalesOrder) {

@@ -7,8 +7,11 @@
  *  
  */
 
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices.Models;
 using BosmanCommerce7.Module.BusinessObjects;
 using BosmanCommerce7.Module.Extensions;
+using CSharpFunctionalExtensions;
 using DevExpress.ExpressApp;
 using DevExpress.ExpressApp.Actions;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,11 +37,15 @@ namespace BosmanCommerce7.Module.Controllers {
     }
 
     private void Execute() {
-      View.CommitChangesIfEditState();
+      var service = _serviceProvider!.GetService<ISalesOrdersSyncService>();
+      var context = new SalesOrdersSyncContext();
 
-      // TODO: Implement fetch from Commerce7
+      service!
+        .Execute(context)
+        .Tap(() => { ShowSuccessMessage(); })
+        .TapError(ShowErrorMessage);
 
-      View.CommitChangesIfEditState();
+      View.RefreshView();
     }
 
     protected override void ExecutePopup(object sender, PopupWindowShowActionExecuteEventArgs args) {

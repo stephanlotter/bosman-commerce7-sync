@@ -42,7 +42,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
     public Result<string?> GetChannelProjectCode(string? channel) {
       if (string.IsNullOrWhiteSpace(channel)) { return Result.Failure<string?>("Channel provided is empty."); }
-      var keyName = $"sales-orders-sync-{channel.ToLower()}-channel-project-code";
+      var keyName = $"sales-orders-sync-channel-{channel.Trim().ToLower()}-project-code";
       return _valueStoreRepository
         .GetValue(keyName)
         .Bind(p => string.IsNullOrWhiteSpace(p)

@@ -8,6 +8,10 @@
  */
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices.Models {
-  public record SalesOrdersSyncResult { }
+  public record SalesOrdersSyncResult {
+
+    public string? Message { get; init; }
+
+  }
 
 }

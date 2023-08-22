@@ -7,9 +7,9 @@
  *  
  */
 
-namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices.Models {
-  public record SalesOrdersPostContext {
+using DevExpress.Data.Filtering;
 
-  }
+namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices.Models {
+  public record SalesOrdersPostContext(CriteriaOperator? Criteria = null);
 
 }
