@@ -18,7 +18,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
         return Result.Failure<Project>($"Project lookup: code may not be empty.");
       }
 
-      int? id = GetId("select p.ProjectLink from Project p where lower(p.ProjectCode)=lower(@projectCode)", new { code });
+      int? id = GetId("select p.ProjectLink from Project p where lower(p.ProjectCode)=lower(@code)", new { code });
 
       if (id == null) {
         return Result.Failure<Project>($"Project with code {code} not found");

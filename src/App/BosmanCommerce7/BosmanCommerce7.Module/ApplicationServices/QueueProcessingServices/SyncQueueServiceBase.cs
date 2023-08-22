@@ -24,10 +24,12 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices {
         try {
           Logger.LogDebug("START: Execute {service}", _typeName);
           ProcessQueue();
-          Logger.LogDebug("END: Execute {service}", _typeName);
         }
         catch (Exception ex) {
           Logger.LogError(ex, "While processing queue: {type}", _typeName);
+        }
+        finally {
+          Logger.LogDebug("END: Execute {service}", _typeName);
         }
       });
 

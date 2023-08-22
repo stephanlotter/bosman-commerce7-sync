@@ -112,14 +112,15 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
         .Bind(salesOrder => {
           salesOrder.DiscountPercent = onlineSalesOrder.IsStoreOrder ? salesOrder.Customer.AutomaticDiscount : 0d;
           return Result.Success(salesOrder);
-        })
-        ;
+        });
 
-      Result<SalesOrder> NewSalesOrder() => Result.Success(new SalesOrder {
-        ExternalOrderNo = $"{onlineSalesOrder.OrderNumber}",
-        OrderDate = onlineSalesOrder.OrderDate,
-        TaxMode = TaxMode.Inclusive
-      });
+      Result<SalesOrder> NewSalesOrder() {
+        return Result.Success(new SalesOrder {
+          ExternalOrderNo = $"{onlineSalesOrder.OrderNumber}",
+          OrderDate = onlineSalesOrder.OrderDate,
+          TaxMode = TaxMode.Inclusive
+        });
+      }
 
       Address AddCustomerNameToAddress(Address deliveryAddress) {
         if (!onlineSalesOrder.IsStoreOrder || string.IsNullOrWhiteSpace(onlineSalesOrder.ShipToName)) { return deliveryAddress; }

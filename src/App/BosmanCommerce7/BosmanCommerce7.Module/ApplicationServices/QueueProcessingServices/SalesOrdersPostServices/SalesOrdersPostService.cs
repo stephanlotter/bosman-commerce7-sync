@@ -51,6 +51,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
             _postToEvolutionSalesOrderService
               .Post(postToEvolutionSalesOrderContext, onlineSalesOrder)
               .OnFailureCompensate(err => {
+                Logger.LogError("Error posting sales order Online Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
+                Logger.LogError("{error}", err);
+
                 onlineSalesOrder.PostLog("Error posting sales order", err);
 
                 if (onlineSalesOrder.RetryCount < 6) {
