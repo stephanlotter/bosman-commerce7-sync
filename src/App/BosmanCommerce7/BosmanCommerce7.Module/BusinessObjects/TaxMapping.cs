@@ -11,6 +11,7 @@ using DevExpress.Persistent.Base;
 using DevExpress.Xpo;
 
 namespace BosmanCommerce7.Module.BusinessObjects {
+
   [DefaultClassOptions]
   [NavigationItem(true)]
   public class TaxMapping : XPObject {

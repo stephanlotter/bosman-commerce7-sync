@@ -14,6 +14,10 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
   public class EvolutionProjectRepository : EvolutionRepositoryBase, IEvolutionProjectRepository {
 
     public Result<Project> Get(string? code) {
+      if (string.IsNullOrWhiteSpace(code)) {
+        return Result.Failure<Project>($"Project lookup: code may not be empty.");
+      }
+
       int? id = GetId("select p.ProjectLink from Project p where lower(p.ProjectCode)=lower(@projectCode)", new { code });
 
       if (id == null) {

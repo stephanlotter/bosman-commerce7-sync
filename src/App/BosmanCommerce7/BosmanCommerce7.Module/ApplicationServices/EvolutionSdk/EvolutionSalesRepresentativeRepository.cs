@@ -14,6 +14,10 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
   public class EvolutionSalesRepresentativeRepository : EvolutionRepositoryBase, IEvolutionSalesRepresentativeRepository {
 
     public Result<SalesRepresentative> Get(string? code) {
+      if (string.IsNullOrWhiteSpace(code)) {
+        return Result.Failure<SalesRepresentative>($"Sales representative lookup: code may not be empty.");
+      }
+
       int? id = GetId("select idSalesRep from SalesRep where Code = @code", new { code });
 
       if (id == null) {

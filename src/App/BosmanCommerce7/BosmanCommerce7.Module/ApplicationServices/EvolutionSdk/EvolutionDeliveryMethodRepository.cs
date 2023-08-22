@@ -14,6 +14,10 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
   public class EvolutionDeliveryMethodRepository : EvolutionRepositoryBase, IEvolutionDeliveryMethodRepository {
 
     public Result<DeliveryMethod> Get(string? code) {
+      if (string.IsNullOrWhiteSpace(code)) {
+        return Result.Failure<DeliveryMethod>($"Delivery method lookup: code may not be empty.");
+      }
+
       int? id = GetId("select Counter from DelTbl where Method = @code", new { code });
 
       if (id == null) {

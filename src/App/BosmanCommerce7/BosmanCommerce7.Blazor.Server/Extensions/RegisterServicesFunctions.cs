@@ -14,11 +14,9 @@ using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOr
 using BosmanCommerce7.Module.ApplicationServices.RestApiClients;
 using BosmanCommerce7.Module.Models;
 using BosmanCommerce7.Module.Models.EvolutionSdk;
-using Microsoft.Extensions.Options;
 
-namespace BosmanCommerce7.Blazor.Server.Extensions
-{
-    public static class RegisterServicesFunctions {
+namespace BosmanCommerce7.Blazor.Server.Extensions {
+  public static class RegisterServicesFunctions {
 
     public static void RegisterServices(IServiceCollection services) {
       RegisterApiServices(services);
@@ -50,6 +48,9 @@ namespace BosmanCommerce7.Blazor.Server.Extensions
       services.AddTransient<IEvolutionSalesRepresentativeRepository, EvolutionSalesRepresentativeRepository>();
       services.AddTransient<IEvolutionDeliveryMethodRepository, EvolutionDeliveryMethodRepository>();
       services.AddTransient<IEvolutionInventoryItemRepository, EvolutionInventoryItemRepository>();
+      services.AddTransient<IEvolutionWarehouseRepository, EvolutionWarehouseRepository>();
+      services.AddTransient<IEvolutionPriceListRepository, EvolutionPriceListRepository>();
+      services.AddTransient<IEvolutionGeneralLedgerAccountRepository, EvolutionGeneralLedgerAccountRepository>();
     }
 
     private static void RegisterUtilityServices(IServiceCollection services) {

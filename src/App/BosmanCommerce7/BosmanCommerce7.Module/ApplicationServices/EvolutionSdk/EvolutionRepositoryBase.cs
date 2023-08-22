@@ -18,8 +18,12 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
 
     protected DbTransaction Transaction => DatabaseContext.DBTransaction;
 
-    protected int? GetId(string sql, object param = null) {
+    protected int? GetId(string sql, object? param = null) {
       return Connection.QueryFirstOrDefault<int?>(sql, param, transaction: Transaction);
+    }
+
+    protected double? GetDouble(string sql, object? param = null) {
+      return Connection.QueryFirstOrDefault<double?>(sql, param, transaction: Transaction);
     }
 
   }

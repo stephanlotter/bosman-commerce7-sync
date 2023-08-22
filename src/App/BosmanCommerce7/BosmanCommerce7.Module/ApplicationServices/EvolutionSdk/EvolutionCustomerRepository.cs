@@ -15,6 +15,10 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
   public class EvolutionCustomerRepository : EvolutionRepositoryBase, IEvolutionCustomerRepository {
 
     public Result<Customer> Get(CustomerDescriptor customerDescriptor) {
+      if (string.IsNullOrWhiteSpace(customerDescriptor.EmailAddress)) {
+        return Result.Failure<Customer>($"Customer account lookup: Email address may not be empty.");
+      }
+
       int? id = GetId("SELECT DCLink FROM Client WHERE ucARwcEmail = @EmailAddress", new { customerDescriptor.EmailAddress });
 
       if (id == null) {

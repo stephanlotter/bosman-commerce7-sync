@@ -7,12 +7,16 @@
  *  
  */
 
+using DevExpress.ExpressApp;
+
 namespace BosmanCommerce7.Module.Models.LocalDatabase {
   public record FindWarehouseCodeDescriptor {
 
     public bool IsStoreOrder { get; init; }
 
     public string? PostalCode { get; init; }
+
+    public IObjectSpace ObjectSpace { get; init; } = default!;
 
   }
 

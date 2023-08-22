@@ -29,6 +29,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
     private readonly IEvolutionDeliveryMethodRepository _evolutionDeliveryMethodRepository;
     private readonly IEvolutionSalesRepresentativeRepository _evolutionSalesRepresentativeRepository;
     private readonly IEvolutionInventoryItemRepository _evolutionInventoryItemRepository;
+    private readonly IEvolutionWarehouseRepository _evolutionWarehouseRepository;
+    private readonly IEvolutionPriceListRepository _evolutionPriceListRepository;
+    private readonly IEvolutionGeneralLedgerAccountRepository _evolutionGeneralLedgerAccountRepository;
 
     public PostToEvolutionSalesOrderService(ILogger<PostToEvolutionSalesOrderService> logger,
       IEvolutionSdk evolutionSdk,
@@ -38,7 +41,10 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
       IEvolutionProjectRepository evolutionProjectRepository,
       IEvolutionDeliveryMethodRepository evolutionDeliveryMethodRepository,
       IEvolutionSalesRepresentativeRepository evolutionSalesRepresentativeRepository,
-      IEvolutionInventoryItemRepository evolutionInventoryItemRepository) {
+      IEvolutionInventoryItemRepository evolutionInventoryItemRepository,
+      IEvolutionWarehouseRepository evolutionWarehouseRepository,
+      IEvolutionPriceListRepository evolutionPriceListRepository,
+      IEvolutionGeneralLedgerAccountRepository evolutionGeneralLedgerAccountRepository) {
       _logger = logger;
       _evolutionSdk = evolutionSdk;
       _salesOrdersPostValueStoreService = salesOrdersPostValueStoreService;
@@ -48,6 +54,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
       _evolutionDeliveryMethodRepository = evolutionDeliveryMethodRepository;
       _evolutionSalesRepresentativeRepository = evolutionSalesRepresentativeRepository;
       _evolutionInventoryItemRepository = evolutionInventoryItemRepository;
+      _evolutionWarehouseRepository = evolutionWarehouseRepository;
+      _evolutionPriceListRepository = evolutionPriceListRepository;
+      _evolutionGeneralLedgerAccountRepository = evolutionGeneralLedgerAccountRepository;
     }
 
     public Result<OnlineSalesOrder> Post(PostToEvolutionSalesOrderContext context, OnlineSalesOrder onlineSalesOrder) {
@@ -152,52 +161,50 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
     }
 
     private Result<SalesOrder> AddSalesOrderInventoryLine(PostToEvolutionSalesOrderContext context, SalesOrder salesOrder, OnlineSalesOrder onlineSalesOrder, OnlineSalesOrderLine onlineSalesOrderLine) {
-      // Add line note if not null
-
       try {
         if (string.IsNullOrWhiteSpace(onlineSalesOrderLine.Sku)) {
           return Result.Failure<SalesOrder>($"Sku on line with Oid {onlineSalesOrderLine.Oid} is blank");
         }
 
-        NewSalesOrderLine()
+        return NewSalesOrderLine(salesOrder)
+
           .Bind(salesOrderLine => RepositoryGetFromCode(salesOrderLine, onlineSalesOrderLine.Sku, _evolutionInventoryItemRepository.Get, inventoryItem => salesOrderLine.InventoryItem = inventoryItem))
+
           .Bind(salesOrderLine => {
             return _warehouseRepository.FindWarehouseCode(new FindWarehouseCodeDescriptor {
               IsStoreOrder = onlineSalesOrder.IsStoreOrder,
-              PostalCode = onlineSalesOrder.ShipToAddressPostalCode
-            }).Bind(warehouseCode => {
-
-              // Add Evo repo to find warehouse using RepositoryGetFromCode
-
-              return Result.Success(salesOrderLine);
-            });
+              PostalCode = onlineSalesOrder.ShipToAddressPostalCode,
+              ObjectSpace = context.ObjectSpace
+            })
+            .Bind(warehouseCode => RepositoryGetFromCode(salesOrderLine, warehouseCode, _evolutionWarehouseRepository.Get, warehouse => salesOrderLine.Warehouse = warehouse));
           })
 
-          ;
+          .Bind(salesOrderLine => {
 
-        //var findInventoryItem = genericSalesOrderLineDto.ItemCode.FindInventoryItem();
-        //if (findInventoryItem.IsFailure) {
-        //  return Result.Fail<OrderDetail>(findInventoryItem.Error);
-        //}
+            int? customerPriceListId = salesOrder.Customer.DefaultPriceListID > 0 ? salesOrder.Customer.DefaultPriceListID : null;
 
-        //var line = evolutionSalesOrder.NewSalesOrderLine();
+            return _evolutionPriceListRepository
+              .Get(salesOrderLine.InventoryItem.ID, customerPriceListId)
+              .Bind(evolutionPrice => {
+                salesOrderLine.PriceListNameID = evolutionPrice.UsedPriceListId;
+                salesOrderLine.UnitSellingPrice = evolutionPrice.UnitPriceInVat;
+                return Result.Success(salesOrderLine);
+              });
 
-        //line.InventoryItem = findInventoryItem.Value;
-        //line.Warehouse = new Warehouse(genericSalesOrderLineDto.WarehouseCode);
-        //line.Quantity = genericSalesOrderLineDto.Quantity;
-        //line.Reserved = line.WarehouseContext.QtyFree >= genericSalesOrderLineDto.Quantity
-        //  ? genericSalesOrderLineDto.Quantity
-        //  : line.WarehouseContext.QtyFree;
+          })
 
-        //var sellingPriceResult = line.InventoryItem.GetSellingPrice(priceListId);
-        //if (sellingPriceResult.IsFailure) {
-        //  return Result.Fail<OrderDetail>(sellingPriceResult.Error);
-        //}
+          .Bind(salesOrderLine => {
+            salesOrderLine.Quantity = onlineSalesOrderLine.Quantity;
+            salesOrderLine.Reserved = Math.Min(salesOrderLine.WarehouseContext.QtyFree, onlineSalesOrderLine.Quantity);
 
-        //line.PriceListNameID = sellingPriceResult.Value.Item1;
-        //line.UnitSellingPrice = sellingPriceResult.Value.Item2.Value;
+            if (!string.IsNullOrWhiteSpace(onlineSalesOrderLine.LineNotes)) {
+              salesOrderLine.Note = onlineSalesOrderLine.LineNotes;
+            }
 
-        return Result.Success(salesOrder);
+            return Result.Success(salesOrderLine);
+          })
+
+          .Map(_ => salesOrder);
       }
       catch (Exception ex) {
         var message = $"Error adding inventory line with code '{onlineSalesOrderLine.Sku}' (Oid:{onlineSalesOrderLine.Oid}): {ex.Message}";
@@ -206,15 +213,49 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
         return Result.Failure<SalesOrder>(message);
       }
 
-      Result<OrderDetail> NewSalesOrderLine() => Result.Success(new OrderDetail {
-        TaxMode = TaxMode.Inclusive
-      });
-
     }
 
     private Result<SalesOrder> AddSalesOrderGeneralLedgerLine(PostToEvolutionSalesOrderContext context, SalesOrder salesOrder, OnlineSalesOrder onlineSalesOrder, OnlineSalesOrderLine onlineSalesOrderLine) {
-      // Add line note if not null
-      return Result.Success(salesOrder);
+      try {
+        return NewSalesOrderLine(salesOrder)
+
+          .Bind(salesOrderLine => RepositoryGetFromCode(salesOrderLine, onlineSalesOrderLine.Sku, _evolutionGeneralLedgerAccountRepository.Get, account => salesOrderLine.Account = account))
+
+          .Bind(salesOrderLine => {
+
+            salesOrderLine.Quantity = onlineSalesOrderLine.Quantity;
+            salesOrderLine.UnitSellingPrice = (double)onlineSalesOrderLine.UnitPriceInVat;
+
+            if (!string.IsNullOrWhiteSpace(onlineSalesOrderLine.LineDescription)) {
+              salesOrderLine.Description = onlineSalesOrderLine.LineDescription;
+            }
+
+            if (!string.IsNullOrWhiteSpace(onlineSalesOrderLine.LineNotes)) {
+              salesOrderLine.Note = onlineSalesOrderLine.LineNotes;
+            }
+
+            return Result.Success(salesOrderLine);
+          })
+
+          .Map(_ => salesOrder);
+      }
+      catch (Exception ex) {
+        var message = $"Error adding general ledger line with code '{onlineSalesOrderLine.Sku}' (Oid:{onlineSalesOrderLine.Oid}): {ex.Message}";
+        _logger.LogError("{error}", message);
+        _logger.LogError(ex, "Error adding general ledger line");
+        return Result.Failure<SalesOrder>(message);
+      }
+
+    }
+
+    private Result<OrderDetail> NewSalesOrderLine(SalesOrder salesOrder) {
+      return Result.Success(new OrderDetail {
+        TaxMode = salesOrder.TaxMode
+      })
+      .Bind(salesOrderLine => {
+        salesOrder.Detail.Add(salesOrderLine);
+        return Result.Success(salesOrderLine);
+      });
     }
 
     private Result<SalesOrder> RepositoryGet<T>(SalesOrder salesOrder, object parameters, Func<object, Result<T>> get, Action<T> onSuccess) {

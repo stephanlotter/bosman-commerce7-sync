@@ -7,6 +7,8 @@
  *  
  */
 
+using BosmanCommerce7.Module.BusinessObjects;
+using BosmanCommerce7.Module.Extensions;
 using BosmanCommerce7.Module.Models;
 using BosmanCommerce7.Module.Models.LocalDatabase;
 using CSharpFunctionalExtensions;
@@ -26,13 +28,12 @@ namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDat
         return _valueStoreRepository.GetValue("default-ship-from-warehouse-code");
       }
 
-      // TODO: Add BO for mapping postal codes to warehouse codes
+      if (string.IsNullOrWhiteSpace(findWarehouseCodeDescriptor.PostalCode)) {
+        return Result.Failure<string?>("Postal code not provided");
+      }
 
-      // TODO: Implement logic to find the warehouse code for findWarehouseCodeDescriptor.PostalCode
-
-
-
-      return Result.Success<string?>(null);
+      var mapping = findWarehouseCodeDescriptor.ObjectSpace.FindObject<WarehousePostalCodeMapping>("PostalCode".IsEqualToOperator(findWarehouseCodeDescriptor.PostalCode.Trim()));
+      return mapping != null ? Result.Success<string?>(mapping.WarehouseCode) : Result.Failure<string?>("No postal code/warehouse code mapping found.");
     }
 
   }

@@ -11,9 +11,14 @@ using CSharpFunctionalExtensions;
 using Pastel.Evolution;
 
 namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
+
   public class EvolutionInventoryItemRepository : EvolutionRepositoryBase, IEvolutionInventoryItemRepository {
 
     public Result<InventoryItem> Get(string? code) {
+      if (string.IsNullOrWhiteSpace(code)) {
+        return Result.Failure<InventoryItem>($"Inventory lookup: code may not be empty.");
+      }
+
       int? id = GetId("select StockLink from StkItem where lower(cSimpleCode)=lower(@code)", new { code });
 
       if (id == null) {

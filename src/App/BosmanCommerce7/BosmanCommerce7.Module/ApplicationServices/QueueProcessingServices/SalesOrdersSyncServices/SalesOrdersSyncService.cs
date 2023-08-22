@@ -96,6 +96,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
             .OnFailureCompensate(error => Result.Failure<string?>($"Unable to map channel to project code: {error}"));
         }
 
+        string NormalizeItemCode(string? code) => (code ?? "").Trim().ToUpper();
+
         _localObjectSpaceProvider.WrapInObjectSpaceTransaction(objectSpace => {
           OnlineSalesOrder NewOrder(dynamic id, dynamic orderNumber) {
             var criteria = CriteriaOperator.Or("OnlineId".IsEqualToOperator($"{id}"), "OrderNumber".IsEqualToOperator($"{orderNumber}"));
@@ -137,7 +139,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
             if (channelProjectCode.IsFailure) { throw new Exception(channelProjectCode.Error); }
 
-
             localSalesOrder.CustomerOnlineId = salesOrder.customerId;
             localSalesOrder.EmailAddress = salesOrder.customer.emails.Count > 0 ? salesOrder.customer.emails[0]?.email : null;
             localSalesOrder.OnlineId = salesOrder.id;
@@ -166,7 +167,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
               localSalesOrderLine.OnlineId = item.id;
               localSalesOrderLine.LineType = SalesOrderLineType.Inventory;
 
-              localSalesOrderLine.Sku = item.sku;
+              localSalesOrderLine.Sku = NormalizeItemCode(item.sku);
               localSalesOrderLine.LineDescription = BuildLineDescription(item.productTitle, item.productVariantTitle);
 
               localSalesOrderLine.Quantity = item.quantity;
@@ -191,7 +192,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
                 localSalesOrderLine.OnlineId = shipping.id;
                 localSalesOrderLine.LineType = SalesOrderLineType.GeneralLedger;
 
-                localSalesOrderLine.Sku = parameters.ShippingGeneralLedgerAccountCode;
+                localSalesOrderLine.Sku = NormalizeItemCode(parameters.ShippingGeneralLedgerAccountCode);
                 localSalesOrderLine.LineDescription = shipping.title;
 
                 localSalesOrderLine.Quantity = 1;
