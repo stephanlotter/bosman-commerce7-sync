@@ -46,6 +46,9 @@ public class Startup {
       builder.Modules
           .AddConditionalAppearance()
           .AddViewVariants()
+          .AddValidation(options => {
+            options.AllowValidationDetailsAccess = false;
+          })
           .Add<Module.BosmanCommerce7Module>()
           .Add<BosmanCommerce7BlazorModule>();
 

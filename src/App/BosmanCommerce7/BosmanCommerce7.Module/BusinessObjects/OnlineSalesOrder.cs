@@ -224,8 +224,8 @@ namespace BosmanCommerce7.Module.BusinessObjects {
 
     public void PostLog(string shortDescription, string? details = null) {
       if (shortDescription.Length > 100) {
-        shortDescription = shortDescription[..100];
         details = shortDescription + "\r\n" + (details ?? "");
+        shortDescription = shortDescription[..100];
       }
 
       LastErrorMessage = shortDescription;
@@ -247,13 +247,42 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     }
 
     public Address ShipToAddress() {
+      var list = new List<string>();
+
+      string Normalize(string? value) {
+        value = value?.Trim() ?? "";
+        var x = Math.Min(value.Length, 40);
+        return value[..x];
+      }
+
+      void Add(string? value) {
+        if (string.IsNullOrWhiteSpace(value)) { return; }
+
+        if (!value.Contains(',')) {
+          list.Add(Normalize(value));
+          return;
+        }
+
+        value.Split(',').ToList().ForEach(x => list.Add(Normalize(x)));
+      }
+
+      Add(ShipToAddress1);
+      Add(ShipToAddress2);
+      Add(ShipToAddressCity);
+      Add(ShipToAddressProvince);
+      Add(ShipToAddressCountryCode);
+
+      list = list.Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
+
+      string GetLine(int i) => list!.Count > i ? list![i] : "";
+
       return new Address(
-          ShipToAddress1 ?? "",
-          ShipToAddress2 ?? "",
-          ShipToAddressCity ?? "",
-          ShipToAddressProvince ?? "",
-          ShipToAddressCountryCode ?? "",
-          ShipToAddressPostalCode ?? "");
+          GetLine(0),
+          GetLine(1),
+          GetLine(2),
+          GetLine(3),
+          GetLine(4),
+          Normalize(ShipToAddressPostalCode));
     }
 
   }

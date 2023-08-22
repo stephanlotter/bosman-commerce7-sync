@@ -8,22 +8,26 @@
  */
 
 using DevExpress.Persistent.Base;
+using DevExpress.Persistent.Validation;
 using DevExpress.Xpo;
 
 namespace BosmanCommerce7.Module.BusinessObjects {
 
   [DefaultClassOptions]
-  [NavigationItem(true)]
+  [NavigationItem("System")]
   public class TaxMapping : XPObject {
 
     private string? _onlineTaxType;
     private string? _evolutionTaxType;
 
+    [RuleRequiredField]
+    [RuleUniqueValue]
     public string? OnlineTaxType {
       get => _onlineTaxType;
       set => SetPropertyValue(nameof(OnlineTaxType), ref _onlineTaxType, value);
     }
 
+    [RuleRequiredField]
     public string? EvolutionTaxType {
       get => _evolutionTaxType;
       set => SetPropertyValue(nameof(EvolutionTaxType), ref _evolutionTaxType, value);

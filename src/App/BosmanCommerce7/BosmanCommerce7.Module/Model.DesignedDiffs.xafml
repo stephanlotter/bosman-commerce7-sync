@@ -1,5 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Application Title="Bosman Commerce7 Sync">
+  <NavigationItems>
+    <Items>
+      <Item Id="Default">
+        <Items>
+          <Item Id="OnlineSalesOrder_ListView" Index="0" />
+          <Item Id="OnlineSalesOrderProcessingLog_ListView" Index="1" />
+        </Items>
+      </Item>
+      <Item Id="System">
+        <Items>
+          <Item Id="WarehousePostalCodeMapping_ListView" Index="0" />
+          <Item Id="TaxMapping_ListView" Index="1" />
+          <Item Id="ValueStore_ListView" Index="2" />
+        </Items>
+      </Item>
+    </Items>
+  </NavigationItems>
   <SchemaModules>
     <SchemaModule Name="SystemModule" Version="23.1.4.0" IsNewNode="True" />
   </SchemaModules>
@@ -7,26 +24,27 @@
     <ListView Id="OnlineSalesOrder_ListView">
       <Columns>
         <ColumnInfo Id="CustomerOnlineId" Index="-1" />
+        <ColumnInfo Id="EmailAddress" Index="-1" />
         <ColumnInfo Id="OnlineId" Index="-1" />
-        <ColumnInfo Id="ProjectCode" Index="-1" Width="88" />
+        <ColumnInfo Id="ProjectCode" Index="-1" />
         <ColumnInfo Id="ShipToAddress1" Index="-1" />
         <ColumnInfo Id="ShipToAddress2" Index="-1" />
         <ColumnInfo Id="ShipToAddressCity" Index="-1" />
         <ColumnInfo Id="ShipToAddressCountryCode" Index="-1" />
         <ColumnInfo Id="ShipToAddressPostalCode" Index="-1" />
         <ColumnInfo Id="ShipToAddressProvince" Index="-1" />
-        <ColumnInfo Id="ShipToName" Index="-1" Width="94" />
+        <ColumnInfo Id="ShipToName" Index="-1" />
         <ColumnInfo Id="ShipToPhoneNumber" Index="-1" />
-        <ColumnInfo Id="OrderNumber" Index="0" SortIndex="0" SortOrder="Descending" Width="94" />
-        <ColumnInfo Id="EvolutionSalesOrderNumber" Index="1" Width="93" />
-        <ColumnInfo Id="OrderDate" Index="2" Width="112" />
-        <ColumnInfo Id="OrderValueInVat" Index="3" Width="115" />
-        <ColumnInfo Id="Channel" Index="4" Width="64" />
-        <ColumnInfo Id="PostingStatus" Index="6" SortIndex="-1" SortOrder="None" Width="95" />
-        <ColumnInfo Id="DatePosted" Index="7" Width="83" />
-        <ColumnInfo Id="RetryAfter" Index="8" Width="76" />
-        <ColumnInfo Id="RetryCount" Index="9" Width="83" />
-        <ColumnInfo Id="LastErrorMessage" Width="118" />
+        <ColumnInfo Id="RetryAfter" Index="0" SortIndex="0" SortOrder="Ascending" />
+        <ColumnInfo Id="OrderNumber" Index="1" SortIndex="-1" SortOrder="None" />
+        <ColumnInfo Id="EvolutionSalesOrderNumber" Index="2" />
+        <ColumnInfo Id="PostingStatus" Index="3" SortIndex="-1" SortOrder="None" />
+        <ColumnInfo Id="LastErrorMessage" Index="4" />
+        <ColumnInfo Id="OrderDate" Index="5" />
+        <ColumnInfo Id="OrderValueInVat" Index="6" />
+        <ColumnInfo Id="Channel" Index="7" />
+        <ColumnInfo Id="DatePosted" Index="8" />
+        <ColumnInfo Id="RetryCount" Index="9" />
       </Columns>
     </ListView>
     <ListView Id="OnlineSalesOrder_SalesOrderLines_ListView">
@@ -41,6 +59,65 @@
         <ColumnInfo Id="UnitPriceInVat" Index="5" />
         <ColumnInfo Id="LineValueInVat" Index="6" />
         <ColumnInfo Id="Oid" Index="7" />
+      </Columns>
+    </ListView>
+    <DetailView Id="TaxMapping_DetailView" FreezeLayout="True">
+      <Layout IsNewNode="True" Removed="True">
+        <LayoutGroup Id="Main" Index="0" ShowCaption="False" RelativeSize="100" IsNewNode="True">
+          <LayoutGroup Id="SimpleEditors" Index="0" ShowCaption="False" RelativeSize="100" IsNewNode="True">
+            <LayoutGroup Id="TaxMapping" Index="0" ShowCaption="False" RelativeSize="5.020242914979757" IsNewNode="True">
+              <LayoutItem Id="OnlineTaxType" ViewItem="OnlineTaxType" ShowCaption="" Index="0" RelativeSize="51.61290322580645" IsNewNode="True" />
+              <LayoutItem Id="EvolutionTaxType" ViewItem="EvolutionTaxType" ShowCaption="" Index="1" RelativeSize="48.38709677419355" IsNewNode="True" />
+            </LayoutGroup>
+            <LayoutGroup Id="XPObject" Index="1" ShowCaption="False" Caption="Oid" RelativeSize="94.97975708502024" IsNewNode="True" />
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <ListView Id="TaxMapping_ListView">
+      <Columns>
+        <ColumnInfo Id="OnlineTaxType" Width="202" SortIndex="0" SortOrder="Ascending" />
+        <ColumnInfo Id="EvolutionTaxType" Width="187" />
+      </Columns>
+    </ListView>
+    <DetailView Id="ValueStore_DetailView" AllowDelete="False" AllowNew="False" FreezeLayout="True">
+      <Layout IsNewNode="True" Removed="True">
+        <LayoutGroup Id="Main" Index="0" ShowCaption="False" RelativeSize="100" IsNewNode="True">
+          <LayoutGroup Id="SimpleEditors" Index="0" ShowCaption="False" RelativeSize="3.076923076923077" IsNewNode="True">
+            <LayoutGroup Id="ValueStore" Index="0" ShowCaption="False" Direction="Horizontal" RelativeSize="100" Caption="Key Name" IsNewNode="True">
+              <LayoutItem Id="KeyName" ViewItem="KeyName" ShowCaption="" Index="0" RelativeSize="50" IsNewNode="True" />
+              <LayoutItem Id="Oid" ViewItem="Oid" Index="1" RelativeSize="50" IsNewNode="True" />
+            </LayoutGroup>
+          </LayoutGroup>
+          <LayoutGroup Id="SizeableEditors" Index="1" ShowCaption="False" RelativeSize="96.92307692307692" IsNewNode="True">
+            <LayoutItem Id="KeyValue" ViewItem="KeyValue" ShowCaption="" Index="0" RelativeSize="100" IsNewNode="True" />
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <ListView Id="ValueStore_ListView" AllowDelete="False" AllowLink="False" AllowNew="False">
+      <Columns>
+        <ColumnInfo Id="KeyName" Index="0" />
+        <ColumnInfo Id="KeyValue" Index="1" Width="341" />
+      </Columns>
+    </ListView>
+    <DetailView Id="WarehousePostalCodeMapping_DetailView" FreezeLayout="True">
+      <Layout IsNewNode="True" Removed="True">
+        <LayoutGroup Id="Main" Index="0" ShowCaption="False" RelativeSize="100" IsNewNode="True">
+          <LayoutGroup Id="SimpleEditors" Index="0" ShowCaption="False" RelativeSize="100" IsNewNode="True">
+            <LayoutGroup Id="WarehousePostalCodeMapping" Index="0" ShowCaption="False" RelativeSize="5.020242914979757" IsNewNode="True">
+              <LayoutItem Id="PostalCode" ViewItem="PostalCode" ShowCaption="" Index="0" RelativeSize="51.61290322580645" IsNewNode="True" />
+              <LayoutItem Id="WarehouseCode" ViewItem="WarehouseCode" ShowCaption="" Index="1" RelativeSize="48.38709677419355" IsNewNode="True" />
+            </LayoutGroup>
+            <LayoutGroup Id="XPObject" Index="1" ShowCaption="False" Caption="Oid" RelativeSize="94.97975708502024" IsNewNode="True" />
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <ListView Id="WarehousePostalCodeMapping_ListView">
+      <Columns>
+        <ColumnInfo Id="PostalCode" Width="152" SortIndex="0" SortOrder="Ascending" />
+        <ColumnInfo Id="WarehouseCode" Width="163" />
       </Columns>
     </ListView>
   </Views>

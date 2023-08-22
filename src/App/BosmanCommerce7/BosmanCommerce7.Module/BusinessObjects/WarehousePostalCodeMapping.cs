@@ -8,23 +8,27 @@
  */
 
 using DevExpress.Persistent.Base;
+using DevExpress.Persistent.Validation;
 using DevExpress.Xpo;
 
 namespace BosmanCommerce7.Module.BusinessObjects {
   [DefaultClassOptions]
-  [NavigationItem(true)]
+  [NavigationItem("System")]
   public class WarehousePostalCodeMapping : XPObject {
     private string? _postalCode;
     private string? _warehouseCode;
 
     [Size(4)]
-    [Indexed(Unique = true)]
+    [Indexed]
+    [RuleUniqueValue]
+    [RuleRequiredField]
     public string? PostalCode {
       get => _postalCode;
       set => SetPropertyValue(nameof(PostalCode), ref _postalCode, value);
     }
 
     [Size(10)]
+    [RuleRequiredField]
     public string? WarehouseCode {
       get => _warehouseCode;
       set => SetPropertyValue(nameof(WarehouseCode), ref _warehouseCode, value);

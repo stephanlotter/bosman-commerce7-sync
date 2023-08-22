@@ -33,7 +33,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDat
       }
 
       var mapping = findWarehouseCodeDescriptor.ObjectSpace.FindObject<WarehousePostalCodeMapping>("PostalCode".IsEqualToOperator(findWarehouseCodeDescriptor.PostalCode.Trim()));
-      return mapping != null ? Result.Success<string?>(mapping.WarehouseCode) : Result.Failure<string?>("No postal code/warehouse code mapping found.");
+      return mapping != null ? Result.Success(mapping.WarehouseCode) : Result.Failure<string?>($"No postal code/warehouse code mapping found for {findWarehouseCodeDescriptor.PostalCode.Trim()}.");
     }
 
   }

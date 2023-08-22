@@ -60,7 +60,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
                   onlineSalesOrder.PostingStatus = SalesOrderPostingStatus.Retrying;
                   onlineSalesOrder.RetryCount++;
                   onlineSalesOrder.RetryAfter = DateTime.Now.AddMinutes(onlineSalesOrder.RetryCount switch {
-                    1 => 1,
+                    1 => 10,
                     2 => 10,
                     3 => 15,
                     4 => 30,
