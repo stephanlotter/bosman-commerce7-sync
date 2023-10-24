@@ -19,7 +19,7 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
     public static Logger Init(IServiceProvider serviceProvider) {
 
       var pattern =
-        """
+        @"
 ^Placing grain
 |^Created .* with GrainContext
 |^Activating grain
@@ -35,7 +35,7 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
 |^Batch acquisition of .* triggers
 |^Trigger instruction : NoInstruction
 |^Calling Execute on job JobsGroup
-""";
+";
 
       var regEx = new Regex(pattern.Replace("\r", "").Replace("\n", ""));
 
