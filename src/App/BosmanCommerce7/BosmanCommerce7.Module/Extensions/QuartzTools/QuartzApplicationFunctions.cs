@@ -1,9 +1,9 @@
-﻿/* 
+﻿/*
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
  * Date created: 2023-08-17 * Author	: Stephan J Lotter
- * Notes	: 
- *  
+ * Notes	:
+ *
  */
 
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices;
@@ -13,10 +13,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Quartz;
 
-namespace BosmanCommerce7.Module.Extensions.QuartzTools
-{
-    public static class QuartzApplicationFunctions {
+namespace BosmanCommerce7.Module.Extensions.QuartzTools {
 
+  public static class QuartzApplicationFunctions {
     private static IScheduler? _scheduler;
 
     public static void StartJobs(QuartzStartJobContext context) {
@@ -49,7 +48,6 @@ namespace BosmanCommerce7.Module.Extensions.QuartzTools
     }
 
     private static void ScheduleSyncQueueService<T>(QuartzStartJobContext context, QuartzStartJobDescriptor jobDescriptor) {
-
       if (!jobDescriptor.JobOptions.Enabled) {
         context.Logger.LogWarning("{service} is disabled", jobDescriptor.JobId);
         return;
@@ -71,28 +69,24 @@ namespace BosmanCommerce7.Module.Extensions.QuartzTools
       jobDescriptor.Scheduler.ScheduleJob(job, trigger);
     }
 
-    public static void StopJobs() { _scheduler?.Shutdown(); }
-
+    public static void StopJobs() {
+      _scheduler?.Shutdown();
+    }
   }
 
   public record QuartzStartJobDescriptor {
-
     public string JobId { get; init; } = default!;
 
     public IScheduler Scheduler { get; init; } = default!;
 
     public JobOptionsBase JobOptions { get; init; } = default!;
-
   }
 
   public record QuartzStartJobContext {
-
     public IServiceProvider ServiceProvider { get; init; } = default!;
 
     public ILogger Logger { get; init; } = default!;
 
     public ApplicationOptions Options { get; init; } = default!;
-
   }
-
 }

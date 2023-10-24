@@ -30,11 +30,17 @@ select s.OID,
        s.CustomerOnlineId
     from OnlineSalesOrder s
     where 1=1
-        and s.LastErrorMessage like 'Inv%'
+        --and s.LastErrorMessage like 'Inv%'
     order by s.OrderDate desc;
 select *
     from OnlineSalesOrderLine
     order by Sku;
+
+
+
+/*
+update OnlineSalesOrderLine set Sku='BOSNER14' where LineType=1
+*/
 
 /*
 update OnlineSalesOrder set RetryAfter = getdate(),

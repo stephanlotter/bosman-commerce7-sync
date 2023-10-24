@@ -14,9 +14,7 @@ using Nuke.Common;
 using Nuke.Common.Execution;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
-using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
-using Nuke.Common.Tools.PowerShell;
 using Nuke.Common.Utilities.Collections;
 using Serilog;
 
