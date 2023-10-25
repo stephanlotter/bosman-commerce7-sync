@@ -23,7 +23,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDat
     public void WrapInObjectSpaceTransaction(Action<IObjectSpace> action) {
       using var connection = new SqlConnection(_localDatabaseConnectionStringProvider.LocalDatabase);
       using var osp = new XPObjectSpaceProvider(_localDatabaseConnectionStringProvider.LocalDatabase, connection, threadSafe: true, useSeparateDataLayers: true);
+      
       using IObjectSpace objectSpace = osp.CreateObjectSpace();
+      
 
       try {
         action(objectSpace);

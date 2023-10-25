@@ -1,10 +1,10 @@
-﻿/* 
+﻿/*
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
  * Date created: 2023-08-17
  * Author	: Stephan J Lotter
- * Notes	: 
- *  
+ * Notes	:
+ *
  */
 
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
@@ -22,7 +22,6 @@ using Newtonsoft.Json;
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices {
 
   public class SalesOrdersSyncService : SyncServiceBase, ISalesOrdersSyncService {
-
     private readonly SalesOrdersSyncJobOptions _salesOrdersSyncJobOptions;
     private readonly ISalesOrdersSyncValueStoreService _salesOrdersSyncValueStoreService;
     private readonly ISalesOrdersApiClient _apiClient;
@@ -84,7 +83,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
         }
 
         _localObjectSpaceProvider.WrapInObjectSpaceTransaction(objectSpace => {
-
           foreach (dynamic salesOrder in response.SalesOrders!) {
             Logger.LogInformation("Sales order found: {orderNumber}", $"{salesOrder.orderNumber}");
 
@@ -110,7 +108,16 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
             if (channelProjectCode.IsFailure) { throw new Exception(channelProjectCode.Error); }
 
             localSalesOrder.CustomerOnlineId = salesOrder.customerId;
-            localSalesOrder.EmailAddress = salesOrder.customer.emails.Count > 0 ? salesOrder.customer.emails[0]?.email : null;
+
+            bool ContainsKey(dynamic o, string name) {
+              var o1 = o as Newtonsoft.Json.Linq.JObject;
+              return o1?.ContainsKey(name) ?? false;
+            }
+
+            if (ContainsKey(salesOrder.customer, "emails")) {
+              localSalesOrder.EmailAddress = salesOrder.customer.emails.Count > 0 ? salesOrder.customer.emails[0]?.email : null;
+            }
+
             localSalesOrder.OnlineId = salesOrder.id;
             localSalesOrder.Channel = salesOrder.channel;
             localSalesOrder.OrderDate = orderDate;
@@ -194,13 +201,11 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
             localSalesOrder.SalesOrderLines.Add(localSalesOrderLine);
             return localSalesOrderLine;
           }
-
         });
 
         _salesOrdersSyncValueStoreService.UpdateSalesOrdersSyncLastSynced(lastOrderDate.Date);
 
         return errorCount == 0 ? Result.Success(BuildResult()) : Result.Failure<SalesOrdersSyncResult>($"Completed with {errorCount} errors.");
-
       }
       catch (Exception ex) {
         Logger.LogError("Unable to execute SalesOrdersSyncService: {error}", ex);
@@ -210,11 +215,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
       SalesOrdersSyncResult BuildResult(string? message = null) {
         return new SalesOrdersSyncResult { Message = message };
       }
-
     }
 
     private Result<SalesOrdersSyncParameters> LoadParameters() {
-
       Result<SalesOrdersSyncParameters> GetResult<T>(SalesOrdersSyncParameters p, Func<Result<T?>> getValue, Func<SalesOrdersSyncParameters, T?, Result<SalesOrdersSyncParameters>> onFound) {
         return getValue().Bind(value => onFound(p, value));
       }
@@ -259,8 +262,5 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
     }
 
     private static string NormalizeItemCode(string? code) => (code ?? "").Trim().ToUpper();
-
   }
-
 }
-
