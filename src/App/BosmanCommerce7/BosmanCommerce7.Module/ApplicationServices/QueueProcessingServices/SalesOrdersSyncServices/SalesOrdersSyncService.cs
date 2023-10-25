@@ -7,6 +7,7 @@
  *
  */
 
+using BosmanCommerce7.Module.ApplicationServices.AppDataServices;
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices.Models;
 using BosmanCommerce7.Module.ApplicationServices.RestApiClients;
@@ -26,19 +27,21 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
     private readonly ISalesOrdersSyncValueStoreService _salesOrdersSyncValueStoreService;
     private readonly ISalesOrdersApiClient _apiClient;
     private readonly ILocalObjectSpaceProvider _localObjectSpaceProvider;
-
+    private readonly IAppDataFileManager _appDataFileManager;
     private readonly List<string> _processedOrders = new();
 
     public SalesOrdersSyncService(ILogger<SalesOrdersSyncService> logger,
       SalesOrdersSyncJobOptions salesOrdersSyncJobOptions,
       ISalesOrdersSyncValueStoreService salesOrdersSyncValueStoreService,
       ISalesOrdersApiClient apiClient,
-      ILocalObjectSpaceProvider localObjectSpaceProvider)
+      ILocalObjectSpaceProvider localObjectSpaceProvider,
+      IAppDataFileManager appDataFileManager)
       : base(logger) {
       _salesOrdersSyncJobOptions = salesOrdersSyncJobOptions;
       _salesOrdersSyncValueStoreService = salesOrdersSyncValueStoreService;
       _apiClient = apiClient;
       _localObjectSpaceProvider = localObjectSpaceProvider;
+      _appDataFileManager = appDataFileManager;
     }
 
     public Result<SalesOrdersSyncResult> Execute(SalesOrdersSyncContext context) {
@@ -108,6 +111,11 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
               continue;
             }
 
+            localSalesOrder.OrderNumber = salesOrder.orderNumber;
+            localSalesOrder.OrderJson = JsonConvert.SerializeObject(salesOrder, Formatting.Indented);
+            _appDataFileManager.StoreText("json-sales-orders", $"{localSalesOrder.OrderNumber}.json", localSalesOrder.OrderJson);
+            //Logger.LogInformation("{json}", localSalesOrder.OrderJson);
+
             var channelProjectCode = MapChannelToProjectCode(salesOrder.channel);
 
             if (channelProjectCode.IsFailure) { throw new Exception(channelProjectCode.Error); }
@@ -121,7 +129,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
             localSalesOrder.OnlineId = salesOrder.id;
             localSalesOrder.Channel = salesOrder.channel;
             localSalesOrder.OrderDate = orderDate;
-            localSalesOrder.OrderNumber = salesOrder.orderNumber;
             localSalesOrder.ProjectCode = channelProjectCode.Value;
 
             if (salesOrder.shipTo != null) {
@@ -135,8 +142,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
               localSalesOrder.ShipToAddressPostalCode = salesOrder.shipTo.zipCode;
               localSalesOrder.ShipToAddressCountryCode = salesOrder.shipTo.countryCode;
             }
-
-            localSalesOrder.OrderJson = JsonConvert.SerializeObject(salesOrder, Formatting.Indented);
 
             foreach (var item in salesOrder.items) {
               var localSalesOrderLine = NewLine(localSalesOrder);

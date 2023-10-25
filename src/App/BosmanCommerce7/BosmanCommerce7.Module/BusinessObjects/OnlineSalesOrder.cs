@@ -107,12 +107,14 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     }
 
     [ModelDefault("AllowEdit", "false")]
+    [Size(200)]
     public string? ShipToAddress1 {
       get => _shipToAddress1;
       set => SetPropertyValue(nameof(ShipToAddress1), ref _shipToAddress1, value);
     }
 
     [ModelDefault("AllowEdit", "false")]
+    [Size(200)]
     public string? ShipToAddress2 {
       get => _shipToAddress2;
       set => SetPropertyValue(nameof(ShipToAddress2), ref _shipToAddress2, value);
