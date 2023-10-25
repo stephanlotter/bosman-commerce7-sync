@@ -82,6 +82,11 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
             .OnFailureCompensate(error => Result.Failure<string?>($"Unable to map channel to project code: {error}"));
         }
 
+        bool ContainsKey(dynamic o, string name) {
+          var o1 = o as Newtonsoft.Json.Linq.JObject;
+          return o1?.ContainsKey(name) ?? false;
+        }
+
         _localObjectSpaceProvider.WrapInObjectSpaceTransaction(objectSpace => {
           foreach (dynamic salesOrder in response.SalesOrders!) {
             Logger.LogInformation("Sales order found: {orderNumber}", $"{salesOrder.orderNumber}");
@@ -108,11 +113,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
             if (channelProjectCode.IsFailure) { throw new Exception(channelProjectCode.Error); }
 
             localSalesOrder.CustomerOnlineId = salesOrder.customerId;
-
-            bool ContainsKey(dynamic o, string name) {
-              var o1 = o as Newtonsoft.Json.Linq.JObject;
-              return o1?.ContainsKey(name) ?? false;
-            }
 
             if (ContainsKey(salesOrder.customer, "emails")) {
               localSalesOrder.EmailAddress = salesOrder.customer.emails.Count > 0 ? salesOrder.customer.emails[0]?.email : null;
