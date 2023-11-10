@@ -47,13 +47,11 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     private DateTime? _datePosted;
 
     [Size(40)]
-    [ModelDefault("AllowEdit", "false")]
     public string? CustomerOnlineId {
       get => _customerId;
       set => SetPropertyValue(nameof(CustomerOnlineId), ref _customerId, value);
     }
 
-    [ModelDefault("AllowEdit", "false")]
     public string? EmailAddress {
       get => _emailAddress;
       set => SetPropertyValue(nameof(EmailAddress), ref _emailAddress, value);
@@ -94,51 +92,43 @@ namespace BosmanCommerce7.Module.BusinessObjects {
       set => SetPropertyValue(nameof(OrderNumber), ref _orderNumber, value);
     }
 
-    [ModelDefault("AllowEdit", "false")]
     public string? ShipToName {
       get => _shipToName;
       set => SetPropertyValue(nameof(ShipToName), ref _shipToName, value);
     }
 
-    [ModelDefault("AllowEdit", "false")]
     public string? ShipToPhoneNumber {
       get => _shipToPhoneNumber;
       set => SetPropertyValue(nameof(ShipToPhoneNumber), ref _shipToPhoneNumber, value);
     }
 
-    [ModelDefault("AllowEdit", "false")]
     [Size(200)]
     public string? ShipToAddress1 {
       get => _shipToAddress1;
       set => SetPropertyValue(nameof(ShipToAddress1), ref _shipToAddress1, value);
     }
 
-    [ModelDefault("AllowEdit", "false")]
     [Size(200)]
     public string? ShipToAddress2 {
       get => _shipToAddress2;
       set => SetPropertyValue(nameof(ShipToAddress2), ref _shipToAddress2, value);
     }
 
-    [ModelDefault("AllowEdit", "false")]
     public string? ShipToAddressCity {
       get => _shipToAddressCity;
       set => SetPropertyValue(nameof(ShipToAddressCity), ref _shipToAddressCity, value);
     }
 
-    [ModelDefault("AllowEdit", "false")]
     public string? ShipToAddressProvince {
       get => _shipToAddressProvince;
       set => SetPropertyValue(nameof(ShipToAddressProvince), ref _shipToAddressProvince, value);
     }
 
-    [ModelDefault("AllowEdit", "false")]
     public string? ShipToAddressPostalCode {
       get => _shipToAddressPostalCode;
       set => SetPropertyValue(nameof(ShipToAddressPostalCode), ref _shipToAddressPostalCode, value);
     }
 
-    [ModelDefault("AllowEdit", "false")]
     public string? ShipToAddressCountryCode {
       get => _shipToAddressCountryCode;
       set => SetPropertyValue(nameof(ShipToAddressCountryCode), ref _shipToAddressCountryCode, value);

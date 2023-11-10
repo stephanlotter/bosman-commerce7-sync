@@ -92,7 +92,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
         _localObjectSpaceProvider.WrapInObjectSpaceTransaction(objectSpace => {
           foreach (dynamic salesOrder in response.SalesOrders!) {
-            Logger.LogInformation("Sales order found: {orderNumber}", $"{salesOrder.orderNumber}");
+            Logger.LogInformation("Sales order received: {orderNumber}", $"{salesOrder.orderNumber}");
 
             var orderDate = (DateTime)salesOrder.orderSubmittedDate;
             lastOrderDate = lastOrderDate > orderDate ? lastOrderDate : orderDate;

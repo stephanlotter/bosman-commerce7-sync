@@ -58,6 +58,20 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
           try {
             Logger.LogInformation("Start posting online sales order. Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
 
+            if (string.IsNullOrWhiteSpace(onlineSalesOrder.CustomerOnlineId)) {
+              Logger.LogError("Customer Online Id is empty. Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
+              onlineSalesOrder.PostLog("Customer Online Id is empty.");
+              onlineSalesOrder.PostingStatus = SalesOrderPostingStatus.Failed;
+              continue;
+            }
+
+            if (string.IsNullOrWhiteSpace(onlineSalesOrder.EmailAddress)) {
+              Logger.LogError("Email Address is empty. Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
+              onlineSalesOrder.PostLog("Email Address is empty.");
+              onlineSalesOrder.PostingStatus = SalesOrderPostingStatus.Failed;
+              continue;
+            }
+
             _postToEvolutionSalesOrderService
               .Post(postToEvolutionSalesOrderContext, onlineSalesOrder)
               .OnFailureCompensate(err => {

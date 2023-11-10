@@ -2,6 +2,9 @@
 <Application Title="Bosman Commerce7 Sync">
   <BOModel>
     <Class Name="BosmanCommerce7.Module.BusinessObjects.OnlineSalesOrder">
+      <AppearanceRules>
+        <AppearanceRule Id="ReadOnlyAfterPosted" Enabled="False" TargetItems="*" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Posted#" IsNewNode="True" />
+      </AppearanceRules>
       <OwnMembers>
         <Member Name="OrderJson" RowCount="15" />
       </OwnMembers>
@@ -30,10 +33,10 @@
     </Items>
   </NavigationItems>
   <SchemaModules>
-    <SchemaModule Name="SystemModule" Version="23.1.4.0" IsNewNode="True" />
+    <SchemaModule Name="SystemModule" Version="23.1.5.0" IsNewNode="True" />
   </SchemaModules>
   <Views>
-    <DetailView Id="OnlineSalesOrder_DetailView" FreezeLayout="True" AllowDelete="False" AllowEdit="False" AllowNew="False">
+    <DetailView Id="OnlineSalesOrder_DetailView" FreezeLayout="True" AllowDelete="False" AllowEdit="True" AllowNew="False">
       <Layout IsNewNode="True" Removed="True">
         <LayoutGroup Id="Main" Index="0" ShowCaption="False" RelativeSize="100" IsNewNode="True">
           <LayoutGroup Id="SimpleEditors" Index="0" ShowCaption="False" RelativeSize="31.118314424635333" Direction="Horizontal" IsNewNode="True">
