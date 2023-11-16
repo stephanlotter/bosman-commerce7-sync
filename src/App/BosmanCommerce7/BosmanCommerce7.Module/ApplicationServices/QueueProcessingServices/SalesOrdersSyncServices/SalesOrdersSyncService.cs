@@ -90,9 +90,20 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
           return o1?.ContainsKey(name) ?? false;
         }
 
+        var channelsToProcess = _salesOrdersSyncJobOptions.ChannelsToProcess?.Select(c => c.ToLower()).ToList();
+
         _localObjectSpaceProvider.WrapInObjectSpaceTransaction(objectSpace => {
           foreach (dynamic salesOrder in response.SalesOrders!) {
             Logger.LogInformation("Sales order received: {orderNumber}", $"{salesOrder.orderNumber}");
+
+            var channel = $"{salesOrder.channel}";
+
+            var processChannel = channelsToProcess?.Contains(channel.ToLower()) ?? false;
+
+            if (!processChannel) {
+              Logger.LogWarning("Sales order channel not configured to process: {orderNumber} [channel:{channel}]", $"{salesOrder.orderNumber}", $"{channel}");
+              continue;
+            }
 
             var orderDate = (DateTime)salesOrder.orderSubmittedDate;
             lastOrderDate = lastOrderDate > orderDate ? lastOrderDate : orderDate;
@@ -116,7 +127,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
             _appDataFileManager.StoreText("json-sales-orders", $"{localSalesOrder.OrderNumber}.json", localSalesOrder.OrderJson);
             //Logger.LogInformation("{json}", localSalesOrder.OrderJson);
 
-            var channelProjectCode = MapChannelToProjectCode(salesOrder.channel);
+            var channelProjectCode = MapChannelToProjectCode(channel);
 
             if (channelProjectCode.IsFailure) { throw new Exception(channelProjectCode.Error); }
 
@@ -127,7 +138,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
             }
 
             localSalesOrder.OnlineId = salesOrder.id;
-            localSalesOrder.Channel = salesOrder.channel;
+            localSalesOrder.Channel = channel;
             localSalesOrder.OrderDate = orderDate;
             localSalesOrder.ProjectCode = channelProjectCode.Value;
 
