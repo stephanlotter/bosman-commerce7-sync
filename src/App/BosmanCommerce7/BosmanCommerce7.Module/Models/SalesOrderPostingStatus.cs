@@ -12,6 +12,7 @@ namespace BosmanCommerce7.Module.Models {
     New = 0,
     Retrying = 10,
     Posted = 100,
+    Skipped = 110,
     Failed = 200
   }
 

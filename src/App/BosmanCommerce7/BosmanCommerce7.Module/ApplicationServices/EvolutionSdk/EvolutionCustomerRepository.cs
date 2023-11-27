@@ -22,7 +22,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
       int? id = GetId("SELECT DCLink FROM Client WHERE ucARwcEmail = @EmailAddress", new { customerDescriptor.EmailAddress });
 
       if (id == null) {
-        return Result.Failure<Customer>($"Customer with email address {customerDescriptor.EmailAddress} not found");
+        return Result.Failure<Customer>($"Customer with email address {customerDescriptor.EmailAddress} not found in Wine Club E-mail field");
       }
 
       return new Customer(id.Value);

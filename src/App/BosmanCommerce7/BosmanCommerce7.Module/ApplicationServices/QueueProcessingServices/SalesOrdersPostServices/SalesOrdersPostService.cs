@@ -1,10 +1,10 @@
-﻿/* 
+﻿/*
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
  * Date created: 2023-08-17
  * Author	: Stephan J Lotter
- * Notes	: 
- *  
+ * Notes	:
+ *
  */
 
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
@@ -18,6 +18,7 @@ using DevExpress.Data.Filtering;
 using Microsoft.Extensions.Logging;
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices {
+
   public class SalesOrdersPostService : SyncServiceBase, ISalesOrdersPostService {
     private readonly ILocalObjectSpaceProvider _localObjectSpaceProvider;
     private readonly IPostToEvolutionSalesOrderService _postToEvolutionSalesOrderService;
@@ -30,10 +31,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
     }
 
     public Result<SalesOrdersPostResult> Execute(SalesOrdersPostContext context) {
-        var errorCount = 0;
+      var errorCount = 0;
 
       _localObjectSpaceProvider.WrapInObjectSpaceTransaction(objectSpace => {
-
         CriteriaOperator? criteria = context.Criteria;
 
         if (criteria is null) {
@@ -53,10 +53,20 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
           ObjectSpace = objectSpace
         };
 
-
         foreach (var onlineSalesOrder in olineSalesOrders) {
           try {
             Logger.LogInformation("Start posting online sales order. Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
+
+            if (onlineSalesOrder.Channel?.Equals("club", StringComparison.InvariantCultureIgnoreCase) ?? false) {
+              var skip = onlineSalesOrder.SalesOrderLines.Any(x => x.Quantity < 0);
+
+              if (skip) {
+                Logger.LogInformation("Skipping club order containing any negative quantity lines. Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
+                onlineSalesOrder.PostLog("Skipping club order. It contains one or more negative quantity lines.");
+                onlineSalesOrder.PostingStatus = SalesOrderPostingStatus.Skipped;
+                continue;
+              }
+            }
 
             if (string.IsNullOrWhiteSpace(onlineSalesOrder.CustomerOnlineId)) {
               Logger.LogError("Customer Online Id is empty. Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
@@ -99,7 +109,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
                 return Result.Failure<OnlineSalesOrder>(err);
               });
-
           }
           catch (Exception ex) {
             Logger.LogError(ex, "Error posting online sales order number {OrderNumber}", onlineSalesOrder.OrderNumber);
@@ -110,7 +119,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
             Logger.LogInformation("End posting online sales order. Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
           }
         }
-
       });
 
       return errorCount == 0 ? Result.Success(BuildResult()) : Result.Failure<SalesOrdersPostResult>($"Completed with {errorCount} errors.");
@@ -118,10 +126,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
       SalesOrdersPostResult BuildResult() {
         return new SalesOrdersPostResult { };
       }
-
     }
-
   }
-
 }
-

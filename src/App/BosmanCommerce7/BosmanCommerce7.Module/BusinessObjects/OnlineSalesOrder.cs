@@ -1,10 +1,10 @@
-﻿/* 
+﻿/*
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
  * Date created: 2023-08-18
  * Author	: Stephan J Lotter
- * Notes	: 
- *  
+ * Notes	:
+ *
  */
 
 using System.ComponentModel;
@@ -21,7 +21,6 @@ namespace BosmanCommerce7.Module.BusinessObjects {
   [NavigationItem(true)]
   [DefaultProperty(nameof(OrderNumber))]
   public class OnlineSalesOrder : XPObject {
-
     private string? _customerId;
     private string? _emailAddress;
     private string? _onlineId;
@@ -202,7 +201,8 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     [ModelDefault("AllowEdit", "false")]
     public XPCollection<OnlineSalesOrderProcessingLog> SalesOrderProcessingLogs => GetCollection<OnlineSalesOrderProcessingLog>(nameof(SalesOrderProcessingLogs));
 
-    public OnlineSalesOrder(Session session) : base(session) { }
+    public OnlineSalesOrder(Session session) : base(session) {
+    }
 
     public override void AfterConstruction() {
       base.AfterConstruction();
@@ -217,7 +217,7 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     public void PostLog(string shortDescription, string? details = null) {
       if (shortDescription.Length > 100) {
         details = shortDescription + "\r\n" + (details ?? "");
-        shortDescription = shortDescription[..100];
+        shortDescription = $"{shortDescription[..97]}...";
       }
 
       LastErrorMessage = shortDescription;
@@ -281,7 +281,5 @@ namespace BosmanCommerce7.Module.BusinessObjects {
           GetLine(4),
           Normalize(ShipToAddressPostalCode));
     }
-
   }
-
 }
