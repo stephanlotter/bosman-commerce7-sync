@@ -19,8 +19,9 @@
     <Items>
       <Item Id="Default">
         <Items>
-          <Item Id="OnlineSalesOrder_ListView" Index="0" />
-          <Item Id="OnlineSalesOrderProcessingLog_ListView" Index="1" />
+          <Item Id="@d18733e5-bbb9-4176-831a-2b4aad58f610" ViewId="OnlineSalesOrder_ListView_Club" Caption="Club Orders" Index="0" IsNewNode="True" />
+          <Item Id="OnlineSalesOrder_ListView" Index="1" Caption="All Orders" />
+          <Item Id="OnlineSalesOrderProcessingLog_ListView" Index="2" />
         </Items>
       </Item>
       <Item Id="System">
@@ -138,6 +139,46 @@
         <ColumnInfo Id="RetryCount" Index="6" Width="90" />
       </Columns>
       <Filters CurrentFilterId="NewAndRetrying">
+        <Filter Id="NewAndRetrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New# Or [PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="0" Caption="New and Retrying" IsNewNode="True" />
+        <Filter Id="New" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New#" Index="1" IsNewNode="True" />
+        <Filter Id="Retrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="2" IsNewNode="True" />
+        <Filter Id="Posted" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Posted#" Index="3" IsNewNode="True" />
+        <Filter Id="Failed" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Failed#" Index="4" IsNewNode="True" />
+        <Filter Id="All" Index="5" IsNewNode="True" />
+      </Filters>
+    </ListView>
+    <ListView Id="OnlineSalesOrder_ListView_Club" ClassName="BosmanCommerce7.Module.BusinessObjects.OnlineSalesOrder" AllowDelete="False" AllowLink="False" AllowNew="False" IsFooterVisible="True" Criteria="[Channel] = 'Club'" IsNewNode="True">
+      <Columns IsNewNode="True">
+        <ColumnInfo Id="Channel" PropertyName="Channel" Index="-1" Width="103" IsNewNode="True" />
+        <ColumnInfo Id="CustomerOnlineId" PropertyName="CustomerOnlineId" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="EmailAddress" PropertyName="EmailAddress" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="EvolutionSalesOrderNumber" PropertyName="EvolutionSalesOrderNumber" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="Oid" PropertyName="Oid" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="OnlineId" PropertyName="OnlineId" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="OrderDate" PropertyName="OrderDate" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="OrderJson" PropertyName="OrderJson" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="OrderValueInVat" PropertyName="OrderValueInVat" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ProjectCode" PropertyName="ProjectCode" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ShipToAddress1" PropertyName="ShipToAddress1" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ShipToAddress2" PropertyName="ShipToAddress2" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ShipToAddressCity" PropertyName="ShipToAddressCity" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ShipToAddressCountryCode" PropertyName="ShipToAddressCountryCode" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ShipToAddressPostalCode" PropertyName="ShipToAddressPostalCode" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ShipToAddressProvince" PropertyName="ShipToAddressProvince" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ShipToName" PropertyName="ShipToName" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ShipToPhoneNumber" PropertyName="ShipToPhoneNumber" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="OrderNumber" PropertyName="OrderNumber" Index="0" Width="100" IsNewNode="True">
+          <Summary IsNewNode="True">
+            <ColumnSummaryItem Id="NumberOfRows" SummaryType="Count" IsNewNode="True" />
+          </Summary>
+        </ColumnInfo>
+        <ColumnInfo Id="RetryAfter" PropertyName="RetryAfter" Index="1" SortIndex="0" SortOrder="Ascending" Width="150" IsNewNode="True" />
+        <ColumnInfo Id="PostingStatus" PropertyName="PostingStatus" Index="2" Width="100" IsNewNode="True" />
+        <ColumnInfo Id="LastErrorMessage" PropertyName="LastErrorMessage" Index="3" IsNewNode="True" />
+        <ColumnInfo Id="DatePosted" PropertyName="DatePosted" Index="4" Width="150" IsNewNode="True" />
+        <ColumnInfo Id="RetryCount" PropertyName="RetryCount" Index="5" Width="90" IsNewNode="True" />
+      </Columns>
+      <Filters CurrentFilterId="NewAndRetrying" IsNewNode="True">
         <Filter Id="NewAndRetrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New# Or [PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="0" Caption="New and Retrying" IsNewNode="True" />
         <Filter Id="New" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New#" Index="1" IsNewNode="True" />
         <Filter Id="Retrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="2" IsNewNode="True" />
