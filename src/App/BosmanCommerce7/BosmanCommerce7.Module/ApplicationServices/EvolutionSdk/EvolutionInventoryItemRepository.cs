@@ -1,10 +1,10 @@
-﻿/* 
+﻿/*
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
  * Date created: 2023-08-21
  * Author	: Stephan J Lotter
- * Notes	: 
- *  
+ * Notes	:
+ *
  */
 
 using CSharpFunctionalExtensions;
@@ -28,5 +28,4 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
       return new InventoryItem(id.Value);
     }
   }
-
 }

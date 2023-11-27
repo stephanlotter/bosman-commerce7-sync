@@ -1,10 +1,10 @@
-﻿/* 
+﻿/*
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
  * Date created: 2023-08-18
  * Author	: Stephan J Lotter
- * Notes	: 
- *  
+ * Notes	:
+ *
  */
 
 using DevExpress.Persistent.Base;
@@ -16,7 +16,6 @@ namespace BosmanCommerce7.Module.BusinessObjects {
   [DefaultClassOptions]
   [NavigationItem("System")]
   public class TaxMapping : XPObject {
-
     private string? _onlineTaxType;
     private string? _evolutionTaxType;
 
@@ -33,7 +32,7 @@ namespace BosmanCommerce7.Module.BusinessObjects {
       set => SetPropertyValue(nameof(EvolutionTaxType), ref _evolutionTaxType, value);
     }
 
-    public TaxMapping(Session session) : base(session) { }
-
+    public TaxMapping(Session session) : base(session) {
+    }
   }
 }

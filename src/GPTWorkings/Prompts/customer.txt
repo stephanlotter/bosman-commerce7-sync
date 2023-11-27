@@ -1,0 +1,2 @@
+Analyse the SalesOrdersSyncApiRequest class in source.cs and write a class that follows the same style and pattern that updates a customer. Read the customer api documentation in c7_api_customers.md file.
+

@@ -7,13 +7,13 @@
  *
  */
 
-using BosmanCommerce7.Module.Models.LocalDatabase;
 using CSharpFunctionalExtensions;
+using DevExpress.ExpressApp;
 
 namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess {
 
-  public interface IWarehouseRepository {
+  public interface IBundleMappingRepository {
 
-    Result<string?> FindWarehouseCode(FindWarehouseCodeDescriptor findWarehouseCodeDescriptor);
+    Result<string> FindBundleItemCode(IObjectSpace objectSpace, string sku);
   }
 }

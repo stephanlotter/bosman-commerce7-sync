@@ -1,16 +1,15 @@
-﻿/* 
+﻿/*
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
  * Date created: 2023-08-21
  * Author	: Stephan J Lotter
- * Notes	: 
- *  
+ * Notes	:
+ *
  */
 
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices;
 using BosmanCommerce7.Module.BusinessObjects;
-using BosmanCommerce7.Module.Extensions.EvolutionSdk;
 using BosmanCommerce7.Module.Models;
 using BosmanCommerce7.Module.Models.EvolutionSdk;
 using BosmanCommerce7.Module.Models.LocalDatabase;
@@ -19,10 +18,12 @@ using Microsoft.Extensions.Logging;
 using Pastel.Evolution;
 
 namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
+
   public class PostToEvolutionSalesOrderService : IPostToEvolutionSalesOrderService {
     private readonly ILogger<PostToEvolutionSalesOrderService> _logger;
     private readonly IEvolutionSdk _evolutionSdk;
     private readonly ISalesOrdersPostValueStoreService _salesOrdersPostValueStoreService;
+    private readonly IBundleMappingRepository _bundleMappingRepository;
     private readonly IWarehouseRepository _warehouseRepository;
     private readonly IEvolutionCustomerRepository _evolutionCustomerRepository;
     private readonly IEvolutionProjectRepository _evolutionProjectRepository;
@@ -36,6 +37,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
     public PostToEvolutionSalesOrderService(ILogger<PostToEvolutionSalesOrderService> logger,
       IEvolutionSdk evolutionSdk,
       ISalesOrdersPostValueStoreService salesOrdersPostValueStoreService,
+      IBundleMappingRepository bundleMappingRepository,
       IWarehouseRepository warehouseRepository,
       IEvolutionCustomerRepository evolutionCustomerRepository,
       IEvolutionProjectRepository evolutionProjectRepository,
@@ -48,6 +50,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
       _logger = logger;
       _evolutionSdk = evolutionSdk;
       _salesOrdersPostValueStoreService = salesOrdersPostValueStoreService;
+      _bundleMappingRepository = bundleMappingRepository;
       _warehouseRepository = warehouseRepository;
       _evolutionCustomerRepository = evolutionCustomerRepository;
       _evolutionProjectRepository = evolutionProjectRepository;
@@ -119,13 +122,10 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
           TaxMode = TaxMode.Inclusive
         });
       }
-
     }
 
     private Result<SalesOrder> AddSalesOrderLines(PostToEvolutionSalesOrderContext context, SalesOrder salesOrder, OnlineSalesOrder onlineSalesOrder) {
-
       foreach (var onlineSalesOrderLine in onlineSalesOrder.SalesOrderLines.OrderBy(a => a.LineType)) {
-
         var result = onlineSalesOrderLine.LineType switch {
           SalesOrderLineType.Inventory => AddSalesOrderInventoryLine(context, salesOrder, onlineSalesOrder, onlineSalesOrderLine),
           SalesOrderLineType.GeneralLedger => AddSalesOrderGeneralLedgerLine(context, salesOrder, onlineSalesOrder, onlineSalesOrderLine),
@@ -133,7 +133,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
         };
 
         if (result.IsFailure) { return result; }
-
       }
 
       return Result.Success(salesOrder);
@@ -147,7 +146,12 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
 
         return NewSalesOrderLine(salesOrder)
 
-          .Bind(salesOrderLine => RepositoryGetFromCode(salesOrderLine, onlineSalesOrderLine.Sku, _evolutionInventoryItemRepository.Get, inventoryItem => salesOrderLine.InventoryItem = inventoryItem))
+          .Bind(salesOrderLine => {
+            var skuResult = _bundleMappingRepository.FindBundleItemCode(context.ObjectSpace, onlineSalesOrderLine.Sku);
+            if (skuResult.IsFailure) { return Result.Failure<OrderDetail>(skuResult.Error); }
+            var sku = skuResult.Value;
+            return RepositoryGetFromCode(salesOrderLine, sku, _evolutionInventoryItemRepository.Get, inventoryItem => salesOrderLine.InventoryItem = inventoryItem);
+          })
 
           .Bind(salesOrderLine => {
             return _warehouseRepository.FindWarehouseCode(new FindWarehouseCodeDescriptor {
@@ -159,7 +163,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
           })
 
           .Bind(salesOrderLine => {
-
             int? customerPriceListId = salesOrder.Customer.DefaultPriceListID > 0 ? salesOrder.Customer.DefaultPriceListID : null;
 
             return _evolutionPriceListRepository
@@ -169,7 +172,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
                 salesOrderLine.UnitSellingPrice = evolutionPrice.UnitPriceInVat;
                 return Result.Success(salesOrderLine);
               });
-
           })
 
           .Bind(salesOrderLine => {
@@ -191,7 +193,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
         _logger.LogError(ex, "Error adding inventory line");
         return Result.Failure<SalesOrder>(message);
       }
-
     }
 
     private Result<SalesOrder> AddSalesOrderGeneralLedgerLine(PostToEvolutionSalesOrderContext context, SalesOrder salesOrder, OnlineSalesOrder onlineSalesOrder, OnlineSalesOrderLine onlineSalesOrderLine) {
@@ -201,7 +202,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
           .Bind(salesOrderLine => RepositoryGetFromCode(salesOrderLine, onlineSalesOrderLine.Sku, _evolutionGeneralLedgerAccountRepository.Get, account => salesOrderLine.Account = account))
 
           .Bind(salesOrderLine => {
-
             salesOrderLine.Quantity = onlineSalesOrderLine.Quantity;
             salesOrderLine.UnitSellingPrice = (double)onlineSalesOrderLine.UnitPriceInVat;
 
@@ -224,7 +224,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
         _logger.LogError(ex, "Error adding general ledger line");
         return Result.Failure<SalesOrder>(message);
       }
-
     }
 
     private Result<OrderDetail> NewSalesOrderLine(SalesOrder salesOrder) {
@@ -254,7 +253,5 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
         return Result.Success(salesOrderLine);
       }) : Result.Failure<OrderDetail>("Parameters may not be null");
     }
-
   }
-
 }

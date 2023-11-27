@@ -1,62 +1,66 @@
 ﻿/*
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
- * Date created: 2023-08-21
+ * Date created: 2023-11-27
  * Author	: Stephan J Lotter
  * Notes	:
  *
  */
 
+using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices;
-using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices.Models;
 using BosmanCommerce7.Module.BusinessObjects;
 using BosmanCommerce7.Module.Extensions;
 using BosmanCommerce7.Module.Models;
-using CSharpFunctionalExtensions;
 using DevExpress.ExpressApp;
 using DevExpress.ExpressApp.Actions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace BosmanCommerce7.Module.Controllers {
 
-  public class PostNowActionController : ActionControllerBase {
+  public class RetryActionController : ActionControllerBase {
     private readonly IServiceProvider? _serviceProvider;
+    private readonly ILogger<SalesOrdersPostService>? _logger;
 
-    public PostNowActionController() {
+    public RetryActionController() {
       TargetObjectType = typeof(OnlineSalesOrder);
       TargetViewType = ViewType.ListView;
       TargetViewNesting = Nesting.Root;
     }
 
     [ActivatorUtilitiesConstructor]
-    public PostNowActionController(IServiceProvider serviceProvider) : this() {
+    public RetryActionController(IServiceProvider serviceProvider, ILogger<SalesOrdersPostService> logger) : this() {
       _serviceProvider = serviceProvider;
+      _logger = logger;
     }
 
     protected override void CreateActions() {
-      var criteria = "PostingStatus".InCriteriaOperator(SalesOrderPostingStatus.New, SalesOrderPostingStatus.Retrying, SalesOrderPostingStatus.Failed).ToCriteriaString();
-      var action = NewAction("Post now", (s, e) => { Execute(); },
+      var criteria = "PostingStatus".InCriteriaOperator(SalesOrderPostingStatus.Failed).ToCriteriaString();
+      var action = NewAction("Retry", (s, e) => { Execute(); },
         selectionDependencyType: SelectionDependencyType.Independent,
         targetObjectsCriteria: criteria);
     }
 
     private void Execute() {
-      var userHasSelectedSalesOrders = View.SelectedObjects.Count > 0;
-      var selectedSalesOrders = userHasSelectedSalesOrders ? View.SelectedObjects.Cast<OnlineSalesOrder>().ToList() : new List<OnlineSalesOrder>();
+      try {
+        var localObjectSpaceProvider = _serviceProvider!.GetService<ILocalObjectSpaceProvider>()!;
 
-      var criteria = userHasSelectedSalesOrders
-        ? "Oid".MapArrayToInOperator(selectedSalesOrders.Select(a => a.Oid).ToArray())
-        : null;
+        localObjectSpaceProvider.WrapInObjectSpaceTransaction(objectSpace => {
+          foreach (var salesOrder in View.SelectedObjects.Cast<OnlineSalesOrder>()) {
+            var o = objectSpace.GetObjectByKey<OnlineSalesOrder>(salesOrder.Oid);
+            o.ResetPostingStatus();
+            o.Save();
+          }
+        });
 
-      var service = _serviceProvider!.GetService<ISalesOrdersPostService>();
-      var context = new SalesOrdersPostContext(criteria);
-
-      service!
-        .Execute(context)
-        .Tap(() => { ShowSuccessMessage(); })
-        .TapError(ShowErrorMessage);
-
-      View.RefreshView();
+        View.RefreshView();
+        ShowSuccessMessage();
+      }
+      catch (Exception ex) {
+        _logger?.LogError(ex, "Error while retrying sales order posting.");
+        ShowErrorMessage(ex.Message);
+      }
     }
 
     protected override void ExecutePopup(object sender, PopupWindowShowActionExecuteEventArgs args) {

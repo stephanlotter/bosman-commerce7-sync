@@ -25,9 +25,10 @@
       </Item>
       <Item Id="System">
         <Items>
-          <Item Id="WarehousePostalCodeMapping_ListView" Index="0" />
-          <Item Id="TaxMapping_ListView" Index="1" />
-          <Item Id="ValueStore_ListView" Index="2" />
+          <Item Id="BundleMapping_ListView" Index="0" />
+          <Item Id="WarehousePostalCodeMapping_ListView" Index="1" Removed="True" />
+          <Item Id="TaxMapping_ListView" Index="2" />
+          <Item Id="ValueStore_ListView" Index="3" />
         </Items>
       </Item>
     </Items>
@@ -36,6 +37,24 @@
     <SchemaModule Name="SystemModule" Version="23.1.5.0" IsNewNode="True" />
   </SchemaModules>
   <Views>
+    <DetailView Id="BundleMapping_DetailView" FreezeLayout="True">
+      <Layout IsNewNode="True" Removed="True">
+        <LayoutGroup Id="Main" Index="0" ShowCaption="False" RelativeSize="100" IsNewNode="True">
+          <LayoutGroup Id="SimpleEditors" Index="0" ShowCaption="False" RelativeSize="100" IsNewNode="True">
+            <LayoutGroup Id="BundleMapping" Index="0" ShowCaption="False" RelativeSize="100" Caption="Evolution Code" IsNewNode="True">
+              <LayoutItem Id="BundleSku" ViewItem="BundleSku" Index="0" RelativeSize="2.588996763754045" IsNewNode="True" />
+              <LayoutItem Id="EvolutionCode" ViewItem="EvolutionCode" ShowCaption="" Index="1" RelativeSize="97.41100323624596" IsNewNode="True" />
+            </LayoutGroup>
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <ListView Id="BundleMapping_ListView">
+      <Columns>
+        <ColumnInfo Id="BundleSku" Index="0" Width="198" SortIndex="0" SortOrder="Ascending" />
+        <ColumnInfo Id="EvolutionCode" Width="210" Index="1" />
+      </Columns>
+    </ListView>
     <DetailView Id="OnlineSalesOrder_DetailView" FreezeLayout="True" AllowDelete="False" AllowEdit="True" AllowNew="False">
       <Layout IsNewNode="True" Removed="True">
         <LayoutGroup Id="Main" Index="0" ShowCaption="False" RelativeSize="100" IsNewNode="True">

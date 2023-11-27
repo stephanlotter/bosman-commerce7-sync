@@ -1,9 +1,9 @@
-﻿/* 
+﻿/*
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
  * Date created: 2023-08-17 * Author	: Stephan J Lotter
- * Notes	: 
- *  
+ * Notes	:
+ *
  */
 
 using BosmanCommerce7.Module.ApplicationServices.AppDataServices;
@@ -16,6 +16,7 @@ using BosmanCommerce7.Module.Models;
 using BosmanCommerce7.Module.Models.EvolutionSdk;
 
 namespace BosmanCommerce7.Blazor.Server.Extensions {
+
   public static class RegisterServicesFunctions {
 
     public static void RegisterServices(IServiceCollection services) {
@@ -57,6 +58,7 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
       services.AddTransient<IAppDataFileManager, AppDataFileManager>();
       services.AddTransient<IValueStoreRepository, ValueStoreRepository>();
       services.AddTransient<IWarehouseRepository, WarehouseRepository>();
+      services.AddTransient<IBundleMappingRepository, BundleMappingRepository>();
     }
 
     private static void RegisterSalesOrderServices(IServiceCollection services) {
@@ -75,7 +77,6 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
     }
 
     public static void RegisterConfig(IServiceCollection services, IConfiguration configuration) {
-
       void AddConfig(string sectionName, object instance) {
         configuration.GetSection(sectionName).Bind(instance);
         services.AddSingleton(instance.GetType(), instance);
@@ -90,7 +91,6 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
       services.AddSingleton(options.SalesOrdersSyncJobOptions);
       services.AddSingleton(options.SalesOrdersPostJobOptions);
       services.AddSingleton(options.ApiOptions);
-
     }
 
     private static EvolutionCompanyDescriptor Instance(IServiceProvider serviceProvider) {
@@ -103,7 +103,5 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
 
       return new EvolutionCompanyDescriptor(companyDatabaseConnectionString, commonDatabaseConnectionString);
     }
-
   }
-
 }
