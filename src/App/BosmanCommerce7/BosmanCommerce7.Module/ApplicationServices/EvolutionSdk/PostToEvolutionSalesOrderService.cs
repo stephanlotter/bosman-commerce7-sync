@@ -156,7 +156,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
               salesOrder.ExternalOrderNo = bundleMappingResult.Value.ExternalReferenceCode;
             }
 
-            var sku = bundleMappingResult.Value?.BundleSku ?? onlineSalesOrderLine.Sku;
+            var sku = bundleMappingResult.Value?.EvolutionCode ?? onlineSalesOrderLine.Sku;
             return RepositoryGetFromCode(salesOrderLine, sku, _evolutionInventoryItemRepository.Get, inventoryItem => salesOrderLine.InventoryItem = inventoryItem);
           })
 
