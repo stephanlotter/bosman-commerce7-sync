@@ -1,15 +1,16 @@
-﻿/* 
+﻿/*
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
  * Date created: 2023-08-17 * Author	: Stephan J Lotter
- * Notes	: 
- *  
+ * Notes	:
+ *
  */
 
 using Quartz;
 using Serilog;
 
 namespace BosmanCommerce7.Module.Extensions.QuartzTools {
+
   [DisallowConcurrentExecution]
   public class ProcessQueueTableJob : IJob {
 
@@ -22,6 +23,8 @@ namespace BosmanCommerce7.Module.Extensions.QuartzTools {
         }
         else {
           await syncQueueService.Execute();
+          Log.Logger.Debug($"Executed Job {name}.");
+          context.Trigger.PrintNextRun();
         }
       }
       catch (Exception ex) {
@@ -29,5 +32,4 @@ namespace BosmanCommerce7.Module.Extensions.QuartzTools {
       }
     }
   }
-
 }

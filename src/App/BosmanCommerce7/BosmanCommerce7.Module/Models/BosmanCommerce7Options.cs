@@ -43,6 +43,8 @@ namespace BosmanCommerce7.Module.Models {
 
     public int RepeatIntervalSeconds { get; init; }
 
+    public string? RepeatIntervalCronExpression { get; init; }
+
     public int StartDelaySeconds { get; init; }
   }
 

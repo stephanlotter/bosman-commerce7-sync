@@ -20,7 +20,6 @@ namespace BosmanCommerce7.Module.Extensions.QuartzTools {
 
     public static void StartJobs(QuartzStartJobContext context) {
       _scheduler = QuartzFunctions.CreateScheduler();
-
       ScheduleSalesOrdersSyncJobQueueService(context, _scheduler);
       ScheduleSalesOrdersPostJobQueueService(context, _scheduler);
 
@@ -60,11 +59,21 @@ namespace BosmanCommerce7.Module.Extensions.QuartzTools {
         .SetJobData(new JobDataMap() { { JobIds.JobServiceInstance, service! } })
         .Build();
 
+      var cronExpression = string.IsNullOrWhiteSpace(jobDescriptor.JobOptions.RepeatIntervalCronExpression)
+        ? CronExpressionFunctions.SecondsInterval(jobDescriptor.JobOptions.RepeatIntervalSeconds)
+        : jobDescriptor.JobOptions.RepeatIntervalCronExpression;
+
+      var startTimeUtc = DateTime.Now.AddSeconds(jobDescriptor.JobOptions.StartDelaySeconds);
+
+      context.Logger.LogDebug("Start {service} at {time:o}", jobDescriptor.JobId, startTimeUtc.ToLocalTime());//$"{startTimeUtc.ToLocalTime():o}"
+
       var trigger = TriggerBuilder.Create()
         .WithIdentity(jobDescriptor.JobId, JobIds.JobsGroup)
-        .StartAt(DateTime.Now.AddSeconds(jobDescriptor.JobOptions.StartDelaySeconds))
-        .WithCronSchedule(CronExpressionFunctions.SecondsInterval(jobDescriptor.JobOptions.RepeatIntervalSeconds))
+        .StartAt(startTimeUtc)
+        .WithCronSchedule(cronExpression)
         .Build();
+
+      trigger.PrintNextRun();
 
       jobDescriptor.Scheduler.ScheduleJob(job, trigger);
     }

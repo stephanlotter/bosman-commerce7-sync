@@ -94,14 +94,19 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
         _localObjectSpaceProvider.WrapInObjectSpaceTransaction(objectSpace => {
           foreach (dynamic salesOrder in response.SalesOrders!) {
-            Logger.LogInformation("Sales order received: {orderNumber}", $"{salesOrder.orderNumber}");
+            if (!_processedOrders.Contains($"{salesOrder.id}")) {
+              Logger.LogInformation("Sales order received: {orderNumber}", $"{salesOrder.orderNumber}");
+            }
 
             var channel = $"{salesOrder.channel}";
 
             var processChannel = channelsToProcess?.Contains(channel.ToLower()) ?? false;
 
             if (!processChannel) {
-              Logger.LogWarning("Sales order channel not configured to process: {orderNumber} [channel:{channel}]", $"{salesOrder.orderNumber}", $"{channel}");
+              if (!_processedOrders.Contains($"{salesOrder.id}")) {
+                Logger.LogWarning("Sales order channel not configured to process: {orderNumber} [channel:{channel}]", $"{salesOrder.orderNumber}", $"{channel}");
+                _processedOrders.Add($"{salesOrder.id}");
+              }
               continue;
             }
 
@@ -109,18 +114,21 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
             lastOrderDate = lastOrderDate > orderDate ? lastOrderDate : orderDate;
 
             if (_processedOrders.Contains($"{salesOrder.id}")) {
-              Logger.LogWarning("Sales order already processed: {orderNumber} [id:{id}]", $"{salesOrder.orderNumber}", $"{salesOrder.id}");
+              //Logger.LogWarning("Sales order already processed: {orderNumber} [id:{id}]", $"{salesOrder.orderNumber}", $"{salesOrder.id}");
               continue;
             }
-
-            _processedOrders.Add($"{salesOrder.id}");
 
             var localSalesOrder = NewOrder(salesOrder.id, salesOrder.orderNumber);
 
             if (localSalesOrder.OnlineId == $"{salesOrder.id}") {
-              Logger.LogWarning("Sales order already exists: {orderNumber} [id:{id}]", $"{salesOrder.orderNumber}", $"{salesOrder.id}");
+              if (!_processedOrders.Contains($"{salesOrder.id}")) {
+                Logger.LogWarning("Sales order already exists: {orderNumber} [id:{id}]", $"{salesOrder.orderNumber}", $"{salesOrder.id}");
+                _processedOrders.Add($"{salesOrder.id}");
+              }
               continue;
             }
+
+            _processedOrders.Add($"{salesOrder.id}");
 
             localSalesOrder.OrderNumber = salesOrder.orderNumber;
             localSalesOrder.OrderJson = JsonConvert.SerializeObject(salesOrder, Formatting.Indented);
