@@ -7,6 +7,7 @@
  *
  */
 
+using BosmanCommerce7.Module.BusinessObjects;
 using CSharpFunctionalExtensions;
 using DevExpress.ExpressApp;
 
@@ -14,6 +15,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDat
 
   public interface IBundleMappingRepository {
 
-    Result<string> FindBundleItemCode(IObjectSpace objectSpace, string sku);
+    Result<BundleMapping?> FindBundleMapping(IObjectSpace objectSpace, string sku);
   }
 }

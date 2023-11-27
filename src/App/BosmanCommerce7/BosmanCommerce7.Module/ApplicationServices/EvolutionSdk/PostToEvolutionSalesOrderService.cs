@@ -73,6 +73,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
             salesOrder.Save();
             onlineSalesOrder.EvolutionSalesOrderNumber = salesOrder.OrderNo;
             onlineSalesOrder.PostingStatus = SalesOrderPostingStatus.Posted;
+            onlineSalesOrder.LastErrorMessage = null;
+            onlineSalesOrder.RetryCount = 0;
             onlineSalesOrder.DatePosted = DateTime.Now;
             return Result.Success(onlineSalesOrder);
           });
@@ -147,9 +149,14 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
         return NewSalesOrderLine(salesOrder)
 
           .Bind(salesOrderLine => {
-            var skuResult = _bundleMappingRepository.FindBundleItemCode(context.ObjectSpace, onlineSalesOrderLine.Sku);
-            if (skuResult.IsFailure) { return Result.Failure<OrderDetail>(skuResult.Error); }
-            var sku = skuResult.Value;
+            var bundleMappingResult = _bundleMappingRepository.FindBundleMapping(context.ObjectSpace, onlineSalesOrderLine.Sku);
+            if (bundleMappingResult.IsFailure) { return Result.Failure<OrderDetail>(bundleMappingResult.Error); }
+
+            if (bundleMappingResult.Value != null) {
+              salesOrder.ExternalOrderNo = bundleMappingResult.Value.ExternalReferenceCode;
+            }
+
+            var sku = bundleMappingResult.Value?.BundleSku ?? onlineSalesOrderLine.Sku;
             return RepositoryGetFromCode(salesOrderLine, sku, _evolutionInventoryItemRepository.Get, inventoryItem => salesOrderLine.InventoryItem = inventoryItem);
           })
 

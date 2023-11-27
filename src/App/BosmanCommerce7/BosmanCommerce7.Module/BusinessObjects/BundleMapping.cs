@@ -18,6 +18,7 @@ namespace BosmanCommerce7.Module.BusinessObjects {
   public class BundleMapping : XPObject {
     private string _bundleSku = default!;
     private string _evolutionCode = default!;
+    private string? _externalReferenceCode;
 
     [RuleRequiredField]
     public string BundleSku {
@@ -29,6 +30,11 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     public string EvolutionCode {
       get => _evolutionCode;
       set => SetPropertyValue(nameof(EvolutionCode), ref _evolutionCode, value);
+    }
+
+    public string? ExternalReferenceCode {
+      get => _externalReferenceCode;
+      set => SetPropertyValue(nameof(ExternalReferenceCode), ref _externalReferenceCode, value);
     }
 
     public BundleMapping(Session session) : base(session) {

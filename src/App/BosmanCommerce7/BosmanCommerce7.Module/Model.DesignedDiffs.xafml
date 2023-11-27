@@ -43,7 +43,8 @@
           <LayoutGroup Id="SimpleEditors" Index="0" ShowCaption="False" RelativeSize="100" IsNewNode="True">
             <LayoutGroup Id="BundleMapping" Index="0" ShowCaption="False" RelativeSize="100" Caption="Evolution Code" IsNewNode="True">
               <LayoutItem Id="BundleSku" ViewItem="BundleSku" Index="0" RelativeSize="2.588996763754045" IsNewNode="True" />
-              <LayoutItem Id="EvolutionCode" ViewItem="EvolutionCode" ShowCaption="" Index="1" RelativeSize="97.41100323624596" IsNewNode="True" />
+              <LayoutItem Id="EvolutionCode" ViewItem="EvolutionCode" ShowCaption="" Index="1" RelativeSize="1.941747572815534" IsNewNode="True" />
+              <LayoutItem Id="ExternalReferenceCode" ViewItem="ExternalReferenceCode" Index="2" RelativeSize="95.46925566343042" IsNewNode="True" />
             </LayoutGroup>
           </LayoutGroup>
         </LayoutGroup>
@@ -53,6 +54,7 @@
       <Columns>
         <ColumnInfo Id="BundleSku" Index="0" Width="198" SortIndex="0" SortOrder="Ascending" />
         <ColumnInfo Id="EvolutionCode" Width="210" Index="1" />
+        <ColumnInfo Id="ExternalReferenceCode" Index="2" />
       </Columns>
     </ListView>
     <DetailView Id="OnlineSalesOrder_DetailView" FreezeLayout="True" AllowDelete="False" AllowEdit="True" AllowNew="False">
@@ -108,7 +110,6 @@
     </DetailView>
     <ListView Id="OnlineSalesOrder_ListView" AllowDelete="False" AllowLink="False" AllowNew="False" IsFooterVisible="True">
       <Columns>
-        <ColumnInfo Id="Channel" Index="-1" />
         <ColumnInfo Id="CustomerOnlineId" Index="-1" />
         <ColumnInfo Id="EmailAddress" Index="-1" />
         <ColumnInfo Id="EvolutionSalesOrderNumber" Index="-1" />
@@ -124,16 +125,17 @@
         <ColumnInfo Id="ShipToAddressProvince" Index="-1" />
         <ColumnInfo Id="ShipToName" Index="-1" />
         <ColumnInfo Id="ShipToPhoneNumber" Index="-1" />
-        <ColumnInfo Id="OrderNumber" Index="0" SortIndex="-1" SortOrder="None" Width="100">
+        <ColumnInfo Id="Channel" Index="0" Width="103" />
+        <ColumnInfo Id="OrderNumber" Index="1" SortIndex="-1" SortOrder="None" Width="100">
           <Summary>
             <ColumnSummaryItem Id="NumberOfRows" SummaryType="Count" IsNewNode="True" />
           </Summary>
         </ColumnInfo>
-        <ColumnInfo Id="RetryAfter" Index="1" SortIndex="0" SortOrder="Ascending" Width="150" />
-        <ColumnInfo Id="PostingStatus" Index="2" SortIndex="-1" SortOrder="None" Width="100" />
-        <ColumnInfo Id="LastErrorMessage" Index="3" />
-        <ColumnInfo Id="DatePosted" Index="4" Width="150" />
-        <ColumnInfo Id="RetryCount" Index="5" Width="90" />
+        <ColumnInfo Id="RetryAfter" Index="2" SortIndex="0" SortOrder="Ascending" Width="150" />
+        <ColumnInfo Id="PostingStatus" Index="3" SortIndex="-1" SortOrder="None" Width="100" />
+        <ColumnInfo Id="LastErrorMessage" Index="4" />
+        <ColumnInfo Id="DatePosted" Index="5" Width="150" />
+        <ColumnInfo Id="RetryCount" Index="6" Width="90" />
       </Columns>
       <Filters CurrentFilterId="NewAndRetrying">
         <Filter Id="NewAndRetrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New# Or [PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="0" Caption="New and Retrying" IsNewNode="True" />

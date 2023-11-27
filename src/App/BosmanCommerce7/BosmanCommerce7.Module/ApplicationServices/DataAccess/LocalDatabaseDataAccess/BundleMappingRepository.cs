@@ -21,9 +21,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDat
     public BundleMappingRepository(ILogger<BundleMappingRepository> logger, ILocalDatabaseConnectionStringProvider connectionStringProvider) : base(logger, connectionStringProvider) {
     }
 
-    public Result<string> FindBundleItemCode(IObjectSpace objectSpace, string sku) {
+    public Result<BundleMapping?> FindBundleMapping(IObjectSpace objectSpace, string sku) {
       var bundleMapping = objectSpace.FindObject<BundleMapping>("BundleSku".IsEqualToOperator(sku));
-      return bundleMapping != null ? Result.Success(bundleMapping.EvolutionCode) : Result.Success(sku);
+      return bundleMapping;
     }
   }
 }
