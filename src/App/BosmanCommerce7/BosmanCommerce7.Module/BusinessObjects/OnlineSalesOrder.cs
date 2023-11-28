@@ -91,6 +91,8 @@ namespace BosmanCommerce7.Module.BusinessObjects {
       set => SetPropertyValue(nameof(OrderNumber), ref _orderNumber, value);
     }
 
+    //purchaseType
+
     public string? ShipToName {
       get => _shipToName;
       set => SetPropertyValue(nameof(ShipToName), ref _shipToName, value);

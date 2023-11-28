@@ -23,7 +23,7 @@ begin
 			from inserted i
 			join WhseMst wm
 				on i.WHWhseID = wm.WhseLink
-				and wm.Code in ('037'))
+				and wm.Code in ('035'))
 		return;
 
 	insert into BosmanCommerce7.dbo.StockLevelUpdateQueue (

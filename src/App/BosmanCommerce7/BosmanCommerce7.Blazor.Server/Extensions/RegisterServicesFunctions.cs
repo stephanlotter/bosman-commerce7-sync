@@ -21,10 +21,13 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
 
     public static void RegisterServices(IServiceCollection services) {
       RegisterApiServices(services);
+
       RegisterLocalDatabaseServices(services);
+
       RegisterEvolutionServices(services);
+
       RegisterUtilityServices(services);
-      RegisterSalesOrderServices(services);
+
       RegisterSalesOrderSyncServices(services);
       RegisterSalesOrderPostServices(services);
     }
@@ -59,9 +62,6 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
       services.AddTransient<IValueStoreRepository, ValueStoreRepository>();
       services.AddTransient<IWarehouseRepository, WarehouseRepository>();
       services.AddTransient<IBundleMappingRepository, BundleMappingRepository>();
-    }
-
-    private static void RegisterSalesOrderServices(IServiceCollection services) {
     }
 
     private static void RegisterSalesOrderSyncServices(IServiceCollection services) {
