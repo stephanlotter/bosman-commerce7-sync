@@ -1,17 +1,18 @@
-﻿/* 
+﻿/*
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
  * Date created: 2023-08-18
  * Author	: Stephan J Lotter
- * Notes	: 
- *  
+ * Notes	:
+ *
  */
 
 using DevExpress.ExpressApp.Model;
 using DevExpress.Persistent.Base;
 using DevExpress.Xpo;
 
-namespace BosmanCommerce7.Module.BusinessObjects {
+namespace BosmanCommerce7.Module.BusinessObjects.Settings {
+
   [DefaultClassOptions]
   [NavigationItem("System")]
   public class ValueStore : XPObject {
@@ -30,7 +31,7 @@ namespace BosmanCommerce7.Module.BusinessObjects {
       set => SetPropertyValue(nameof(KeyValue), ref _keyValue, value);
     }
 
-    public ValueStore(Session session) : base(session) { }
-
+    public ValueStore(Session session) : base(session) {
+    }
   }
 }

@@ -7,16 +7,17 @@
  *
  */
 
-using BosmanCommerce7.Module.BusinessObjects;
+using BosmanCommerce7.Module.BusinessObjects.Settings;
 using BosmanCommerce7.Module.Extensions;
 using BosmanCommerce7.Module.Models;
 using CSharpFunctionalExtensions;
 using DevExpress.ExpressApp;
 using Microsoft.Extensions.Logging;
 
-namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess {
+namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess
+{
 
-  public class BundleMappingRepository : LocalDatabaseRepositoryBase, IBundleMappingRepository {
+    public class BundleMappingRepository : LocalDatabaseRepositoryBase, IBundleMappingRepository {
 
     public BundleMappingRepository(ILogger<BundleMappingRepository> logger, ILocalDatabaseConnectionStringProvider connectionStringProvider) : base(logger, connectionStringProvider) {
     }

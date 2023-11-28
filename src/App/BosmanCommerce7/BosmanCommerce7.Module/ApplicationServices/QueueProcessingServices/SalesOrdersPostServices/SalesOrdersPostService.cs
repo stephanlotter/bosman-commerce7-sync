@@ -10,16 +10,17 @@
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
 using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices.Models;
-using BosmanCommerce7.Module.BusinessObjects;
+using BosmanCommerce7.Module.BusinessObjects.SalesOrders;
 using BosmanCommerce7.Module.Extensions;
 using BosmanCommerce7.Module.Models;
 using CSharpFunctionalExtensions;
 using DevExpress.Data.Filtering;
 using Microsoft.Extensions.Logging;
 
-namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices {
+namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices
+{
 
-  public class SalesOrdersPostService : SyncServiceBase, ISalesOrdersPostService {
+    public class SalesOrdersPostService : SyncServiceBase, ISalesOrdersPostService {
     private readonly ILocalObjectSpaceProvider _localObjectSpaceProvider;
     private readonly IPostToEvolutionSalesOrderService _postToEvolutionSalesOrderService;
 

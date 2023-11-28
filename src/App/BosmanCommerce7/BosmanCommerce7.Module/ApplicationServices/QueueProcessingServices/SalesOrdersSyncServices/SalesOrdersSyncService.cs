@@ -10,8 +10,8 @@
 using BosmanCommerce7.Module.ApplicationServices.AppDataServices;
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices.Models;
-using BosmanCommerce7.Module.ApplicationServices.RestApiClients;
-using BosmanCommerce7.Module.BusinessObjects;
+using BosmanCommerce7.Module.ApplicationServices.RestApiClients.SalesOrders;
+using BosmanCommerce7.Module.BusinessObjects.SalesOrders;
 using BosmanCommerce7.Module.Extensions;
 using BosmanCommerce7.Module.Models;
 using CSharpFunctionalExtensions;
@@ -20,9 +20,10 @@ using DevExpress.Data.Filtering;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices {
+namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices
+{
 
-  public class SalesOrdersSyncService : SyncServiceBase, ISalesOrdersSyncService {
+    public class SalesOrdersSyncService : SyncServiceBase, ISalesOrdersSyncService {
     private readonly SalesOrdersSyncJobOptions _salesOrdersSyncJobOptions;
     private readonly ISalesOrdersSyncValueStoreService _salesOrdersSyncValueStoreService;
     private readonly ISalesOrdersApiClient _apiClient;

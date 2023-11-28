@@ -9,7 +9,7 @@
 
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices;
-using BosmanCommerce7.Module.BusinessObjects;
+using BosmanCommerce7.Module.BusinessObjects.SalesOrders;
 using BosmanCommerce7.Module.Models;
 using BosmanCommerce7.Module.Models.EvolutionSdk;
 using BosmanCommerce7.Module.Models.LocalDatabase;
@@ -17,9 +17,10 @@ using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Pastel.Evolution;
 
-namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
+namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk
+{
 
-  public class PostToEvolutionSalesOrderService : IPostToEvolutionSalesOrderService {
+    public class PostToEvolutionSalesOrderService : IPostToEvolutionSalesOrderService {
     private readonly ILogger<PostToEvolutionSalesOrderService> _logger;
     private readonly IEvolutionSdk _evolutionSdk;
     private readonly ISalesOrdersPostValueStoreService _salesOrdersPostValueStoreService;

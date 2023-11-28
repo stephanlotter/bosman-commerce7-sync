@@ -8,14 +8,15 @@
  */
 
 using System.Data.SqlClient;
-using BosmanCommerce7.Module.BusinessObjects;
+using BosmanCommerce7.Module.BusinessObjects.SalesOrders;
 using BosmanCommerce7.Module.Models;
 using DevExpress.ExpressApp;
 using DevExpress.ExpressApp.Xpo;
 
-namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess {
+namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess
+{
 
-  public class LocalObjectSpaceProvider : ILocalObjectSpaceProvider {
+    public class LocalObjectSpaceProvider : ILocalObjectSpaceProvider {
     private readonly ILocalDatabaseConnectionStringProvider _localDatabaseConnectionStringProvider;
 
     public LocalObjectSpaceProvider(ILocalDatabaseConnectionStringProvider localDatabaseConnectionStringProvider) {

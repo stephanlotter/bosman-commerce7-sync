@@ -8,10 +8,12 @@
  */
 
 using BosmanCommerce7.Module.ApplicationServices.RestApiClients;
+using BosmanCommerce7.Module.ApplicationServices.RestApiClients.SalesOrders;
 using BosmanCommerce7.Module.Models;
 
-namespace BosmanCommerce7.UnitTests.Commerce7Tests {
-  public class SalesOrdersApiClientApiClientTests {
+namespace BosmanCommerce7.UnitTests.Commerce7Tests
+{
+    public class SalesOrdersApiClientApiClientTests {
 
     public SalesOrdersApiClientApiClientTests() {
 

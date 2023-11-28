@@ -9,7 +9,7 @@
 
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices;
-using BosmanCommerce7.Module.BusinessObjects;
+using BosmanCommerce7.Module.BusinessObjects.SalesOrders;
 using BosmanCommerce7.Module.Extensions;
 using BosmanCommerce7.Module.Models;
 using DevExpress.ExpressApp;
@@ -17,9 +17,10 @@ using DevExpress.ExpressApp.Actions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace BosmanCommerce7.Module.Controllers {
+namespace BosmanCommerce7.Module.Controllers
+{
 
-  public class RetryActionController : ActionControllerBase {
+    public class RetryActionController : ActionControllerBase {
     private readonly IServiceProvider? _serviceProvider;
     private readonly ILogger<SalesOrdersPostService>? _logger;
 

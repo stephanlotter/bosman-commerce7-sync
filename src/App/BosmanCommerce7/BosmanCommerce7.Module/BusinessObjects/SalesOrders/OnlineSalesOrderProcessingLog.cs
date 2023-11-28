@@ -1,17 +1,18 @@
-﻿/* 
+﻿/*
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
  * Date created: 2023-08-18
  * Author	: Stephan J Lotter
- * Notes	: 
- *  
+ * Notes	:
+ *
  */
 
 using DevExpress.ExpressApp.Model;
 using DevExpress.Persistent.Base;
 using DevExpress.Xpo;
 
-namespace BosmanCommerce7.Module.BusinessObjects {
+namespace BosmanCommerce7.Module.BusinessObjects.SalesOrders {
+
   [DefaultClassOptions]
   [NavigationItem(true)]
   public class OnlineSalesOrderProcessingLog : XPObject {
@@ -47,13 +48,12 @@ namespace BosmanCommerce7.Module.BusinessObjects {
       set => SetPropertyValue(nameof(Details), ref _details, value);
     }
 
-    public OnlineSalesOrderProcessingLog(Session session) : base(session) { }
+    public OnlineSalesOrderProcessingLog(Session session) : base(session) {
+    }
 
     public override void AfterConstruction() {
       base.AfterConstruction();
       EntryDate = DateTime.Now;
     }
-
   }
-
 }

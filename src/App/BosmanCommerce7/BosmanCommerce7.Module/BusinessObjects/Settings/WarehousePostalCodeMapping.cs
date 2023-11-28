@@ -1,17 +1,18 @@
-﻿/* 
+﻿/*
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
  * Date created: 2023-08-22
  * Author	: Stephan J Lotter
- * Notes	: 
- *  
+ * Notes	:
+ *
  */
 
 using DevExpress.Persistent.Base;
 using DevExpress.Persistent.Validation;
 using DevExpress.Xpo;
 
-namespace BosmanCommerce7.Module.BusinessObjects {
+namespace BosmanCommerce7.Module.BusinessObjects.Settings {
+
   [DefaultClassOptions]
   [NavigationItem("System")]
   public class WarehousePostalCodeMapping : XPObject {
@@ -34,7 +35,7 @@ namespace BosmanCommerce7.Module.BusinessObjects {
       set => SetPropertyValue(nameof(WarehouseCode), ref _warehouseCode, value);
     }
 
-    public WarehousePostalCodeMapping(Session session) : base(session) { }
-
+    public WarehousePostalCodeMapping(Session session) : base(session) {
+    }
   }
 }

@@ -6,6 +6,7 @@
  *
  */
 
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.Models;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices;
 using BosmanCommerce7.Module.Models;
@@ -20,10 +21,22 @@ namespace BosmanCommerce7.Module.Extensions.QuartzTools {
 
     public static void StartJobs(QuartzStartJobContext context) {
       _scheduler = QuartzFunctions.CreateScheduler();
+
+      ScheduleCustomerMasterSyncJobQueueService(context, _scheduler);
       ScheduleSalesOrdersSyncJobQueueService(context, _scheduler);
       ScheduleSalesOrdersPostJobQueueService(context, _scheduler);
 
       _scheduler.Start();
+    }
+
+    private static void ScheduleCustomerMasterSyncJobQueueService(QuartzStartJobContext context, IScheduler scheduler) {
+      var jobOptions = context.Options.CustomerMasterSyncJobOptions as JobOptionsBase ?? throw new Exception($"{nameof(context.Options.CustomerMasterSyncJobOptions)} not defined in appsettings.json.");
+
+      ScheduleSyncQueueService<ICustomerMasterSyncQueueService>(context, new QuartzStartJobDescriptor {
+        JobId = JobIds.CustomerMasterSyncJob,
+        JobOptions = jobOptions,
+        Scheduler = scheduler
+      });
     }
 
     private static void ScheduleSalesOrdersSyncJobQueueService(QuartzStartJobContext context, IScheduler scheduler) {

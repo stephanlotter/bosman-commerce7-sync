@@ -9,16 +9,17 @@
 
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices.Models;
-using BosmanCommerce7.Module.BusinessObjects;
+using BosmanCommerce7.Module.BusinessObjects.SalesOrders;
 using BosmanCommerce7.Module.Extensions;
 using CSharpFunctionalExtensions;
 using DevExpress.ExpressApp;
 using DevExpress.ExpressApp.Actions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BosmanCommerce7.Module.Controllers {
+namespace BosmanCommerce7.Module.Controllers
+{
 
-  public class FetchNowActionController : ActionControllerBase {
+    public class FetchNowActionController : ActionControllerBase {
     private readonly IServiceProvider? _serviceProvider;
 
     public FetchNowActionController() {

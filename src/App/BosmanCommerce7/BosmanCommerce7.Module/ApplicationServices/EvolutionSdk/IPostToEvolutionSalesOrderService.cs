@@ -7,11 +7,12 @@
  *  
  */
 
-using BosmanCommerce7.Module.BusinessObjects;
+using BosmanCommerce7.Module.BusinessObjects.SalesOrders;
 using CSharpFunctionalExtensions;
 
-namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
-  public interface IPostToEvolutionSalesOrderService {
+namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk
+{
+    public interface IPostToEvolutionSalesOrderService {
 
     Result<OnlineSalesOrder> Post(PostToEvolutionSalesOrderContext context, OnlineSalesOrder onlineSalesOrder);
 

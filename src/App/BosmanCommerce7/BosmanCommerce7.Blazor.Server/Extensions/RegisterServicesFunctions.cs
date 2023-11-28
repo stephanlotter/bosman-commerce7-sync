@@ -9,9 +9,12 @@
 using BosmanCommerce7.Module.ApplicationServices.AppDataServices;
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
 using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.Models;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices;
 using BosmanCommerce7.Module.ApplicationServices.RestApiClients;
+using BosmanCommerce7.Module.ApplicationServices.RestApiClients.SalesOrders;
 using BosmanCommerce7.Module.Models;
 using BosmanCommerce7.Module.Models.EvolutionSdk;
 
@@ -28,6 +31,8 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
 
       RegisterUtilityServices(services);
 
+      RegisterCustomerMasterSyncServices(services);
+
       RegisterSalesOrderSyncServices(services);
       RegisterSalesOrderPostServices(services);
     }
@@ -39,6 +44,8 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
     private static void RegisterApiServices(IServiceCollection services) {
       services.AddTransient<IRestClientFactory, RestClientFactory>();
       services.AddTransient<IApiClientService, ApiClientService>();
+
+      services.AddTransient<ICustomerMasterApiClient, CustomerMasterApiClient>();
 
       services.AddTransient<ISalesOrdersApiClient, SalesOrdersApiClient>();
     }
@@ -62,6 +69,11 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
       services.AddTransient<IValueStoreRepository, ValueStoreRepository>();
       services.AddTransient<IWarehouseRepository, WarehouseRepository>();
       services.AddTransient<IBundleMappingRepository, BundleMappingRepository>();
+    }
+
+    private static void RegisterCustomerMasterSyncServices(IServiceCollection services) {
+      services.AddTransient<ICustomerMasterSyncQueueService, CustomerMasterSyncQueueService>();
+      services.AddTransient<ICustomerMasterSyncService, CustomerMasterSyncService>();
     }
 
     private static void RegisterSalesOrderSyncServices(IServiceCollection services) {
@@ -88,6 +100,7 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
 
       services.AddSingleton<ILocalDatabaseConnectionStringProvider>(options.ConnectionStrings);
       services.AddSingleton<IEvolutionDatabaseConnectionStringProvider>(options.ConnectionStrings);
+      services.AddSingleton(options.CustomerMasterSyncJobOptions);
       services.AddSingleton(options.SalesOrdersSyncJobOptions);
       services.AddSingleton(options.SalesOrdersPostJobOptions);
       services.AddSingleton(options.ApiOptions);

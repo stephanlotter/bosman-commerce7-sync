@@ -15,7 +15,7 @@ using DevExpress.Persistent.Base;
 using DevExpress.Xpo;
 using Pastel.Evolution;
 
-namespace BosmanCommerce7.Module.BusinessObjects {
+namespace BosmanCommerce7.Module.BusinessObjects.SalesOrders {
 
   [DefaultClassOptions]
   [NavigationItem(true)]

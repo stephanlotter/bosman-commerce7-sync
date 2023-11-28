@@ -18,4 +18,5 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
       IsPagedResponse = true;
     }
   }
+
 }

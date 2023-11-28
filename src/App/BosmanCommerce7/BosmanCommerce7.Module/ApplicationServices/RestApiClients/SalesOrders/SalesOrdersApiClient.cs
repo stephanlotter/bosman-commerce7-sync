@@ -1,26 +1,24 @@
-﻿/* 
+﻿/*
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
  * Date created: 2023-08-18
  * Author	: Stephan J Lotter
- * Notes	: 
- *  
+ * Notes	:
+ *
  */
 
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices.Models;
-using BosmanCommerce7.Module.Models.RestApi;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 
-namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients {
+namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients.SalesOrders {
+
   public class SalesOrdersApiClient : ApiClientBase, ISalesOrdersApiClient {
 
     public SalesOrdersApiClient(ILogger<SalesOrdersApiClient> logger, IApiClientService apiClientService) : base(logger, apiClientService) {
-
     }
 
     public Result<SalesOrdersSyncResponse> GetSalesOrders(DateTime orderSubmittedDate) {
-
       SalesOrdersSyncResponse apiResponse = new();
       var list = new List<dynamic>();
 
@@ -38,7 +36,5 @@ namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients {
         return (Result.Success(apiResponse), list.Count < totalRecords ? ApiRequestPaginationStatus.MorePages : ApiRequestPaginationStatus.Completed);
       });
     }
-
   }
-
 }

@@ -21,8 +21,8 @@ begin
 	if update(DCBalance)
 		return;
 
-	if not update(ucARbIsPosCustomer)
-		and (select isnull(ucARbIsPosCustomer, 0) from inserted) = 0
+	if not update(ubARbIsPosCustomer)
+		and (select isnull(ubARbIsPosCustomer, 0) from inserted) = 0
 		return;
 
 	if not update(ON_HOLD)
@@ -30,12 +30,17 @@ begin
 		return;
 
 	-- Define columns to check for update
-	if update(ucARbboxaccountno)
-		or update(On_Hold)
+	if update(On_Hold)
+		or update(ubARbIsPosCustomer)
 		or update(name)
 		or update(contact_person)
 		or update(email)
 		or update(ucARwcEmail)
+
+		or update(Telephone)
+		or update(Telephone2)
+		or update(Fax1)
+		or update(Fax2)
 
 		or update(Physical1)
 		or update(Physical2)
@@ -44,12 +49,12 @@ begin
 		or update(Physical5)
 		or update(PhysicalPC)
 
-		or update(Post1)
-		or update(Post2)
-		or update(Post3)
-		or update(Post4)
-		or update(Post5)
-		or update(PostPC)
+		--or update(Post1)
+		--or update(Post2)
+		--or update(Post3)
+		--or update(Post4)
+		--or update(Post5)
+		--or update(PostPC)
 
 		or update(account)
 	begin

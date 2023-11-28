@@ -17,6 +17,8 @@ namespace BosmanCommerce7.Module.Models {
 
     public bool EnableDebugLoggingLevel { get; init; }
 
+    public CustomerMasterSyncJobOptions CustomerMasterSyncJobOptions { get; init; } = default!;
+
     public SalesOrdersSyncJobOptions SalesOrdersSyncJobOptions { get; init; } = default!;
 
     public SalesOrdersPostJobOptions SalesOrdersPostJobOptions { get; init; } = default!;
@@ -53,6 +55,9 @@ namespace BosmanCommerce7.Module.Models {
   }
 
   public record SalesOrdersPostJobOptions : JobOptionsBase {
+  }
+
+  public record CustomerMasterSyncJobOptions : JobOptionsBase {
   }
 
   public record ConnectionStrings : ILocalDatabaseConnectionStringProvider, IEvolutionDatabaseConnectionStringProvider {

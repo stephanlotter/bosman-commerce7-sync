@@ -11,7 +11,7 @@ using DevExpress.Persistent.Base;
 using DevExpress.Persistent.Validation;
 using DevExpress.Xpo;
 
-namespace BosmanCommerce7.Module.BusinessObjects {
+namespace BosmanCommerce7.Module.BusinessObjects.Settings {
 
   [DefaultClassOptions]
   [NavigationItem("System")]

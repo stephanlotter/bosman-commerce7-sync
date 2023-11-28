@@ -1,10 +1,10 @@
-﻿/* 
+﻿/*
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
  * Date created: 2023-08-18
  * Author	: Stephan J Lotter
- * Notes	: 
- *  
+ * Notes	:
+ *
  */
 
 using BosmanCommerce7.Module.Models;
@@ -12,11 +12,11 @@ using DevExpress.ExpressApp.Model;
 using DevExpress.Persistent.Base;
 using DevExpress.Xpo;
 
-namespace BosmanCommerce7.Module.BusinessObjects {
+namespace BosmanCommerce7.Module.BusinessObjects.SalesOrders {
+
   [DefaultClassOptions]
   [NavigationItem(false)]
   public class OnlineSalesOrderLine : XPObject {
-
     private OnlineSalesOrder? _onlineSalesOrder;
     private string? _onlineId;
     private SalesOrderLineType _lineType;
@@ -86,7 +86,6 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     [ModelDefault("DisplayFormat", "{0:n2}")]
     [ModelDefault("EditMask", "n2")]
     [ModelDefault("AllowEdit", "false")]
-    // price
     public double UnitPriceInVat {
       get => _unitPriceInVat;
       set => SetPropertyValue(nameof(UnitPriceInVat), ref _unitPriceInVat, value);
@@ -94,7 +93,7 @@ namespace BosmanCommerce7.Module.BusinessObjects {
 
     [ModelDefault("DisplayFormat", "{0:n2}")]
     public double LineValueInVat => Quantity * UnitPriceInVat;
-    
+
     [Size(-1)]
     [ModelDefault("AllowEdit", "false")]
     public string? LineNotes {
@@ -102,8 +101,7 @@ namespace BosmanCommerce7.Module.BusinessObjects {
       set => SetPropertyValue(nameof(LineNotes), ref _lineNotes, value);
     }
 
-    public OnlineSalesOrderLine(Session session) : base(session) { }
-
+    public OnlineSalesOrderLine(Session session) : base(session) {
+    }
   }
-
 }
