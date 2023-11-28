@@ -147,6 +147,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
             localSalesOrder.OnlineId = salesOrder.id;
             localSalesOrder.Channel = channel;
+            localSalesOrder.PurchaseType = salesOrder.purchaseType;
             localSalesOrder.OrderDate = orderDate;
             localSalesOrder.ProjectCode = channelProjectCode.Value;
 

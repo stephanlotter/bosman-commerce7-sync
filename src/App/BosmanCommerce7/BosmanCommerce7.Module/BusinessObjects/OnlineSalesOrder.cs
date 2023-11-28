@@ -25,6 +25,7 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     private string? _emailAddress;
     private string? _onlineId;
     private string? _channel;
+    private string? _purchaseType;
     private DateTime _orderDate;
     private int? _orderNumber;
     private string? _evolutionSalesOrderNumber;
@@ -71,6 +72,24 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     }
 
     [ModelDefault("AllowEdit", "false")]
+    public string? PurchaseType {
+      get => _purchaseType;
+      set => SetPropertyValue(nameof(PurchaseType), ref _purchaseType, value);
+    }
+
+    [VisibleInDetailView(false)]
+    [VisibleInListView(false)]
+    public bool IsRefund => PurchaseType?.Equals("refund", StringComparison.InvariantCultureIgnoreCase) ?? false;
+
+    [VisibleInDetailView(false)]
+    [VisibleInListView(false)]
+    public bool IsClubOrder => Channel?.Equals("club", StringComparison.InvariantCultureIgnoreCase) ?? false;
+
+    [VisibleInDetailView(false)]
+    [VisibleInListView(false)]
+    public bool IsPosOrder => Channel?.Equals("pos", StringComparison.InvariantCultureIgnoreCase) ?? false;
+
+    [ModelDefault("AllowEdit", "false")]
     public string? EvolutionSalesOrderNumber {
       get => _evolutionSalesOrderNumber;
       set => SetPropertyValue(nameof(EvolutionSalesOrderNumber), ref _evolutionSalesOrderNumber, value);
@@ -90,8 +109,6 @@ namespace BosmanCommerce7.Module.BusinessObjects {
       get => _orderNumber;
       set => SetPropertyValue(nameof(OrderNumber), ref _orderNumber, value);
     }
-
-    //purchaseType
 
     public string? ShipToName {
       get => _shipToName;

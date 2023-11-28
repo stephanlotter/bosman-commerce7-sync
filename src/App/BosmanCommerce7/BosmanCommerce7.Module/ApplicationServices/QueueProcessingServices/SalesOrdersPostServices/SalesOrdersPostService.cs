@@ -57,15 +57,11 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
           try {
             Logger.LogInformation("Start posting online sales order. Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
 
-            if (onlineSalesOrder.Channel?.Equals("club", StringComparison.InvariantCultureIgnoreCase) ?? false) {
-              var skip = onlineSalesOrder.SalesOrderLines.Any(x => x.Quantity < 0);
-
-              if (skip) {
-                Logger.LogInformation("Skipping club order containing any negative quantity lines. Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
-                onlineSalesOrder.PostLog("Skipping club order. It contains one or more negative quantity lines.");
-                onlineSalesOrder.PostingStatus = SalesOrderPostingStatus.Skipped;
-                continue;
-              }
+            if (onlineSalesOrder.IsRefund && onlineSalesOrder.IsClubOrder) {
+              Logger.LogInformation("Skipping club order refund. Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
+              onlineSalesOrder.PostLog("Skipping club order refund.");
+              onlineSalesOrder.PostingStatus = SalesOrderPostingStatus.Skipped;
+              continue;
             }
 
             if (string.IsNullOrWhiteSpace(onlineSalesOrder.CustomerOnlineId)) {
