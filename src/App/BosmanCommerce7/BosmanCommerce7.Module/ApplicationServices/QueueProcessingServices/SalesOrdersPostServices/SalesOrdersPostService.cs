@@ -43,9 +43,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
           criteria = CriteriaOperator.And(criteriaPostingStatus, criteriaRetryAfter);
         }
 
-        var olineSalesOrders = objectSpace.GetObjects<OnlineSalesOrder>(criteria).ToList();
+        var onlineSalesOrders = objectSpace.GetObjects<OnlineSalesOrder>(criteria).ToList();
 
-        if (!olineSalesOrders.Any()) {
+        if (!onlineSalesOrders.Any()) {
           Logger.LogDebug("No sales orders to post");
           return;
         }
@@ -54,7 +54,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
           ObjectSpace = objectSpace
         };
 
-        foreach (var onlineSalesOrder in olineSalesOrders) {
+        foreach (var onlineSalesOrder in onlineSalesOrders) {
           try {
             Logger.LogInformation("Start posting online sales order. Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
 

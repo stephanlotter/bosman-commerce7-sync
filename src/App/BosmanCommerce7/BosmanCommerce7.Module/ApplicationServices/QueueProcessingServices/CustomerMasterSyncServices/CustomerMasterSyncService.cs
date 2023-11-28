@@ -10,10 +10,12 @@
 using BosmanCommerce7.Module.ApplicationServices.AppDataServices;
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.Models;
-using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices.Models;
 using BosmanCommerce7.Module.ApplicationServices.RestApiClients.SalesOrders;
+using BosmanCommerce7.Module.BusinessObjects.Customers;
+using BosmanCommerce7.Module.Extensions;
 using BosmanCommerce7.Module.Models;
 using CSharpFunctionalExtensions;
+using DevExpress.Data.Filtering;
 using Microsoft.Extensions.Logging;
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices {
@@ -37,22 +39,36 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
     }
 
     public Result<CustomerMasterSyncResult> Execute(CustomerMasterSyncContext context) {
-      // TODO:  Add sync logic here
+      var errorCount = 0;
 
-      // TODO: Store the JSON request in the AppData folder (_appDataFileManager)
+      _localObjectSpaceProvider.WrapInObjectSpaceTransaction(objectSpace => {
+        CriteriaOperator? criteria = context.Criteria;
 
+        if (criteria is null) {
+          var criteriaPostingStatus = "Status".InCriteriaOperator(QueueProcessingStatus.New, QueueProcessingStatus.Retrying);
+          var criteriaRetryAfter = CriteriaOperator.Or("RetryAfter".IsNullOperator(), "RetryAfter".PropertyLessThan(DateTime.Now));
+          criteria = CriteriaOperator.And(criteriaPostingStatus, criteriaRetryAfter);
+        }
 
-      try {
+        var queueItems = objectSpace.GetObjects<CustomerUpdateQueue>(criteria).ToList();
 
-      return Result.Success(new CustomerMasterSyncResult());
+        if (!queueItems.Any()) {
+          Logger.LogDebug("No sales orders to post");
+          return;
+        }
+
+        foreach (var queueItem in queueItems) {
+          // TODO:  Add sync logic here
+
+          // TODO: Store the JSON request in the AppData folder (_appDataFileManager)
+        }
+      });
+
+      return errorCount == 0 ? Result.Success(BuildResult()) : Result.Failure<CustomerMasterSyncResult>($"Completed with {errorCount} errors.");
+
+      CustomerMasterSyncResult BuildResult() {
+        return new CustomerMasterSyncResult { };
       }
-      catch (Exception ex) {
-                Logger.LogError("Unable to execute SalesOrdersSyncService: {error}", ex);
-        return Result.Failure<CustomerMasterSyncResult>(ex.Message);
-
-        
-      }
-
     }
   }
 }

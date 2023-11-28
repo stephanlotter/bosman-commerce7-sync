@@ -7,6 +7,8 @@
  *
  */
 
+using DevExpress.Data.Filtering;
+
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.Models {
-  public record CustomerMasterSyncContext { }
+  public record CustomerMasterSyncContext(CriteriaOperator? Criteria = null);
 }
