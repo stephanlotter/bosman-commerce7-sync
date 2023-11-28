@@ -60,6 +60,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
         foreach (var queueItem in queueItems) {
           // TODO:  Add sync logic here
 
+          // TODO: Add local cache for customer DCLink to C7 Customer ID mapping. If a local mapping exists, use it. If not, call the API to get the mapping and store it in the local cache.
+
+
           // TODO: Store the JSON request in the AppData folder (_appDataFileManager)
         }
       });
