@@ -58,7 +58,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.AppDataServices {
         return Result.Success();
       }
       catch (Exception ex) {
-        _logger.LogError(ex, "While loading text");
+        _logger.LogError(ex, "While removing file");
         return Result.Failure(ex.Message);
       }
     }

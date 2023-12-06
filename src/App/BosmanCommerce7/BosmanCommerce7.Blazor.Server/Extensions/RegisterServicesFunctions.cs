@@ -74,6 +74,7 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
     private static void RegisterCustomerMasterSyncServices(IServiceCollection services) {
       services.AddTransient<ICustomerMasterSyncQueueService, CustomerMasterSyncQueueService>();
       services.AddTransient<ICustomerMasterSyncService, CustomerMasterSyncService>();
+      services.AddTransient<ICustomerMasterLocalMappingService, CustomerMasterLocalMappingService>();
     }
 
     private static void RegisterSalesOrderSyncServices(IServiceCollection services) {

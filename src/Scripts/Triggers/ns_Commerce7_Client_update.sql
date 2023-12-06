@@ -60,9 +60,17 @@ begin
 	begin
 
 		insert into BosmanCommerce7.dbo.CustomerUpdateQueue (
-						CustomerId
+						CustomerId,
+						Status,
+						RetryCount,
+						DateTimeAdded,
+						OptimisticLockField
 					)
-			select DCLink
+			select DCLink,
+				   0,
+				   0,
+				   getdate(),
+				   0
 				from inserted;
 
 	end;

@@ -1,10 +1,10 @@
-﻿/* 
+﻿/*
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
  * Date created: 2023-08-17
  * Author	: Stephan J Lotter
- * Notes	: 
- *  
+ * Notes	:
+ *
  */
 
 using BosmanCommerce7.Module.Extensions;
@@ -17,6 +17,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients {
 
   public abstract class ApiClientBase {
     private readonly IApiClientService _apiClientService;
+
     protected ILogger Logger { get; }
 
     public ApiClientBase(ILogger logger, IApiClientService apiClientService) {
@@ -51,7 +52,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients {
 
         (Result<T> result, ApiRequestPaginationStatus paginationStatus) r = onSuccess(data);
 
-        if (r.result.IsFailure || r.paginationStatus == ApiRequestPaginationStatus.Completed) { return r.result; }
+        if (r.result.IsFailure || !apiRequest.IsPagedResponse || r.paginationStatus == ApiRequestPaginationStatus.Completed) { return r.result; }
       }
     }
 
@@ -76,7 +77,5 @@ namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients {
         return Result.Failure<T>(ex.Message);
       }
     }
-
   }
-
 }

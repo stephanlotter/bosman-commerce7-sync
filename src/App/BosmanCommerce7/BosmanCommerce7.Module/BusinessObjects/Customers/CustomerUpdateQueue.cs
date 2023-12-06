@@ -16,10 +16,10 @@ namespace BosmanCommerce7.Module.BusinessObjects.Customers {
   [DefaultClassOptions]
   [NavigationItem(true)]
   public class CustomerUpdateQueue : UpdateQueueBase {
-    private int _customerId;
+    private EvolutionCustomerId _customerId;
 
     [ModelDefault("AllowEdit", "false")]
-    public int CustomerId {
+    public EvolutionCustomerId CustomerId {
       get => _customerId;
       set => SetPropertyValue(nameof(CustomerId), ref _customerId, value);
     }

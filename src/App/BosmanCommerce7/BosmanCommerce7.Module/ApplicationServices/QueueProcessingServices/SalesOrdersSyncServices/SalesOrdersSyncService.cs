@@ -20,14 +20,12 @@ using DevExpress.Data.Filtering;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices
-{
+namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices {
 
-    public class SalesOrdersSyncService : SyncServiceBase, ISalesOrdersSyncService {
+  public class SalesOrdersSyncService : SyncServiceBase, ISalesOrdersSyncService {
     private readonly SalesOrdersSyncJobOptions _salesOrdersSyncJobOptions;
     private readonly ISalesOrdersSyncValueStoreService _salesOrdersSyncValueStoreService;
     private readonly ISalesOrdersApiClient _apiClient;
-    private readonly ILocalObjectSpaceProvider _localObjectSpaceProvider;
     private readonly IAppDataFileManager _appDataFileManager;
     private readonly List<string> _processedOrders = new();
 
@@ -37,11 +35,10 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
       ISalesOrdersApiClient apiClient,
       ILocalObjectSpaceProvider localObjectSpaceProvider,
       IAppDataFileManager appDataFileManager)
-      : base(logger) {
+      : base(logger, localObjectSpaceProvider) {
       _salesOrdersSyncJobOptions = salesOrdersSyncJobOptions;
       _salesOrdersSyncValueStoreService = salesOrdersSyncValueStoreService;
       _apiClient = apiClient;
-      _localObjectSpaceProvider = localObjectSpaceProvider;
       _appDataFileManager = appDataFileManager;
     }
 
@@ -93,7 +90,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
         var channelsToProcess = _salesOrdersSyncJobOptions.ChannelsToProcess?.Select(c => c.ToLower()).ToList();
 
-        _localObjectSpaceProvider.WrapInObjectSpaceTransaction(objectSpace => {
+        LocalObjectSpaceProvider.WrapInObjectSpaceTransaction(objectSpace => {
           foreach (dynamic salesOrder in response.SalesOrders!) {
             if (!_processedOrders.Contains($"{salesOrder.id}")) {
               Logger.LogInformation("Sales order received: {orderNumber}", $"{salesOrder.orderNumber}");

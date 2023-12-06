@@ -1,9 +1,9 @@
-﻿/* 
+﻿/*
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
  * Date created: 2023-08-17 * Author	: Stephan J Lotter
- * Notes	: 
- *  
+ * Notes	:
+ *
  */
 
 using System.Text;
@@ -11,17 +11,14 @@ using BosmanCommerce7.Module.Extensions;
 
 namespace BosmanCommerce7.Module.Models.RestApi {
   public abstract record ApiResponseBase {
-
     public string? ResonseBody { get; init; }
 
     public byte[]? ResponseRawBytes { get; init; }
 
     public record Success : ApiResponseBase {
-
     }
 
     public record Failure : ApiResponseBase {
-
       public string? Uri { get; init; }
 
       public string? ErrorMessage { get; init; }
@@ -30,7 +27,9 @@ namespace BosmanCommerce7.Module.Models.RestApi {
 
       public string FullErrorMessage => GetFullErrorMessage();
 
-      public bool ProductNotFound => (FullErrorMessage?.Contains("not found", StringComparison.InvariantCultureIgnoreCase) ?? false) || (FullErrorMessage?.Contains("notfound", StringComparison.InvariantCultureIgnoreCase) ?? false);
+      public bool NotFound => (FullErrorMessage?.Contains("not found", StringComparison.InvariantCultureIgnoreCase) ?? false) || (FullErrorMessage?.Contains("notfound", StringComparison.InvariantCultureIgnoreCase) ?? false);
+
+      public bool ProductNotFound => NotFound;
 
       public bool UnprocessableEntity => (FullErrorMessage?.Contains("Unprocessable Entity", StringComparison.InvariantCultureIgnoreCase) ?? false) || (FullErrorMessage?.Contains("UnprocessableEntity", StringComparison.InvariantCultureIgnoreCase) ?? false);
 
@@ -57,9 +56,6 @@ namespace BosmanCommerce7.Module.Models.RestApi {
 
         return sb.ToString();
       }
-
     }
-
   }
-
 }

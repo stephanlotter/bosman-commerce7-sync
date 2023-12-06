@@ -18,7 +18,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients.SalesOrders 
     public CustomerMasterApiClient(ILogger<CustomerMasterApiClient> logger, IApiClientService apiClientService) : base(logger, apiClientService) {
     }
 
-    public Result<CustomerMasterResponse> ListCustomerMaster(string emailAddress) {
+    public Result<CustomerMasterResponse> GetCustomerMasterByEmail(string emailAddress) {
       CustomerMasterResponse apiResponse = new();
       var list = new List<dynamic>();
 
@@ -34,6 +34,25 @@ namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients.SalesOrders 
         apiResponse = apiResponse with { CustomerMasters = list.ToArray() };
 
         return (Result.Success(apiResponse), list.Count < totalRecords ? ApiRequestPaginationStatus.MorePages : ApiRequestPaginationStatus.Completed);
+      });
+    }
+
+    public Result<CustomerMasterResponse> GetCustomerMasterById(Commerce7CustomerId commerce7CustomerId) {
+      CustomerMasterResponse apiResponse = new();
+      var list = new List<dynamic>();
+
+      return SendRequest(new CustomerMasterGetApiRequest(commerce7CustomerId), data => {
+        if (data == null) {
+          return (Result.Failure<CustomerMasterResponse>("Response body not valid JSON."), ApiRequestPaginationStatus.Completed);
+        }
+
+        var totalRecords = (int)data!.total;
+
+        list.Add(data);
+
+        apiResponse = apiResponse with { CustomerMasters = list.ToArray() };
+
+        return (Result.Success(apiResponse), ApiRequestPaginationStatus.Completed);
       });
     }
   }

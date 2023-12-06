@@ -17,24 +17,21 @@ using CSharpFunctionalExtensions;
 using DevExpress.Data.Filtering;
 using Microsoft.Extensions.Logging;
 
-namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices
-{
+namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices {
 
-    public class SalesOrdersPostService : SyncServiceBase, ISalesOrdersPostService {
-    private readonly ILocalObjectSpaceProvider _localObjectSpaceProvider;
+  public class SalesOrdersPostService : SyncServiceBase, ISalesOrdersPostService {
     private readonly IPostToEvolutionSalesOrderService _postToEvolutionSalesOrderService;
 
     public SalesOrdersPostService(ILogger<SalesOrdersPostService> logger,
       ILocalObjectSpaceProvider localObjectSpaceProvider,
-      IPostToEvolutionSalesOrderService postToEvolutionSalesOrderService) : base(logger) {
-      _localObjectSpaceProvider = localObjectSpaceProvider;
+      IPostToEvolutionSalesOrderService postToEvolutionSalesOrderService) : base(logger, localObjectSpaceProvider) {
       _postToEvolutionSalesOrderService = postToEvolutionSalesOrderService;
     }
 
     public Result<SalesOrdersPostResult> Execute(SalesOrdersPostContext context) {
-      var errorCount = 0;
+      _errorCount = 0;
 
-      _localObjectSpaceProvider.WrapInObjectSpaceTransaction(objectSpace => {
+      LocalObjectSpaceProvider.WrapInObjectSpaceTransaction(objectSpace => {
         CriteriaOperator? criteria = context.Criteria;
 
         if (criteria is null) {
@@ -82,23 +79,16 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
             _postToEvolutionSalesOrderService
               .Post(postToEvolutionSalesOrderContext, onlineSalesOrder)
               .OnFailureCompensate(err => {
-                errorCount++;
+                _errorCount++;
                 Logger.LogError("Error posting sales order Online Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
                 Logger.LogError("{error}", err);
 
                 onlineSalesOrder.PostLog(err);
 
-                if (onlineSalesOrder.RetryCount < 6) {
+                if (onlineSalesOrder.RetryCount < MaxRetryCount) {
                   onlineSalesOrder.PostingStatus = SalesOrderPostingStatus.Retrying;
                   onlineSalesOrder.RetryCount++;
-                  onlineSalesOrder.RetryAfter = DateTime.Now.AddMinutes(onlineSalesOrder.RetryCount switch {
-                    1 => 10,
-                    2 => 10,
-                    3 => 15,
-                    4 => 30,
-                    5 => 60,
-                    _ => 60
-                  });
+                  onlineSalesOrder.RetryAfter = GetRetryAfter(onlineSalesOrder.RetryCount);
                 }
                 else {
                   onlineSalesOrder.PostingStatus = SalesOrderPostingStatus.Failed;
@@ -118,7 +108,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
         }
       });
 
-      return errorCount == 0 ? Result.Success(BuildResult()) : Result.Failure<SalesOrdersPostResult>($"Completed with {errorCount} errors.");
+      return _errorCount == 0 ? Result.Success(BuildResult()) : Result.Failure<SalesOrdersPostResult>($"Completed with {_errorCount} errors.");
 
       SalesOrdersPostResult BuildResult() {
         return new SalesOrdersPostResult { };

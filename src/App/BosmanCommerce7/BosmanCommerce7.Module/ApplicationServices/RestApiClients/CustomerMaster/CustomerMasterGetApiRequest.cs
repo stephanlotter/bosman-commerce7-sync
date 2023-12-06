@@ -13,9 +13,18 @@ using RestSharp;
 namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients.SalesOrders {
   public record CustomerMasterGetApiRequest : ApiRequestBase {
     public CustomerMasterGetApiRequest(string emailAddress) {
+      if (string.IsNullOrWhiteSpace(emailAddress)) { throw new ArgumentNullException(nameof(emailAddress)); }
+
       Resource = $"/customer?q={emailAddress}";
       Method = Method.Get;
       IsPagedResponse = true;
+    }
+
+    public CustomerMasterGetApiRequest(Commerce7CustomerId commerce7CustomerId) {
+      if (commerce7CustomerId == Guid.Empty) { throw new Exception("commerce7CustomerId may not be empty"); }
+      Resource = $"/customer/{commerce7CustomerId}";
+      Method = Method.Get;
+      IsPagedResponse = false;
     }
   }
 }

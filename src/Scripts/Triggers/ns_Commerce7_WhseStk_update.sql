@@ -28,10 +28,18 @@ begin
 
 	insert into BosmanCommerce7.dbo.StockLevelUpdateQueue (
 					WarehouseId,
-					ItemId
+					ItemId,
+					Status,
+					RetryCount,
+					DateTimeAdded,
+					OptimisticLockField
 				)
 		select WHWhseID,
-			   WHStockLink
+			   WHStockLink,
+			   0,
+			   0,
+			   getdate(),
+			   0
 			from inserted;
 
 end;

@@ -14,7 +14,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients.SalesOrders 
 
   public interface ICustomerMasterApiClient {
 
-    Result<CustomerMasterResponse> ListCustomerMaster(string emailAddress);
+    Result<CustomerMasterResponse> GetCustomerMasterByEmail(string emailAddress);
+
+    Result<CustomerMasterResponse> GetCustomerMasterById(Commerce7CustomerId commerce7CustomerId);
 
     // TODO: Add Create method
     // TODO: Add Update method

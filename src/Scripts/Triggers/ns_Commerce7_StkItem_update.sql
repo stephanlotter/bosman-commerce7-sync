@@ -43,9 +43,17 @@ begin
 
 	-- Logic to insert into StockItemUpdateQueue
 	insert into BosmanCommerce7..StockItemUpdateQueue (
-					ItemId
+					ItemId,
+					Status,
+					RetryCount,
+					DateTimeAdded,
+					OptimisticLockField
 				)
-		select StockLink
+		select StockLink,
+			   0,
+			   0,
+			   getdate(),
+			   0
 			from inserted;
 
 	-- Resetting ubIIReSubmit if needed
