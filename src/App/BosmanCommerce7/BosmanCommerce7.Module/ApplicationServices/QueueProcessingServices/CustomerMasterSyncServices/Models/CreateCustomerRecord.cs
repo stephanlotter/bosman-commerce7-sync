@@ -8,5 +8,5 @@
  */
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.Models {
-  public abstract record CreateCustomerRecord : CustomerRecordBase { }
+  public record CreateCustomerRecord : CustomerRecordBase { }
 }

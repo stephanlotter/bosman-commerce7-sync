@@ -10,7 +10,7 @@
 using Newtonsoft.Json;
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.Models {
-  public abstract record UpdateCustomerRecord : CustomerRecordBase {
+  public record UpdateCustomerRecord : CustomerRecordBase {
     [JsonIgnore]
     public required Commerce7CustomerId Id { get; init; }
   }

@@ -86,13 +86,27 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
 
       var createCustomer = customerMaster == null;
 
+      var customerFirstName = $"{evolutionCustomer.AccountDescription}";
+      var customerLastName = "";
+
       if (createCustomer) {
-        // create the customer
-        // TODO: Store the JSON request in the AppData folder (_appDataFileManager)
+        customerMaster = _apiClient.CreateCustomerWithAddress(new CreateCustomerRecord {
+          FirstName = $"{customerFirstName}",
+          LastName = $"{customerLastName}",
+          Address = $"{evolutionCustomer.PhysicalAddress.Line1}",
+          Address2 = $"{evolutionCustomer.PhysicalAddress.Line2}",
+          City = $"{evolutionCustomer.PhysicalAddress.Line3}",
+          StateCode = $"{evolutionCustomer.PhysicalAddress.Line4}",
+          ZipCode = $"{evolutionCustomer.PhysicalAddress.PostalCode}",
+          Emails = new EmailAddress[] { new EmailAddress { Email = evolutionEmailAddress } },
+          Phones = new TelephoneNumber[] { new TelephoneNumber { Phone = $"{evolutionCustomer.Telephone}" } }
+        });
+
+        var customerMasterId = customerMaster.Id;
+        _customerMasterLocalMappingService.StoreMapping(queueItem.CustomerId, customerMasterId);
       }
       else {
         // update the customer
-        // TODO: Store the JSON request in the AppData folder (_appDataFileManager)
       }
 
       _customerMasterLocalMappingService.StoreMapping(queueItem.CustomerId, customerMaster!.Id);
