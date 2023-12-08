@@ -95,7 +95,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
         // TODO: Store the JSON request in the AppData folder (_appDataFileManager)
       }
 
-      _customerMasterLocalMappingService.StoreMapping(queueItem.CustomerId, customerMaster.Id);
+      _customerMasterLocalMappingService.StoreMapping(queueItem.CustomerId, customerMaster!.Id);
 
       _processedCustomerIds.Add(queueItem.CustomerId);
 

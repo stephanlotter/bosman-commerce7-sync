@@ -8,6 +8,7 @@
  */
 
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.Models;
+using BosmanCommerce7.Module.Models.RestApi;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 
@@ -38,10 +39,39 @@ namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients.SalesOrders 
     }
 
     public Result<CustomerMasterResponse> GetCustomerMasterById(Commerce7CustomerId commerce7CustomerId) {
+      //CustomerMasterResponse apiResponse = new();
+      //var list = new List<dynamic>();
+
+      //return SendRequest(new CustomerMasterGetApiRequest(commerce7CustomerId), data => {
+      //  if (data == null) {
+      //    return (Result.Failure<CustomerMasterResponse>("Response body not valid JSON."), ApiRequestPaginationStatus.Completed);
+      //  }
+
+      //  var totalRecords = (int)data!.total;
+
+      //  list.Add(data);
+
+      //  apiResponse = apiResponse with { CustomerMasters = list.ToArray() };
+
+      //  return (Result.Success(apiResponse), ApiRequestPaginationStatus.Completed);
+      //});
+
+      return SendSingleResultRequest(new CustomerMasterGetApiRequest(commerce7CustomerId));
+    }
+
+    public Result<CustomerMasterResponse> CreateCustomerWithAddress(CreateCustomerRecord customerRecord) {
+      return SendSingleResultRequest(new CustomerMasterCreateApiRequest(customerRecord));
+    }
+
+    public Result<CustomerMasterResponse> UpdateCustomerWithAddress(UpdateCustomerRecord customerRecord) {
+      return SendSingleResultRequest(new CustomerMasterUpdateApiRequest(customerRecord));
+    }
+
+    public Result<CustomerMasterResponse> SendSingleResultRequest(ApiRequestBase apiRequest) {
       CustomerMasterResponse apiResponse = new();
       var list = new List<dynamic>();
 
-      return SendRequest(new CustomerMasterGetApiRequest(commerce7CustomerId), data => {
+      return SendRequest(apiRequest, data => {
         if (data == null) {
           return (Result.Failure<CustomerMasterResponse>("Response body not valid JSON."), ApiRequestPaginationStatus.Completed);
         }

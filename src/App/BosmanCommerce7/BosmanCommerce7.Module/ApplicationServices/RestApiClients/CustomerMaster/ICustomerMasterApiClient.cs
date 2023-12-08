@@ -18,7 +18,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.RestApiClients.SalesOrders 
 
     Result<CustomerMasterResponse> GetCustomerMasterById(Commerce7CustomerId commerce7CustomerId);
 
-    // TODO: Add Create method
-    // TODO: Add Update method
+    Result<CustomerMasterResponse> CreateCustomerWithAddress(CreateCustomerRecord customerRecord);
+
+    Result<CustomerMasterResponse> UpdateCustomerWithAddress(UpdateCustomerRecord customerRecord);
+
   }
 }
