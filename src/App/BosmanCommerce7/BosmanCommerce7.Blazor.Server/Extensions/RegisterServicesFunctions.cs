@@ -11,6 +11,7 @@ using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAcc
 using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.Models;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventorySyncServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices;
 using BosmanCommerce7.Module.ApplicationServices.RestApiClients;
@@ -75,6 +76,12 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
       services.AddTransient<ICustomerMasterSyncQueueService, CustomerMasterSyncQueueService>();
       services.AddTransient<ICustomerMasterSyncService, CustomerMasterSyncService>();
       services.AddTransient<ICustomerMasterLocalMappingService, CustomerMasterLocalMappingService>();
+    }
+
+    private static void RegisterInventoryMasterSyncServices(IServiceCollection services) {
+      //services.AddTransient<IInventoryMasterSyncQueueService, InventoryMasterSyncQueueService>();
+      services.AddTransient<IInventoryItemsSyncService, InventoryMasterSyncService>();
+      //services.AddTransient<IInventoryMasterLocalMappingService, InventoryMasterLocalMappingService>();
     }
 
     private static void RegisterSalesOrderSyncServices(IServiceCollection services) {

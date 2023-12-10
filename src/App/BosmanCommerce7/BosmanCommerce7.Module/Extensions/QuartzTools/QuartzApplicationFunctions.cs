@@ -6,7 +6,7 @@
  *
  */
 
-using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.Models;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices;
 using BosmanCommerce7.Module.Models;
@@ -14,9 +14,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Quartz;
 
-namespace BosmanCommerce7.Module.Extensions.QuartzTools {
+namespace BosmanCommerce7.Module.Extensions.QuartzTools
+{
 
-  public static class QuartzApplicationFunctions {
+    public static class QuartzApplicationFunctions {
     private static IScheduler? _scheduler;
 
     public static void StartJobs(QuartzStartJobContext context) {

@@ -8,7 +8,6 @@
  */
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.Models {
-  public record CustomerMasterSyncResult {
-    public string? Message { get; init; }
+  public record CustomerMasterSyncResult : SyncResultBase {
   }
 }

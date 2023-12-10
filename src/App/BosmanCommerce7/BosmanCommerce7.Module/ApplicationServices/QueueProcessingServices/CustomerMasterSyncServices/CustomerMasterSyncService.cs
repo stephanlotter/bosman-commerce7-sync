@@ -7,8 +7,6 @@
  *
  */
 
-using System;
-using BosmanCommerce7.Module.ApplicationServices.AppDataServices;
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
 using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.Models;

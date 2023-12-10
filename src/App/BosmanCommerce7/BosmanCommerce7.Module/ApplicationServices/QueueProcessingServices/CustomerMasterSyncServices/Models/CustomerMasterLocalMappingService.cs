@@ -10,9 +10,10 @@
 using BosmanCommerce7.Module.ApplicationServices.AppDataServices;
 using CSharpFunctionalExtensions;
 
-namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.Models {
+namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.Models
+{
 
-  public class CustomerMasterLocalMappingService : ICustomerMasterLocalMappingService {
+    public class CustomerMasterLocalMappingService : ICustomerMasterLocalMappingService {
     private readonly IAppDataFileManager _appDataFileManager;
 
     private const string FolderName = "CustomerMasterSyncMappings";

@@ -11,6 +11,7 @@ using DevExpress.Persistent.Base;
 using DevExpress.Xpo;
 
 namespace BosmanCommerce7.Module.BusinessObjects.Customers {
+
   [DefaultClassOptions]
   public class CustomerUpdateQueueLog : UpdateQueueLogBase {
     private CustomerUpdateQueue _customerUpdateQueue = default!;

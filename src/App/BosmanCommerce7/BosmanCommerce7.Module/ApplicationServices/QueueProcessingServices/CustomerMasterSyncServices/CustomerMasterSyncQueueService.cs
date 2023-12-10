@@ -10,9 +10,10 @@
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.Models;
 using Microsoft.Extensions.Logging;
 
-namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices {
+namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices
+{
 
-  public class CustomerMasterSyncQueueService : SyncQueueServiceBase, ICustomerMasterSyncQueueService {
+    public class CustomerMasterSyncQueueService : SyncQueueServiceBase, ICustomerMasterSyncQueueService {
     private readonly ICustomerMasterSyncService _customerMasterSyncService;
 
     public CustomerMasterSyncQueueService(ILogger<CustomerMasterSyncQueueService> logger, ICustomerMasterSyncService customerMasterSyncService) : base(logger) {
