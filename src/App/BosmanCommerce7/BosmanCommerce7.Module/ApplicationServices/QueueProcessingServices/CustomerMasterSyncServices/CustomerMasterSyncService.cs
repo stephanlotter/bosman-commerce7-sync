@@ -8,6 +8,7 @@
  */
 
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
+using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk;
 using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Customers;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.Models;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.RestApi;
@@ -33,8 +34,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
       ICustomerMasterLocalMappingService customerMasterLocalMappingService,
       ICustomerMasterApiClient apiClient,
       IEvolutionCustomerRepository evolutionCustomerRepository,
-      ILocalObjectSpaceProvider localObjectSpaceProvider
-      ) : base(logger, localObjectSpaceProvider) {
+      ILocalObjectSpaceProvider localObjectSpaceProvider,
+      IEvolutionSdk evolutionSdk
+      ) : base(logger, localObjectSpaceProvider, evolutionSdk) {
       _customerMasterSyncJobOptions = customerMasterSyncJobOptions;
       _customerMasterLocalMappingService = customerMasterLocalMappingService;
       _apiClient = apiClient;
@@ -85,8 +87,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
 
       var createCustomer = customerMaster == null;
 
-      var customerFirstName = $"{evolutionCustomer.AccountDescription}";
-      var customerLastName = "";
+      var customerName = $"{evolutionCustomer.Description.Trim()}".Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+      var customerFirstName = customerName.First();
+      var customerLastName = customerName.Length > 1 ? string.Join(" ", customerName.Skip(1)) : "No last name";
 
       if (createCustomer) {
         customerMaster = _apiClient.CreateCustomerWithAddress(new CreateCustomerRecord {

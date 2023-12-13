@@ -7,6 +7,7 @@
  */
 
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventorySyncServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices;
 using BosmanCommerce7.Module.Models;
@@ -14,16 +15,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Quartz;
 
-namespace BosmanCommerce7.Module.Extensions.QuartzTools
-{
+namespace BosmanCommerce7.Module.Extensions.QuartzTools {
 
-    public static class QuartzApplicationFunctions {
+  public static class QuartzApplicationFunctions {
     private static IScheduler? _scheduler;
 
     public static void StartJobs(QuartzStartJobContext context) {
       _scheduler = QuartzFunctions.CreateScheduler();
 
       ScheduleCustomerMasterSyncJobQueueService(context, _scheduler);
+      ScheduleInventoryItemsSyncJobQueueService(context, _scheduler);
       ScheduleSalesOrdersSyncJobQueueService(context, _scheduler);
       ScheduleSalesOrdersPostJobQueueService(context, _scheduler);
 
@@ -34,6 +35,16 @@ namespace BosmanCommerce7.Module.Extensions.QuartzTools
       var jobOptions = context.Options.CustomerMasterSyncJobOptions as JobOptionsBase ?? throw new Exception($"{nameof(context.Options.CustomerMasterSyncJobOptions)} not defined in appsettings.json.");
 
       ScheduleSyncQueueService<ICustomerMasterSyncQueueService>(context, new QuartzStartJobDescriptor {
+        JobId = JobIds.CustomerMasterSyncJob,
+        JobOptions = jobOptions,
+        Scheduler = scheduler
+      });
+    }
+
+    private static void ScheduleInventoryItemsSyncJobQueueService(QuartzStartJobContext context, IScheduler scheduler) {
+      var jobOptions = context.Options.InventoryItemsSyncJobOptions as JobOptionsBase ?? throw new Exception($"{nameof(context.Options.InventoryItemsSyncJobOptions)} not defined in appsettings.json.");
+
+      ScheduleSyncQueueService<IInventoryItemsSyncQueueService>(context, new QuartzStartJobDescriptor {
         JobId = JobIds.CustomerMasterSyncJob,
         JobOptions = jobOptions,
         Scheduler = scheduler

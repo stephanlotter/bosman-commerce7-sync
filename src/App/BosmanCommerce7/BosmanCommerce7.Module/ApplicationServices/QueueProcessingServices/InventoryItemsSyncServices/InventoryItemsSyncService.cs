@@ -8,6 +8,7 @@
  */
 
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
+using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk;
 using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Inventory;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.Models;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.RestApi;
@@ -33,8 +34,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
         IInventoryItemsLocalMappingService inventoryLocalMappingService,
         IInventoryItemsApiClient apiClient,
         IEvolutionInventoryItemRepository evolutionInventoryRepository,
-        ILocalObjectSpaceProvider localObjectSpaceProvider
-    ) : base(logger, localObjectSpaceProvider) {
+        ILocalObjectSpaceProvider localObjectSpaceProvider,
+        IEvolutionSdk evolutionSdk
+    ) : base(logger, localObjectSpaceProvider, evolutionSdk) {
       _inventorySyncJobOptions = inventorySyncJobOptions;
       _inventoryLocalMappingService = inventoryLocalMappingService;
       _apiClient = apiClient;

@@ -15,6 +15,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Inventory {
 
   public interface IEvolutionInventoryItemRepository {
 
+    Result<InventoryItem> Get(string? code);
+
     Result<InventoryItem> GetInventoryItem(InventoryDescriptor inventoryDescriptor);
   }
 }

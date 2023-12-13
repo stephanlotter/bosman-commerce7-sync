@@ -8,7 +8,7 @@
  */
 
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
-using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices.Models;
+using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk;
 using BosmanCommerce7.Module.BusinessObjects;
 using BosmanCommerce7.Module.Extensions;
 using BosmanCommerce7.Module.Models;
@@ -19,8 +19,10 @@ using Microsoft.Extensions.Logging;
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices {
 
   public abstract class SyncMasterDataServiceBase : SyncServiceBase {
+    private readonly IEvolutionSdk _evolutionSdk;
 
-    public SyncMasterDataServiceBase(ILogger logger, ILocalObjectSpaceProvider localObjectSpaceProvider) : base(logger, localObjectSpaceProvider) {
+    public SyncMasterDataServiceBase(ILogger logger, ILocalObjectSpaceProvider localObjectSpaceProvider, IEvolutionSdk evolutionSdk) : base(logger, localObjectSpaceProvider) {
+      _evolutionSdk = evolutionSdk;
     }
 
     protected Result ProcessQueueItems<T>(SyncContextBase context) where T : UpdateQueueBase {
@@ -28,32 +30,33 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices {
       CriteriaOperator? criteria = context.Criteria;
 
       try {
-        LocalObjectSpaceProvider.WrapInObjectSpaceTransaction(objectSpace => {
-          CriteriaOperator? criteria = context.Criteria;
-          var now = DateTime.Now;
+        return LocalObjectSpaceProvider.WrapInObjectSpaceTransaction(objectSpace => {
+          return _evolutionSdk.WrapInSdkTransaction(connection => {
+            CriteriaOperator? criteria = context.Criteria;
+            var now = DateTime.Now;
 
-          if (criteria is null) {
-            var criteriaPostingStatus = "Status".InCriteriaOperator(QueueProcessingStatus.New, QueueProcessingStatus.Retrying);
-            var criteriaRetryAfter = CriteriaOperator.Or("RetryAfter".IsNullOperator(), "RetryAfter".PropertyLessThan(now));
-            criteria = CriteriaOperator.And(criteriaPostingStatus, criteriaRetryAfter);
-          }
+            if (criteria is null) {
+              var criteriaPostingStatus = "Status".InCriteriaOperator(QueueProcessingStatus.New, QueueProcessingStatus.Retrying);
+              var criteriaRetryAfter = CriteriaOperator.Or("RetryAfter".IsNullOperator(), "RetryAfter".PropertyLessThan(now));
+              criteria = CriteriaOperator.And(criteriaPostingStatus, criteriaRetryAfter);
+            }
 
-          var queueItems = objectSpace.GetObjects<T>(criteria).ToList<UpdateQueueBase>();
+            var queueItems = objectSpace.GetObjects<T>(criteria).ToList<UpdateQueueBase>();
 
-          if (!queueItems.Any()) {
-            Logger.LogDebug("No records to sync.");
-            return;
-          }
+            if (!queueItems.Any()) {
+              Logger.LogDebug("No records to sync.");
+              return Result.Success() ;
+            }
 
-          Logger.LogDebug("{count} records to sync.", queueItems.Count);
+            Logger.LogDebug("{count} records to sync.", queueItems.Count);
 
-          foreach (var queueItem in queueItems) {
-            var result = ProcessQueueItem(queueItem);
-            SetStatus(result, queueItem);
-          }
+            foreach (var queueItem in queueItems) {
+              var result = ProcessQueueItem(queueItem);
+              SetStatus(result, queueItem);
+            }
+            return _errorCount == 0 ? Result.Success() : Result.Failure($"Completed with {_errorCount} errors.");
+          });
         });
-
-        return _errorCount == 0 ? Result.Success() : Result.Failure($"Completed with {_errorCount} errors.");
       }
       catch (Exception ex) {
         Logger.LogError("Unable to process queue items: {error}", ex);

@@ -9,7 +9,6 @@
 
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.RestApiClients;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices.RestApi;
-using BosmanCommerce7.Module.ApplicationServices.RestApiClients;
 using BosmanCommerce7.Module.Models;
 
 namespace BosmanCommerce7.UnitTests.Commerce7Tests

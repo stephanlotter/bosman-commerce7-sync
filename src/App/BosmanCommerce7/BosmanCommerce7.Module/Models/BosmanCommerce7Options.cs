@@ -19,6 +19,8 @@ namespace BosmanCommerce7.Module.Models {
 
     public CustomerMasterSyncJobOptions CustomerMasterSyncJobOptions { get; init; } = default!;
 
+    public InventoryItemsSyncJobOptions InventoryItemsSyncJobOptions { get; init; } = default!;
+
     public SalesOrdersSyncJobOptions SalesOrdersSyncJobOptions { get; init; } = default!;
 
     public SalesOrdersPostJobOptions SalesOrdersPostJobOptions { get; init; } = default!;

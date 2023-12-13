@@ -10,13 +10,13 @@
 using System.Data.SqlClient;
 using BosmanCommerce7.Module.BusinessObjects.SalesOrders;
 using BosmanCommerce7.Module.Models;
+using CSharpFunctionalExtensions;
 using DevExpress.ExpressApp;
 using DevExpress.ExpressApp.Xpo;
 
-namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess
-{
+namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess {
 
-    public class LocalObjectSpaceProvider : ILocalObjectSpaceProvider {
+  public class LocalObjectSpaceProvider : ILocalObjectSpaceProvider {
     private readonly ILocalDatabaseConnectionStringProvider _localDatabaseConnectionStringProvider;
 
     public LocalObjectSpaceProvider(ILocalDatabaseConnectionStringProvider localDatabaseConnectionStringProvider) {
@@ -24,8 +24,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDat
     }
 
     public void WrapInObjectSpaceTransaction(Action<IObjectSpace> action) {
-      //XafTypesInfo.Instance.RegisterEntity(typeof(OnlineSalesOrder));
-
       using var connection = new SqlConnection(_localDatabaseConnectionStringProvider.LocalDatabase);
       using var osp = new XPObjectSpaceProvider(_localDatabaseConnectionStringProvider.LocalDatabase, connection, threadSafe: true, useSeparateDataLayers: true);
 
@@ -36,6 +34,25 @@ namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDat
       try {
         action(objectSpace);
         objectSpace.CommitChanges();
+      }
+      catch {
+        objectSpace.Rollback();
+        throw;
+      }
+    }
+
+    public Result WrapInObjectSpaceTransaction(Func<IObjectSpace, Result> func) {
+      using var connection = new SqlConnection(_localDatabaseConnectionStringProvider.LocalDatabase);
+      using var osp = new XPObjectSpaceProvider(_localDatabaseConnectionStringProvider.LocalDatabase, connection, threadSafe: true, useSeparateDataLayers: true);
+
+      using IObjectSpace objectSpace = osp.CreateObjectSpace();
+
+      osp.TypesInfo.RegisterEntity(typeof(OnlineSalesOrder));
+
+      try {
+        var result = func(objectSpace);
+        objectSpace.CommitChanges();
+        return result;
       }
       catch {
         objectSpace.Rollback();

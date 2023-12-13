@@ -117,6 +117,7 @@ namespace BosmanCommerce7.Blazor.Server.Extensions
       services.AddSingleton<ILocalDatabaseConnectionStringProvider>(options.ConnectionStrings);
       services.AddSingleton<IEvolutionDatabaseConnectionStringProvider>(options.ConnectionStrings);
       services.AddSingleton(options.CustomerMasterSyncJobOptions);
+      services.AddSingleton(options.InventoryItemsSyncJobOptions);
       services.AddSingleton(options.SalesOrdersSyncJobOptions);
       services.AddSingleton(options.SalesOrdersPostJobOptions);
       services.AddSingleton(options.ApiOptions);
