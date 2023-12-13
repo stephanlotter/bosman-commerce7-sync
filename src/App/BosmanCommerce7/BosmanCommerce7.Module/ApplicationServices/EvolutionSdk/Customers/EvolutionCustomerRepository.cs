@@ -45,7 +45,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Customers {
       EvolutionCustomerId? id = GetId("SELECT DCLink FROM Client WHERE ucARwcEmail = @EmailAddress", new { customerDescriptor.EmailAddress });
 
       if (!id.HasValue) {
-        return Result.Failure<Customer>($"Customer with email address {customerDescriptor.EmailAddress} not found in Wine Club E-mail field");
+        return Result.Failure<Customer>($"Customer with email address {customerDescriptor.EmailAddress} not found in Wine Club E-mail field (ucARwcEmail)");
       }
 
       return Get(id.Value);

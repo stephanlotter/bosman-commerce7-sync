@@ -29,7 +29,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
 
     public EmailAddress[] Emails { get; init; }
 
-    public TelephoneNumber[] Phones { get; init; }
+    public TelephoneNumber[]? Phones { get; init; }
   }
 
   public record EmailAddress {

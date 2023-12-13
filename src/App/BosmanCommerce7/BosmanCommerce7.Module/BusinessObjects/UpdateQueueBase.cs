@@ -59,6 +59,7 @@ namespace BosmanCommerce7.Module.BusinessObjects {
     }
 
     [ModelDefault("AllowEdit", "false")]
+    [Size(-1)]
     public string? LastErrorMessage {
       get => _lastErrorMessage;
       set => SetPropertyValue(nameof(LastErrorMessage), ref _lastErrorMessage, value);

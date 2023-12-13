@@ -78,8 +78,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
           return (Result.Failure<CustomerMasterResponse>("Response body not valid JSON."), ApiRequestPaginationStatus.Completed);
         }
 
-        var totalRecords = (int)data!.total;
-
         list.Add(data);
 
         apiResponse = apiResponse with { CustomerMasters = list.ToArray() };

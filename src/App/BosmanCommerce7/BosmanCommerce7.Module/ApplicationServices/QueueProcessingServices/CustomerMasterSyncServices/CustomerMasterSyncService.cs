@@ -77,6 +77,10 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
       var evolutionCustomer = evolutionCustomerResult.Value;
       var evolutionEmailAddress = $"{evolutionCustomer.GetUserField("ucARwcEmail") ?? ""}";
 
+      if (string.IsNullOrWhiteSpace(evolutionEmailAddress)) {
+        return Result.Failure($"Cannot process customer with ID {queueItem.CustomerId}. The customer does not have an email address in Wine Club E-mail field (ucARwcEmail)");
+      }
+
       dynamic? customerMaster = null;
 
       var localMappingResult = _customerMasterLocalMappingService.GetLocalId(queueItem.CustomerId);
@@ -87,33 +91,58 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
 
       var createCustomer = customerMaster == null;
 
-      var customerName = $"{evolutionCustomer.Description.Trim()}".Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-      var customerFirstName = customerName.First();
-      var customerLastName = customerName.Length > 1 ? string.Join(" ", customerName.Skip(1)) : "No last name";
+      var customerName = $"{evolutionCustomer.Description.Trim()}";
+      var customerNameFormatter = new CustomerNameFormatter(customerName);
+      var customerFirstName = customerNameFormatter.FirstName;
+      var customerLastName = customerNameFormatter.LastName;
+
+      string? ValueOrNull(string? value) {
+        return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+      }
+
+      TelephoneNumber[]? TelephoneNumbersOrNull(string? telephone) {
+        if (string.IsNullOrWhiteSpace(telephone)) { return null; }
+        var phoneNumberUtil = PhoneNumbers.PhoneNumberUtil.GetInstance();
+        var p = phoneNumberUtil.Parse(telephone, "ZA");
+        var t = phoneNumberUtil.Format(p, PhoneNumbers.PhoneNumberFormat.NATIONAL);
+        if (t.Length < 10) { return null; }
+        return new TelephoneNumber[] { new TelephoneNumber { Phone = $"{t}" } };
+      }
 
       if (createCustomer) {
-        customerMaster = _apiClient.CreateCustomerWithAddress(new CreateCustomerRecord {
+        var customerMasterResult = _apiClient.CreateCustomerWithAddress(new CreateCustomerRecord {
           FirstName = $"{customerFirstName}",
           LastName = $"{customerLastName}",
-          Address = $"{evolutionCustomer.PhysicalAddress.Line1}",
-          Address2 = $"{evolutionCustomer.PhysicalAddress.Line2}",
-          City = $"{evolutionCustomer.PhysicalAddress.Line3}",
-          StateCode = $"{evolutionCustomer.PhysicalAddress.Line4}",
-          ZipCode = $"{evolutionCustomer.PhysicalAddress.PostalCode}",
+          Address = ValueOrNull(evolutionCustomer.PhysicalAddress.Line1),
+          Address2 = ValueOrNull(evolutionCustomer.PhysicalAddress.Line2),
+          City = ValueOrNull(evolutionCustomer.PhysicalAddress.Line3),
+          StateCode = ValueOrNull(evolutionCustomer.PhysicalAddress.Line4),
+          ZipCode = ValueOrNull(evolutionCustomer.PhysicalAddress.PostalCode),
           Emails = new EmailAddress[] { new EmailAddress { Email = evolutionEmailAddress } },
-          Phones = new TelephoneNumber[] { new TelephoneNumber { Phone = $"{evolutionCustomer.Telephone}" } }
+          Phones = TelephoneNumbersOrNull(evolutionCustomer.Telephone)
         });
 
-        var customerMasterId = customerMaster.Id;
-        _customerMasterLocalMappingService.StoreMapping(queueItem.CustomerId, customerMasterId);
+        if (customerMasterResult.IsFailure) {
+          return Result.Failure($"Could not create customer with ID {queueItem.CustomerId} in Commerce7. ({customerMasterResult.Error})");
+        }
+
+        customerMaster = customerMasterResult.Value.CustomerMasters?.First();
+
+        //var customerMasterId = customerMaster.Id;
+        //_customerMasterLocalMappingService.StoreMapping(queueItem.CustomerId, customerMasterId);
       }
       else {
         // update the customer
       }
 
-      _customerMasterLocalMappingService.StoreMapping(queueItem.CustomerId, customerMaster!.Id);
-
       _processedCustomerIds.Add(queueItem.CustomerId);
+
+      if (customerMaster == null) {
+        Logger.LogWarning("Did not receive a customer response object from Commerce7 for queue ID: {queueId}", queueItem.Oid);
+        return Result.Success();
+      }
+
+      _customerMasterLocalMappingService.StoreMapping(queueItem.CustomerId, Commerce7CustomerId.Parse($"{customerMaster!.id}"));
 
       return Result.Success();
 
