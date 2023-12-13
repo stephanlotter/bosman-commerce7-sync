@@ -14,6 +14,7 @@ using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Custome
 using BosmanCommerce7.Module.BusinessObjects;
 using BosmanCommerce7.Module.BusinessObjects.Customers;
 using BosmanCommerce7.Module.Models;
+using BosmanCommerce7.Module.Models.EvolutionSdk.Customers;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 
@@ -65,7 +66,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
 
       if (_processedCustomerIds.Contains(queueItem.CustomerId)) { return Result.Success(); }
 
-      var evolutionCustomerResult = _evolutionCustomerRepository.GetCustomer(new Module.Models.EvolutionSdk.CustomerDescriptor { CustomerId = queueItem.CustomerId });
+      var evolutionCustomerResult = _evolutionCustomerRepository.GetCustomer(new CustomerDescriptor { CustomerId = queueItem.CustomerId });
 
       if (evolutionCustomerResult.IsFailure) {
         return Result.Failure($"Could not load customer with ID {queueItem.CustomerId} from Evolution. ({evolutionCustomerResult.Error})");

@@ -18,10 +18,9 @@ using BosmanCommerce7.Module.Models.EvolutionSdk.Inventory;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 
-namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventorySyncServices
-{
+namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventorySyncServices {
 
-    public class InventoryItemsSyncService : SyncMasterDataServiceBase, IInventoryItemsSyncService {
+  public class InventoryItemsSyncService : SyncMasterDataServiceBase, IInventoryItemsSyncService {
     private readonly InventoryItemsSyncJobOptions _inventorySyncJobOptions;
     private readonly IInventoryItemsLocalMappingService _inventoryLocalMappingService;
     private readonly IInventoryItemsApiClient _apiClient;
@@ -67,18 +66,18 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
 
       if (_processedInventoryIds.Contains(queueItem.InventoryItemId)) { return Result.Success(); }
 
-      var evolutionInventoryResult = _evolutionInventoryItemRepository.GetInventory(new InventoryDescriptor { InventoryItemId = queueItem.InventoryItemId });
+      var evolutionInventoryResult = _evolutionInventoryItemRepository.GetInventoryItem(new InventoryDescriptor { InventoryItemId = queueItem.InventoryItemId });
 
       if (evolutionInventoryResult.IsFailure) {
         return Result.Failure($"Could not load inventory with ID {queueItem.InventoryItemId} from Evolution. ({evolutionInventoryResult.Error})");
       }
 
-      var evolutionInventory = evolutionInventoryResult.Value;
-      var evolutionInventoryName = $"{evolutionInventory.Name}";
+      var evolutionInventoryItem = evolutionInventoryResult.Value;
+      var evolutionInventoryItemSku = $"{evolutionInventoryItem.ShortCode}";
 
       dynamic? inventoryMaster = null;
 
-      var localMappingResult = _inventoryLocalMappingService.GetLocalInventoryId(queueItem.InventoryItemId);
+      var localMappingResult = _inventoryLocalMappingService.GetLocalId(queueItem.InventoryItemId);
 
       if (localMappingResult.HasValue) { inventoryMaster = TryFindUsingLocalMapping(); }
 
@@ -86,11 +85,11 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
 
       var createInventory = inventoryMaster == null;
 
-      var inventoryDescription = $"{evolutionInventory.Description}";
+      var inventoryDescription = $"{evolutionInventoryItem.Description}";
 
       if (createInventory) {
-        inventoryMaster = _apiClient.CreateInventory(new CreateInventoryRecord {
-          Name = $"{evolutionInventoryName}",
+        inventoryMaster = _apiClient.CreateInventoryItem(new CreateInventoryItemsRecord {
+          Sku = $"{evolutionInventoryItemSku}",
           Description = $"{inventoryDescription}"
         });
 
@@ -98,7 +97,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
         _inventoryLocalMappingService.StoreMapping(queueItem.InventoryItemId, inventoryMasterId);
       }
       else {
-        // update the inventory
+        // TODO: update the inventory
       }
 
       _inventoryLocalMappingService.StoreMapping(queueItem.InventoryItemId, inventoryMaster!.Id);
@@ -109,7 +108,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
 
       dynamic? TryFindUsingLocalMapping() {
         var commerce7InventoryId = localMappingResult.Value;
-        var commerce7Inventory = _apiClient.GetInventoryMasterById(commerce7InventoryId);
+        var commerce7Inventory = _apiClient.GetInventoryItemById(commerce7InventoryId);
 
         if (commerce7Inventory.IsFailure) {
           if (commerce7Inventory.Error.Contains("404")) {
@@ -120,7 +119,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
           throw new Exception(commerce7Inventory.Error);
         }
 
-        dynamic? inventory = commerce7Inventory.Value.InventoryMasters?.FirstOrDefault();
+        dynamic? inventory = commerce7Inventory.Value.InventoryItems?.FirstOrDefault();
 
         if (inventory == null) { _inventoryLocalMappingService.DeleteMapping(queueItem.InventoryItemId); }
 
@@ -128,9 +127,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
       }
 
       dynamic? TryFindUsingEvolutionInventoryName() {
-        if (string.IsNullOrWhiteSpace(evolutionInventoryName)) { return null; }
-        var commerce7Inventory = _apiClient.GetInventoryMasterByName(evolutionInventoryName);
-        return commerce7Inventory.IsFailure ? throw new Exception(commerce7Inventory.Error) : commerce7Inventory.Value.InventoryMasters?.FirstOrDefault();
+        if (string.IsNullOrWhiteSpace(evolutionInventoryItemSku)) { return null; }
+        var commerce7Inventory = _apiClient.GetInventoryItemBySku(evolutionInventoryItemSku);
+        return commerce7Inventory.IsFailure ? throw new Exception(commerce7Inventory.Error) : commerce7Inventory.Value.InventoryItems?.FirstOrDefault();
       }
     }
   }

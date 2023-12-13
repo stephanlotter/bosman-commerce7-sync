@@ -13,12 +13,18 @@ using CSharpFunctionalExtensions;
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.RestApi {
 
-  public interface IInventoryItemsApiClient {
+  public class InventoryItemsApiClient : IInventoryItemsApiClient {
 
-    Result<InventoryItemsResponse> CreateInventoryItem(CreateInventoryItemsRecord inventoryItemsRecord);
+    public Result<InventoryItemsResponse> CreateInventoryItem(CreateInventoryItemsRecord inventoryItemsRecord) {
+      throw new NotImplementedException();
+    }
 
-    Result<InventoryItemsResponse> GetInventoryItemBySku(Commerce7Sku sku);
+    public Result<InventoryItemsResponse> GetInventoryItemById(Commerce7InventoryId commerce7InventoryId) {
+      throw new NotImplementedException();
+    }
 
-    Result<InventoryItemsResponse> GetInventoryItemById(Commerce7InventoryId commerce7InventoryId);
+    public Result<InventoryItemsResponse> GetInventoryItemBySku(string sku) {
+      throw new NotImplementedException();
+    }
   }
 }

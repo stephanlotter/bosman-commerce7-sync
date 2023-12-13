@@ -11,10 +11,9 @@ using BosmanCommerce7.Module.Models.EvolutionSdk.Customers;
 using CSharpFunctionalExtensions;
 using Pastel.Evolution;
 
-namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Customers
-{
+namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Customers {
 
-    public class EvolutionCustomerRepository : EvolutionRepositoryBase, IEvolutionCustomerRepository {
+  public class EvolutionCustomerRepository : EvolutionRepositoryBase, IEvolutionCustomerRepository {
 
     public Result<Customer> GetCustomer(CustomerDescriptor customerDescriptor) {
       Result<Customer> Get(EvolutionCustomerId id) {
@@ -34,6 +33,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Customers
       if (customerDescriptor.CustomerId.HasValue) {
         var c = Get(customerDescriptor.CustomerId.Value);
         if (c.IsSuccess) { return c; }
+        if (string.IsNullOrWhiteSpace(customerDescriptor.EmailAddress)) {
+          return Result.Failure<Customer>("Cannot find customer by Id and no email address was provided.");
+        }
       }
 
       if (string.IsNullOrWhiteSpace(customerDescriptor.EmailAddress)) {

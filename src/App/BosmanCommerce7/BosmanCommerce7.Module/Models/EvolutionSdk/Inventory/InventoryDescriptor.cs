@@ -11,6 +11,6 @@ namespace BosmanCommerce7.Module.Models.EvolutionSdk.Inventory {
   public record InventoryDescriptor {
     public EvolutionInventoryItemId? InventoryItemId { get; init; }
 
-    public string? Sku { get; init; }
+    public EvolutionInventoryItemCode? SimpleCode { get; init; }
   }
 }

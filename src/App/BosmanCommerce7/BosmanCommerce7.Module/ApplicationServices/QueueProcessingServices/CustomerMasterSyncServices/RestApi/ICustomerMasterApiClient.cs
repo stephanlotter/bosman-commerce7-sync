@@ -10,9 +10,10 @@
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.Models;
 using CSharpFunctionalExtensions;
 
-namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.RestApi {
+namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.RestApi
+{
 
-  public interface ICustomerMasterApiClient {
+    public interface ICustomerMasterApiClient {
 
     Result<CustomerMasterResponse> GetCustomerMasterByEmail(string emailAddress);
 

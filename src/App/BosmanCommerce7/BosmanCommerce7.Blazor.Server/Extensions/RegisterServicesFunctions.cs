@@ -14,6 +14,7 @@ using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Inventory;
 using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.RestApi;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.RestApi;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventorySyncServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.RestApiClients;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices;
@@ -37,6 +38,7 @@ namespace BosmanCommerce7.Blazor.Server.Extensions
       RegisterUtilityServices(services);
 
       RegisterCustomerMasterSyncServices(services);
+      RegisterInventoryMasterSyncServices(services);
 
       RegisterSalesOrderSyncServices(services);
       RegisterSalesOrderPostServices(services);
@@ -51,6 +53,8 @@ namespace BosmanCommerce7.Blazor.Server.Extensions
       services.AddTransient<IApiClientService, ApiClientService>();
 
       services.AddTransient<ICustomerMasterApiClient, CustomerMasterApiClient>();
+      
+      services.AddTransient<IInventoryItemsApiClient, InventoryItemsApiClient>();
 
       services.AddTransient<ISalesOrdersApiClient, SalesOrdersApiClient>();
     }
@@ -83,7 +87,7 @@ namespace BosmanCommerce7.Blazor.Server.Extensions
     }
 
     private static void RegisterInventoryMasterSyncServices(IServiceCollection services) {
-      //services.AddTransient<IInventoryItemsSyncQueueService, InventoryItemsSyncQueueService>();
+      services.AddTransient<IInventoryItemsSyncQueueService, InventoryItemsSyncQueueService>();
       services.AddTransient<IInventoryItemsSyncService, InventoryItemsSyncService>();
       services.AddTransient<IInventoryItemsLocalMappingService, InventoryItemsLocalMappingService>();
     }
