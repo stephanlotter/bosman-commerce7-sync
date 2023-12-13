@@ -7,31 +7,39 @@
  *
  */
 
+using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
+using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Inventory;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.Models;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.RestApi;
+using BosmanCommerce7.Module.BusinessObjects;
+using BosmanCommerce7.Module.BusinessObjects.InventoryItems;
+using BosmanCommerce7.Module.Models;
+using BosmanCommerce7.Module.Models.EvolutionSdk.Inventory;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 
-namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventorySyncServices {
+namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventorySyncServices
+{
 
-  public class InventoryItemsSyncService : SyncMasterDataServiceBase, IInventoryItemsSyncService {
-    private readonly InventorySyncJobOptions _inventorySyncJobOptions;
-    private readonly IInventoryLocalMappingService _inventoryLocalMappingService;
-    private readonly IInventoryApiClient _apiClient;
-    private readonly IEvolutionInventoryRepository _evolutionInventoryRepository;
+    public class InventoryItemsSyncService : SyncMasterDataServiceBase, IInventoryItemsSyncService {
+    private readonly InventoryItemsSyncJobOptions _inventorySyncJobOptions;
+    private readonly IInventoryItemsLocalMappingService _inventoryLocalMappingService;
+    private readonly IInventoryItemsApiClient _apiClient;
+    private readonly IEvolutionInventoryItemRepository _evolutionInventoryItemRepository;
 
-    private List<EvolutionInventoryId> _processedInventoryIds = new();
+    private List<EvolutionInventoryItemId> _processedInventoryIds = new();
 
     public InventoryItemsSyncService(ILogger<InventoryItemsSyncService> logger,
-        InventorySyncJobOptions inventorySyncJobOptions,
-        IInventoryLocalMappingService inventoryLocalMappingService,
-        IInventoryApiClient apiClient,
-        IEvolutionInventoryRepository evolutionInventoryRepository,
+        InventoryItemsSyncJobOptions inventorySyncJobOptions,
+        IInventoryItemsLocalMappingService inventoryLocalMappingService,
+        IInventoryItemsApiClient apiClient,
+        IEvolutionInventoryItemRepository evolutionInventoryRepository,
         ILocalObjectSpaceProvider localObjectSpaceProvider
     ) : base(logger, localObjectSpaceProvider) {
       _inventorySyncJobOptions = inventorySyncJobOptions;
       _inventoryLocalMappingService = inventoryLocalMappingService;
       _apiClient = apiClient;
-      _evolutionInventoryRepository = evolutionInventoryRepository;
+      _evolutionInventoryItemRepository = evolutionInventoryRepository;
     }
 
     public Result<InventoryItemsSyncResult> Execute(InventoryItemsSyncContext context) {
@@ -39,7 +47,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
       _processedInventoryIds.Clear();
       Logger.LogDebug("Start {SyncService} inventory records sync.", typeof(InventoryItemsSyncService).Name);
 
-      var result = ProcessQueueItems<InventoryUpdateQueue>(context);
+      var result = ProcessQueueItems<InventoryItemsUpdateQueue>(context);
 
       if (result.IsFailure) {
         return Result.Failure<InventoryItemsSyncResult>(result.Error);
@@ -55,14 +63,14 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
     }
 
     protected override Result ProcessQueueItem(UpdateQueueBase updateQueueItem) {
-      var queueItem = (InventoryUpdateQueue)updateQueueItem;
+      var queueItem = (InventoryItemsUpdateQueue)updateQueueItem;
 
-      if (_processedInventoryIds.Contains(queueItem.InventoryId)) { return Result.Success(); }
+      if (_processedInventoryIds.Contains(queueItem.InventoryItemId)) { return Result.Success(); }
 
-      var evolutionInventoryResult = _evolutionInventoryRepository.GetInventory(new Module.Models.EvolutionSdk.InventoryDescriptor { InventoryId = queueItem.InventoryId });
+      var evolutionInventoryResult = _evolutionInventoryItemRepository.GetInventory(new InventoryDescriptor { InventoryItemId = queueItem.InventoryItemId });
 
       if (evolutionInventoryResult.IsFailure) {
-        return Result.Failure($"Could not load inventory with ID {queueItem.InventoryId} from Evolution. ({evolutionInventoryResult.Error})");
+        return Result.Failure($"Could not load inventory with ID {queueItem.InventoryItemId} from Evolution. ({evolutionInventoryResult.Error})");
       }
 
       var evolutionInventory = evolutionInventoryResult.Value;
@@ -70,7 +78,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
 
       dynamic? inventoryMaster = null;
 
-      var localMappingResult = _inventoryLocalMappingService.GetLocalInventoryId(queueItem.InventoryId);
+      var localMappingResult = _inventoryLocalMappingService.GetLocalInventoryId(queueItem.InventoryItemId);
 
       if (localMappingResult.HasValue) { inventoryMaster = TryFindUsingLocalMapping(); }
 
@@ -87,15 +95,15 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
         });
 
         var inventoryMasterId = inventoryMaster.Id;
-        _inventoryLocalMappingService.StoreMapping(queueItem.InventoryId, inventoryMasterId);
+        _inventoryLocalMappingService.StoreMapping(queueItem.InventoryItemId, inventoryMasterId);
       }
       else {
         // update the inventory
       }
 
-      _inventoryLocalMappingService.StoreMapping(queueItem.InventoryId, inventoryMaster!.Id);
+      _inventoryLocalMappingService.StoreMapping(queueItem.InventoryItemId, inventoryMaster!.Id);
 
-      _processedInventoryIds.Add(queueItem.InventoryId);
+      _processedInventoryIds.Add(queueItem.InventoryItemId);
 
       return Result.Success();
 
@@ -105,7 +113,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
 
         if (commerce7Inventory.IsFailure) {
           if (commerce7Inventory.Error.Contains("404")) {
-            _inventoryLocalMappingService.DeleteMapping(queueItem.InventoryId);
+            _inventoryLocalMappingService.DeleteMapping(queueItem.InventoryItemId);
             return null;
           }
 
@@ -114,7 +122,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
 
         dynamic? inventory = commerce7Inventory.Value.InventoryMasters?.FirstOrDefault();
 
-        if (inventory == null) { _inventoryLocalMappingService.DeleteMapping(queueItem.InventoryId); }
+        if (inventory == null) { _inventoryLocalMappingService.DeleteMapping(queueItem.InventoryItemId); }
 
         return inventory;
       }

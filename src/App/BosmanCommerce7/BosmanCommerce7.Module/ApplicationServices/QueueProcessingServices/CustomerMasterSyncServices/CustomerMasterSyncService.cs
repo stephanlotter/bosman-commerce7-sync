@@ -8,9 +8,9 @@
  */
 
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
-using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk;
+using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Customers;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.Models;
-using BosmanCommerce7.Module.ApplicationServices.RestApiClients.SalesOrders;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.RestApi;
 using BosmanCommerce7.Module.BusinessObjects;
 using BosmanCommerce7.Module.BusinessObjects.Customers;
 using BosmanCommerce7.Module.Models;
@@ -76,7 +76,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
 
       dynamic? customerMaster = null;
 
-      var localMappingResult = _customerMasterLocalMappingService.GetLocalCustomerId(queueItem.CustomerId);
+      var localMappingResult = _customerMasterLocalMappingService.GetLocalId(queueItem.CustomerId);
 
       if (localMappingResult.HasValue) { customerMaster = TryFindUsingLocalMapping(); }
 

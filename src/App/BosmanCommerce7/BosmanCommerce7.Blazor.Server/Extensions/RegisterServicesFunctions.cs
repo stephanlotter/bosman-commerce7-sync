@@ -9,19 +9,23 @@
 using BosmanCommerce7.Module.ApplicationServices.AppDataServices;
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
 using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk;
+using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Customers;
+using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Inventory;
+using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices;
-using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.Models;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.RestApi;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventorySyncServices;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.RestApiClients;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices;
-using BosmanCommerce7.Module.ApplicationServices.RestApiClients;
-using BosmanCommerce7.Module.ApplicationServices.RestApiClients.SalesOrders;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices.RestApi;
 using BosmanCommerce7.Module.Models;
 using BosmanCommerce7.Module.Models.EvolutionSdk;
 
-namespace BosmanCommerce7.Blazor.Server.Extensions {
+namespace BosmanCommerce7.Blazor.Server.Extensions
+{
 
-  public static class RegisterServicesFunctions {
+    public static class RegisterServicesFunctions {
 
     public static void RegisterServices(IServiceCollection services) {
       RegisterApiServices(services);
@@ -79,9 +83,9 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
     }
 
     private static void RegisterInventoryMasterSyncServices(IServiceCollection services) {
-      //services.AddTransient<IInventoryMasterSyncQueueService, InventoryMasterSyncQueueService>();
-      services.AddTransient<IInventoryItemsSyncService, InventoryMasterSyncService>();
-      //services.AddTransient<IInventoryMasterLocalMappingService, InventoryMasterLocalMappingService>();
+      //services.AddTransient<IInventoryItemsSyncQueueService, InventoryItemsSyncQueueService>();
+      services.AddTransient<IInventoryItemsSyncService, InventoryItemsSyncService>();
+      services.AddTransient<IInventoryItemsLocalMappingService, InventoryItemsLocalMappingService>();
     }
 
     private static void RegisterSalesOrderSyncServices(IServiceCollection services) {

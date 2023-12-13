@@ -9,16 +9,14 @@
 
 using CSharpFunctionalExtensions;
 
-namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices
-{
+namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices {
 
-    public interface ICustomerMasterLocalMappingService
-    {
+  public interface ICustomerMasterLocalMappingService {
 
-        Maybe<Commerce7CustomerId> GetLocalCustomerId(EvolutionCustomerId evolutionCustomerId);
+    Maybe<Commerce7CustomerId> GetLocalId(EvolutionCustomerId evolutionId);
 
-        Result StoreMapping(EvolutionCustomerId evolutionCustomerId, Commerce7CustomerId commerce7CustomerId);
+    Result StoreMapping(EvolutionCustomerId evolutionId, Commerce7CustomerId commerce7Id);
 
-        Result DeleteMapping(EvolutionCustomerId evolutionCustomerId);
-    }
+    Result DeleteMapping(EvolutionCustomerId evolutionId);
+  }
 }

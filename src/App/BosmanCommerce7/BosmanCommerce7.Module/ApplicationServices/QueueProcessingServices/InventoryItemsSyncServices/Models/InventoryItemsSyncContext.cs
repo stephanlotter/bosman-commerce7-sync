@@ -8,5 +8,5 @@
  */
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.Models {
-  public record InventoryItemsSyncContext { }
+  public record InventoryItemsSyncContext : SyncContextBase { }
 }

@@ -60,6 +60,9 @@ namespace BosmanCommerce7.Module.Models {
   public record CustomerMasterSyncJobOptions : JobOptionsBase {
   }
 
+  public record InventoryItemsSyncJobOptions : JobOptionsBase {
+  }
+
   public record ConnectionStrings : ILocalDatabaseConnectionStringProvider, IEvolutionDatabaseConnectionStringProvider {
     public string? LocalDatabase { get; init; }
 
