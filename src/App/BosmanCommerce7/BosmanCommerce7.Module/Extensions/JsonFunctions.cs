@@ -18,7 +18,7 @@ namespace BosmanCommerce7.Module.Extensions {
 
       var settings = new JsonSerializerSettings {
         NullValueHandling = NullValueHandling.Ignore,
-        ContractResolver = new CamelCasePropertyNamesContractResolver()
+        ContractResolver = new CamelCasePropertyNamesContractResolver()        
       };
       return data != null ? JsonConvert.SerializeObject(data, settings) : null;
     }

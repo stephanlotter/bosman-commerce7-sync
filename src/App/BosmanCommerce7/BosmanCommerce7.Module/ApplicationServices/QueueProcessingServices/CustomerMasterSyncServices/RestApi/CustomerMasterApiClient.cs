@@ -41,23 +41,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
     }
 
     public Result<CustomerMasterResponse> GetCustomerMasterById(Commerce7CustomerId commerce7CustomerId) {
-      //CustomerMasterResponse apiResponse = new();
-      //var list = new List<dynamic>();
-
-      //return SendRequest(new CustomerMasterGetApiRequest(commerce7CustomerId), data => {
-      //  if (data == null) {
-      //    return (Result.Failure<CustomerMasterResponse>("Response body not valid JSON."), ApiRequestPaginationStatus.Completed);
-      //  }
-
-      //  var totalRecords = (int)data!.total;
-
-      //  list.Add(data);
-
-      //  apiResponse = apiResponse with { CustomerMasters = list.ToArray() };
-
-      //  return (Result.Success(apiResponse), ApiRequestPaginationStatus.Completed);
-      //});
-
       return SendSingleResultRequest(new CustomerMasterGetApiRequest(commerce7CustomerId));
     }
 

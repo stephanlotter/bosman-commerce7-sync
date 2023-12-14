@@ -127,7 +127,24 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
           customerMaster = customerMasterResult.Value.CustomerMasters?.First();
         }
         else {
-          // update the customer
+          var customerMasterResult = _apiClient.UpdateCustomerWithAddress(new UpdateCustomerRecord {
+            Id = Commerce7CustomerId.Parse($"{customerMaster!.id}"),
+            FirstName = $"{customerFirstName}",
+            LastName = $"{customerLastName}",
+            Address = ValueOrNull(evolutionCustomer.PhysicalAddress.Line1),
+            Address2 = ValueOrNull(evolutionCustomer.PhysicalAddress.Line2),
+            City = ValueOrNull(evolutionCustomer.PhysicalAddress.Line3),
+            StateCode = ValueOrNull(evolutionCustomer.PhysicalAddress.Line4),
+            ZipCode = ValueOrNull(evolutionCustomer.PhysicalAddress.PostalCode),
+            Emails = new EmailAddress[] { new EmailAddress { Email = evolutionEmailAddress } },
+            Phones = TelephoneNumbersOrNull(evolutionCustomer.Telephone)
+          });
+
+          // TODO: This update needs to be split in two. One for the customer details and one for the address details.
+
+          if (customerMasterResult.IsFailure) {
+            return Result.Failure($"Could not create customer with ID {queueItem.CustomerId} in Commerce7. ({customerMasterResult.Error})");
+          }
         }
 
         if (customerMaster == null) {
