@@ -20,10 +20,9 @@ using DevExpress.Data.Filtering;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices
-{
+namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices {
 
-    public class SalesOrdersSyncService : SyncServiceBase, ISalesOrdersSyncService {
+  public class SalesOrdersSyncService : SyncServiceBase, ISalesOrdersSyncService {
     private readonly SalesOrdersSyncJobOptions _salesOrdersSyncJobOptions;
     private readonly ISalesOrdersSyncValueStoreService _salesOrdersSyncValueStoreService;
     private readonly ISalesOrdersApiClient _apiClient;
@@ -34,9 +33,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
       SalesOrdersSyncJobOptions salesOrdersSyncJobOptions,
       ISalesOrdersSyncValueStoreService salesOrdersSyncValueStoreService,
       ISalesOrdersApiClient apiClient,
-      ILocalObjectSpaceProvider localObjectSpaceProvider,
+      ILocalObjectSpaceEvolutionSdkProvider localObjectSpaceEvolutionSdkProvider,
       IAppDataFileManager appDataFileManager)
-      : base(logger, localObjectSpaceProvider) {
+      : base(logger, localObjectSpaceEvolutionSdkProvider) {
       _salesOrdersSyncJobOptions = salesOrdersSyncJobOptions;
       _salesOrdersSyncValueStoreService = salesOrdersSyncValueStoreService;
       _apiClient = apiClient;
@@ -91,7 +90,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
         var channelsToProcess = _salesOrdersSyncJobOptions.ChannelsToProcess?.Select(c => c.ToLower()).ToList();
 
-        LocalObjectSpaceProvider.WrapInObjectSpaceTransaction(objectSpace => {
+        var result = LocalObjectSpaceEvolutionSdkProvider.WrapInObjectSpaceTransaction(objectSpace => {
           foreach (dynamic salesOrder in response.SalesOrders!) {
             if (!_processedOrders.Contains($"{salesOrder.id}")) {
               Logger.LogInformation("Sales order received: {orderNumber}", $"{salesOrder.orderNumber}");
@@ -99,9 +98,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
             var channel = $"{salesOrder.channel}";
 
-            var processChannel = channelsToProcess?.Contains(channel.ToLower()) ?? false;
-
-            if (!processChannel) {
+            if (SkipChannel(channel, channelsToProcess)) {
               if (!_processedOrders.Contains($"{salesOrder.id}")) {
                 Logger.LogWarning("Sales order channel not configured to process: {orderNumber} [channel:{channel}]", $"{salesOrder.orderNumber}", $"{channel}");
                 _processedOrders.Add($"{salesOrder.id}");
@@ -210,6 +207,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
             localSalesOrder.Save();
           }
 
+          return errorCount == 0 ? Result.Success(BuildResult()) : Result.Failure<SalesOrdersSyncResult>($"Completed with {errorCount} errors.");
+
           OnlineSalesOrder NewOrder(dynamic id, dynamic orderNumber) {
             var criteria = CriteriaOperator.Or("OnlineId".IsEqualToOperator($"{id}"), "OrderNumber".IsEqualToOperator($"{orderNumber}"));
             var orders = objectSpace.GetObjects<OnlineSalesOrder>(criteria);
@@ -229,7 +228,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
         _salesOrdersSyncValueStoreService.UpdateSalesOrdersSyncLastSynced(lastOrderDate.Date);
 
-        return errorCount == 0 ? Result.Success(BuildResult()) : Result.Failure<SalesOrdersSyncResult>($"Completed with {errorCount} errors.");
+        return result;
       }
       catch (Exception ex) {
         Logger.LogError("Unable to execute SalesOrdersSyncService: {error}", ex);
@@ -238,6 +237,10 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
       SalesOrdersSyncResult BuildResult(string? message = null) {
         return new SalesOrdersSyncResult { Message = message };
+      }
+
+      bool SkipChannel(string channel, List<string>? channelsToProcess) {
+        return !channelsToProcess?.Contains(channel.ToLower()) ?? true;
       }
     }
 

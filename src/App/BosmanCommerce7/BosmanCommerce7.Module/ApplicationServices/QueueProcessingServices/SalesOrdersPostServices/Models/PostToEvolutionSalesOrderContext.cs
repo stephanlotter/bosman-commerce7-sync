@@ -11,6 +11,6 @@ using DevExpress.ExpressApp;
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices.Models {
   public record PostToEvolutionSalesOrderContext {
-    public IObjectSpace ObjectSpace { get; init; } = default!;
+    public required IObjectSpace ObjectSpace { get; init; }
   }
 }

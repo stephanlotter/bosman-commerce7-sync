@@ -94,7 +94,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
         .Bind(salesOrder => {
           var parameters = new CustomerDescriptor { EmailAddress = onlineSalesOrder.EmailAddress };
-          return RepositoryGet(salesOrder, parameters, p => _evolutionCustomerRepository.GetCustomer((CustomerDescriptor)p), customer => salesOrder.Customer = customer);
+          return RepositoryGet(salesOrder, parameters, p => _evolutionCustomerRepository.Get((CustomerDescriptor)p), customer => salesOrder.Customer = customer);
         })
 
         .Bind(salesOrder => RepositoryGetFromCode(salesOrder, onlineSalesOrder.ProjectCode, _evolutionProjectRepository.Get, project => salesOrder.Project = project))

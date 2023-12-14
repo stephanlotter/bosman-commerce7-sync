@@ -13,6 +13,7 @@ using DevExpress.Xpo;
 namespace BosmanCommerce7.Module.BusinessObjects.Customers {
 
   [DefaultClassOptions]
+  [NavigationItem("Logs")]
   public class CustomerUpdateQueueLog : UpdateQueueLogBase {
     private CustomerUpdateQueue _customerUpdateQueue = default!;
 

@@ -14,7 +14,7 @@ using DevExpress.Xpo;
 namespace BosmanCommerce7.Module.BusinessObjects.SalesOrders {
 
   [DefaultClassOptions]
-  [NavigationItem(true)]
+  [NavigationItem("Logs")]
   public class OnlineSalesOrderProcessingLog : XPObject {
     private OnlineSalesOrder? _onlineSalesOrder;
     private DateTime _entryDate;

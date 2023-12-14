@@ -59,5 +59,24 @@ namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDat
         throw;
       }
     }
+
+    public Result<T> WrapInObjectSpaceTransaction<T>(Func<IObjectSpace, Result<T>> func) {
+      using var connection = new SqlConnection(_localDatabaseConnectionStringProvider.LocalDatabase);
+      using var osp = new XPObjectSpaceProvider(_localDatabaseConnectionStringProvider.LocalDatabase, connection, threadSafe: true, useSeparateDataLayers: true);
+
+      using IObjectSpace objectSpace = osp.CreateObjectSpace();
+
+      osp.TypesInfo.RegisterEntity(typeof(OnlineSalesOrder));
+
+      try {
+        var result = func(objectSpace);
+        objectSpace.CommitChanges();
+        return result;
+      }
+      catch {
+        objectSpace.Rollback();
+        throw;
+      }
+    }
   }
 }

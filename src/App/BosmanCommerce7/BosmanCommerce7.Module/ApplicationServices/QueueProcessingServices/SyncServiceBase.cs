@@ -15,13 +15,13 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices {
   public abstract class SyncServiceBase {
     protected const int MaxRetryCount = 6;
     protected int _errorCount;
-    protected readonly ILocalObjectSpaceProvider LocalObjectSpaceProvider;
+    protected readonly ILocalObjectSpaceEvolutionSdkProvider LocalObjectSpaceEvolutionSdkProvider;
 
     protected ILogger Logger { get; }
 
-    public SyncServiceBase(ILogger logger, ILocalObjectSpaceProvider localObjectSpaceProvider) {
+    public SyncServiceBase(ILogger logger, ILocalObjectSpaceEvolutionSdkProvider localObjectSpaceEvolutionSdkProvider) {
       Logger = logger;
-      LocalObjectSpaceProvider = localObjectSpaceProvider;
+      LocalObjectSpaceEvolutionSdkProvider = localObjectSpaceEvolutionSdkProvider;
     }
 
     protected DateTime GetRetryAfter(int retryCount) {

@@ -15,6 +15,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Customers {
 
   public interface IEvolutionCustomerRepository {
 
-    Result<Customer> GetCustomer(CustomerDescriptor customerDescriptor);
+    Result<Customer> Get(CustomerDescriptor customerDescriptor);
   }
 }

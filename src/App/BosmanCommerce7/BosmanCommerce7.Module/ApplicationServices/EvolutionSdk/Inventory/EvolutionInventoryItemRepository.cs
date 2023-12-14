@@ -29,7 +29,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Inventory {
       return new InventoryItem(id.Value);
     }
 
-    public Result<InventoryItem> GetInventoryItem(InventoryDescriptor inventoryDescriptor) {
+    public Result<InventoryItem> Get(InventoryDescriptor inventoryDescriptor) {
       Result<InventoryItem> Get(EvolutionInventoryItemId id) {
         try {
           var customer = new InventoryItem(id);

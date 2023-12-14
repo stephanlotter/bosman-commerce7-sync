@@ -46,6 +46,7 @@ namespace BosmanCommerce7.Blazor.Server.Extensions
 
     private static void RegisterLocalDatabaseServices(IServiceCollection services) {
       services.AddTransient<ILocalObjectSpaceProvider, LocalObjectSpaceProvider>();
+      services.AddTransient<ILocalObjectSpaceEvolutionSdkProvider, LocalObjectSpaceEvolutionSdkProvider>();
     }
 
     private static void RegisterApiServices(IServiceCollection services) {

@@ -15,7 +15,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Customers {
 
   public class EvolutionCustomerRepository : EvolutionRepositoryBase, IEvolutionCustomerRepository {
 
-    public Result<Customer> GetCustomer(CustomerDescriptor customerDescriptor) {
+    public Result<Customer> Get(CustomerDescriptor customerDescriptor) {
       Result<Customer> Get(EvolutionCustomerId id) {
         try {
           var customer = new Customer(id);

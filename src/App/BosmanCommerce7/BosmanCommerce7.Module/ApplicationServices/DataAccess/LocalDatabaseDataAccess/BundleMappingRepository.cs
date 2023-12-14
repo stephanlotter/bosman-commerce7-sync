@@ -14,10 +14,9 @@ using CSharpFunctionalExtensions;
 using DevExpress.ExpressApp;
 using Microsoft.Extensions.Logging;
 
-namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess
-{
+namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess {
 
-    public class BundleMappingRepository : LocalDatabaseRepositoryBase, IBundleMappingRepository {
+  public class BundleMappingRepository : LocalDatabaseRepositoryBase, IBundleMappingRepository {
 
     public BundleMappingRepository(ILogger<BundleMappingRepository> logger, ILocalDatabaseConnectionStringProvider connectionStringProvider) : base(logger, connectionStringProvider) {
     }

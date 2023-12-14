@@ -7,22 +7,27 @@
  *
  */
 
+using System.Text;
+using System.Text.RegularExpressions;
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
-using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk;
 using BosmanCommerce7.Module.BusinessObjects;
 using BosmanCommerce7.Module.Extensions;
 using BosmanCommerce7.Module.Models;
 using CSharpFunctionalExtensions;
 using DevExpress.Data.Filtering;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices {
 
   public abstract class SyncMasterDataServiceBase : SyncServiceBase {
-    private readonly IEvolutionSdk _evolutionSdk;
 
-    public SyncMasterDataServiceBase(ILogger logger, ILocalObjectSpaceProvider localObjectSpaceProvider, IEvolutionSdk evolutionSdk) : base(logger, localObjectSpaceProvider) {
-      _evolutionSdk = evolutionSdk;
+    //private Regex regex = new Regex(@"(?<=Response body:\W){.*}");
+    private Regex regexJson = new Regex(@"(?<=Response body:\W){.*}", RegexOptions.IgnoreCase | RegexOptions.Singleline);
+
+    private Regex regexErrorMessage = new Regex(@"(.*?)(?=Response body:)", RegexOptions.IgnoreCase | RegexOptions.Singleline);
+
+    public SyncMasterDataServiceBase(ILogger logger, ILocalObjectSpaceEvolutionSdkProvider localObjectSpaceEvolutionSdkProvider) : base(logger, localObjectSpaceEvolutionSdkProvider) {
     }
 
     protected Result ProcessQueueItems<T>(SyncContextBase context) where T : UpdateQueueBase {
@@ -30,32 +35,31 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices {
       CriteriaOperator? criteria = context.Criteria;
 
       try {
-        return LocalObjectSpaceProvider.WrapInObjectSpaceTransaction(objectSpace => {
-          return _evolutionSdk.WrapInSdkTransaction(connection => {
-            CriteriaOperator? criteria = context.Criteria;
-            var now = DateTime.Now;
+        return LocalObjectSpaceEvolutionSdkProvider.WrapInObjectSpaceEvolutionSdkTransaction((objectSpace, connection) => {
+          CriteriaOperator? criteria = context.Criteria;
+          var now = DateTime.Now;
 
-            if (criteria is null) {
-              var criteriaPostingStatus = "Status".InCriteriaOperator(QueueProcessingStatus.New, QueueProcessingStatus.Retrying);
-              var criteriaRetryAfter = CriteriaOperator.Or("RetryAfter".IsNullOperator(), "RetryAfter".PropertyLessThan(now));
-              criteria = CriteriaOperator.And(criteriaPostingStatus, criteriaRetryAfter);
-            }
+          if (criteria is null) {
+            var criteriaPostingStatus = "Status".InCriteriaOperator(QueueProcessingStatus.New, QueueProcessingStatus.Retrying);
+            var criteriaRetryAfter = CriteriaOperator.Or("RetryAfter".IsNullOperator(), "RetryAfter".PropertyLessThan(now));
+            criteria = CriteriaOperator.And(criteriaPostingStatus, criteriaRetryAfter);
+          }
 
-            var queueItems = objectSpace.GetObjects<T>(criteria).ToList<UpdateQueueBase>();
+          var queueItems = objectSpace.GetObjects<T>(criteria).ToList<UpdateQueueBase>();
 
-            if (!queueItems.Any()) {
-              Logger.LogDebug("No records to sync.");
-              return Result.Success() ;
-            }
+          if (!queueItems.Any()) {
+            Logger.LogDebug("No records to sync.");
+            return Result.Success();
+          }
 
-            Logger.LogDebug("{count} records to sync.", queueItems.Count);
+          Logger.LogDebug("{count} records to sync.", queueItems.Count);
 
-            foreach (var queueItem in queueItems) {
-              var result = ProcessQueueItem(queueItem);
-              SetStatus(result, queueItem);
-            }
-            return _errorCount == 0 ? Result.Success() : Result.Failure($"Completed with {_errorCount} errors.");
-          });
+          foreach (var queueItem in queueItems) {
+            var result = ProcessQueueItem(queueItem);
+            SetStatus(result, queueItem);
+          }
+
+          return _errorCount == 0 ? Result.Success() : Result.Failure($"Completed with {_errorCount} errors.");
         });
       }
       catch (Exception ex) {
@@ -71,8 +75,41 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices {
         _errorCount++;
         queueItem.LastErrorMessage = result.Error;
 
-        queueItem.RetryCount++;
-        queueItem.Status = queueItem.RetryCount < MaxRetryCount ? QueueProcessingStatus.Retrying : QueueProcessingStatus.Failed;
+        var isUnprocessableEntity = result.Error.Contains("UnprocessableEntity");
+
+        if (regexJson.IsMatch(result.Error)) {
+          var errorMessage = regexErrorMessage.Match(result.Error);
+          var json = regexJson.Match(result.Error);
+
+          try {
+            var errorResults = JsonConvert.DeserializeObject<Commerce7ErrorResponse>(json.Value);
+            if (errorResults != null) {
+              var sb = new StringBuilder();
+
+              sb.AppendLine($"{errorMessage}");
+              sb.AppendLine($"{errorResults.Message}");
+              sb.AppendLine($"Errors:");
+
+              foreach (var e in errorResults.Errors) {
+                sb.Append($"  * {e.Field} ");
+                sb.Append($"({e.TranslatedField}): ");
+                sb.AppendLine($"{e.Message}");
+              }
+
+              queueItem.LastErrorMessage = sb.ToString();
+            }
+          }
+          catch {
+          }
+        }
+
+        if (isUnprocessableEntity) {
+          queueItem.Status = QueueProcessingStatus.Failed;
+        }
+        else {
+          queueItem.RetryCount++;
+          queueItem.Status = queueItem.RetryCount < MaxRetryCount ? QueueProcessingStatus.Retrying : QueueProcessingStatus.Failed;
+        }
 
         if (queueItem.Status != QueueProcessingStatus.Failed) {
           queueItem.RetryAfter = GetRetryAfter(queueItem.RetryCount);
@@ -82,6 +119,26 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices {
         queueItem.ResetPostingStatus();
         queueItem.Status = QueueProcessingStatus.Processed;
       }
+    }
+
+    public class Commerce7ErrorResponse {
+
+      public int StatusCode { get; set; }
+
+      public string Type { get; set; }
+
+      public string Message { get; set; }
+
+      public Commerce7Error[] Errors { get; set; }
+    }
+
+    public class Commerce7Error {
+
+      public string Field { get; set; }
+
+      public string TranslatedField { get; set; }
+
+      public string Message { get; set; }
     }
   }
 }

@@ -13,6 +13,7 @@ using DevExpress.Xpo;
 namespace BosmanCommerce7.Module.BusinessObjects.InventoryItems {
 
   [DefaultClassOptions]
+  [NavigationItem("Logs")]
   public class InventoryItemsUpdateQueueLog : UpdateQueueLogBase {
     private InventoryItemsUpdateQueue _inventoryItemsUpdateQueue = default!;
 

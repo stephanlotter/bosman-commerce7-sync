@@ -8,7 +8,6 @@
  */
 
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
-using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk;
 using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Customers;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.Models;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.RestApi;
@@ -17,6 +16,7 @@ using BosmanCommerce7.Module.BusinessObjects.Customers;
 using BosmanCommerce7.Module.Models;
 using BosmanCommerce7.Module.Models.EvolutionSdk.Customers;
 using CSharpFunctionalExtensions;
+using CSharpFunctionalExtensions.ValueTasks;
 using Microsoft.Extensions.Logging;
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices {
@@ -27,16 +27,15 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
     private readonly ICustomerMasterApiClient _apiClient;
     private readonly IEvolutionCustomerRepository _evolutionCustomerRepository;
 
-    private List<EvolutionCustomerId> _processedCustomerIds = new();
+    private List<EvolutionCustomerId> _processedIds = new();
 
     public CustomerMasterSyncService(ILogger<CustomerMasterSyncService> logger,
       CustomerMasterSyncJobOptions customerMasterSyncJobOptions,
       ICustomerMasterLocalMappingService customerMasterLocalMappingService,
       ICustomerMasterApiClient apiClient,
       IEvolutionCustomerRepository evolutionCustomerRepository,
-      ILocalObjectSpaceProvider localObjectSpaceProvider,
-      IEvolutionSdk evolutionSdk
-      ) : base(logger, localObjectSpaceProvider, evolutionSdk) {
+      ILocalObjectSpaceEvolutionSdkProvider localObjectSpaceEvolutionSdkProvider
+      ) : base(logger, localObjectSpaceEvolutionSdkProvider) {
       _customerMasterSyncJobOptions = customerMasterSyncJobOptions;
       _customerMasterLocalMappingService = customerMasterLocalMappingService;
       _apiClient = apiClient;
@@ -45,131 +44,129 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
 
     public Result<CustomerMasterSyncResult> Execute(CustomerMasterSyncContext context) {
       _errorCount = 0;
-      _processedCustomerIds.Clear();
-      Logger.LogDebug("Start {SyncService} master records sync.", typeof(CustomerMasterSyncService).Name);
+      _processedIds.Clear();
 
-      var result = ProcessQueueItems<CustomerUpdateQueue>(context);
+      Logger.LogDebug("Start {SyncService} records sync.", this.GetType().Name);
 
-      if (result.IsFailure) {
-        return Result.Failure<CustomerMasterSyncResult>(result.Error);
-      }
+      return ProcessQueueItems<CustomerUpdateQueue>(context)
+        .Bind(() => BuildResult())
+        .Finally(result => {
+          Logger.LogDebug("End {SyncService} records sync.", this.GetType().Name);
+          return result;
+        });
 
-      Logger.LogDebug("End {SyncService} master records sync.", typeof(CustomerMasterSyncService).Name);
-
-      return _errorCount == 0 ? Result.Success(BuildResult()) : Result.Failure<CustomerMasterSyncResult>($"Completed with {_errorCount} errors.");
-
-      CustomerMasterSyncResult BuildResult() {
-        return new CustomerMasterSyncResult { };
+      Result<CustomerMasterSyncResult> BuildResult() {
+        return _errorCount == 0 ? Result.Success(new CustomerMasterSyncResult { }) : Result.Failure<CustomerMasterSyncResult>($"Completed with {_errorCount} errors.");
       }
     }
 
     protected override Result ProcessQueueItem(UpdateQueueBase updateQueueItem) {
       var queueItem = (CustomerUpdateQueue)updateQueueItem;
 
-      if (_processedCustomerIds.Contains(queueItem.CustomerId)) { return Result.Success(); }
+      if (_processedIds.Contains(queueItem.CustomerId)) { return Result.Success(); }
 
-      var evolutionCustomerResult = _evolutionCustomerRepository.GetCustomer(new CustomerDescriptor { CustomerId = queueItem.CustomerId });
+      try {
+        var evolutionCustomerResult = _evolutionCustomerRepository.Get(new CustomerDescriptor { CustomerId = queueItem.CustomerId });
 
-      if (evolutionCustomerResult.IsFailure) {
-        return Result.Failure($"Could not load customer with ID {queueItem.CustomerId} from Evolution. ({evolutionCustomerResult.Error})");
-      }
-
-      var evolutionCustomer = evolutionCustomerResult.Value;
-      var evolutionEmailAddress = $"{evolutionCustomer.GetUserField("ucARwcEmail") ?? ""}";
-
-      if (string.IsNullOrWhiteSpace(evolutionEmailAddress)) {
-        return Result.Failure($"Cannot process customer with ID {queueItem.CustomerId}. The customer does not have an email address in Wine Club E-mail field (ucARwcEmail)");
-      }
-
-      dynamic? customerMaster = null;
-
-      var localMappingResult = _customerMasterLocalMappingService.GetLocalId(queueItem.CustomerId);
-
-      if (localMappingResult.HasValue) { customerMaster = TryFindUsingLocalMapping(); }
-
-      customerMaster ??= TryFindUsingEvolutionEmailAddress();
-
-      var createCustomer = customerMaster == null;
-
-      var customerName = $"{evolutionCustomer.Description.Trim()}";
-      var customerNameFormatter = new CustomerNameFormatter(customerName);
-      var customerFirstName = customerNameFormatter.FirstName;
-      var customerLastName = customerNameFormatter.LastName;
-
-      string? ValueOrNull(string? value) {
-        return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
-      }
-
-      TelephoneNumber[]? TelephoneNumbersOrNull(string? telephone) {
-        if (string.IsNullOrWhiteSpace(telephone)) { return null; }
-        var phoneNumberUtil = PhoneNumbers.PhoneNumberUtil.GetInstance();
-        var p = phoneNumberUtil.Parse(telephone, "ZA");
-        var t = phoneNumberUtil.Format(p, PhoneNumbers.PhoneNumberFormat.NATIONAL);
-        if (t.Length < 10) { return null; }
-        return new TelephoneNumber[] { new TelephoneNumber { Phone = $"{t}" } };
-      }
-
-      if (createCustomer) {
-        var customerMasterResult = _apiClient.CreateCustomerWithAddress(new CreateCustomerRecord {
-          FirstName = $"{customerFirstName}",
-          LastName = $"{customerLastName}",
-          Address = ValueOrNull(evolutionCustomer.PhysicalAddress.Line1),
-          Address2 = ValueOrNull(evolutionCustomer.PhysicalAddress.Line2),
-          City = ValueOrNull(evolutionCustomer.PhysicalAddress.Line3),
-          StateCode = ValueOrNull(evolutionCustomer.PhysicalAddress.Line4),
-          ZipCode = ValueOrNull(evolutionCustomer.PhysicalAddress.PostalCode),
-          Emails = new EmailAddress[] { new EmailAddress { Email = evolutionEmailAddress } },
-          Phones = TelephoneNumbersOrNull(evolutionCustomer.Telephone)
-        });
-
-        if (customerMasterResult.IsFailure) {
-          return Result.Failure($"Could not create customer with ID {queueItem.CustomerId} in Commerce7. ({customerMasterResult.Error})");
+        if (evolutionCustomerResult.IsFailure) {
+          return Result.Failure($"Could not load customer with ID {queueItem.CustomerId} from Evolution. ({evolutionCustomerResult.Error})");
         }
 
-        customerMaster = customerMasterResult.Value.CustomerMasters?.First();
+        var evolutionCustomer = evolutionCustomerResult.Value;
+        var evolutionEmailAddress = $"{evolutionCustomer.GetUserField("ucARwcEmail") ?? ""}";
 
-        //var customerMasterId = customerMaster.Id;
-        //_customerMasterLocalMappingService.StoreMapping(queueItem.CustomerId, customerMasterId);
-      }
-      else {
-        // update the customer
-      }
+        if (string.IsNullOrWhiteSpace(evolutionEmailAddress)) {
+          return Result.Failure($"Cannot process customer with ID {queueItem.CustomerId}. The customer does not have an email address in Wine Club E-mail field (ucARwcEmail)");
+        }
 
-      _processedCustomerIds.Add(queueItem.CustomerId);
+        dynamic? customerMaster = null;
 
-      if (customerMaster == null) {
-        Logger.LogWarning("Did not receive a customer response object from Commerce7 for queue ID: {queueId}", queueItem.Oid);
-        return Result.Success();
-      }
+        var localMappingResult = _customerMasterLocalMappingService.GetLocalId(queueItem.CustomerId);
 
-      _customerMasterLocalMappingService.StoreMapping(queueItem.CustomerId, Commerce7CustomerId.Parse($"{customerMaster!.id}"));
+        if (localMappingResult.HasValue) { customerMaster = TryFindUsingLocalMapping(); }
 
-      return Result.Success();
+        customerMaster ??= TryFindUsingEvolutionEmailAddress();
 
-      dynamic? TryFindUsingLocalMapping() {
-        var commerce7CustomerId = localMappingResult.Value;
-        var commerce7Customer = _apiClient.GetCustomerMasterById(commerce7CustomerId);
+        var createCustomer = customerMaster == null;
 
-        if (commerce7Customer.IsFailure) {
-          if (commerce7Customer.Error.Contains("404")) {
-            _customerMasterLocalMappingService.DeleteMapping(queueItem.CustomerId);
-            return null;
+        var customerName = $"{evolutionCustomer.Description.Trim()}";
+        var customerNameFormatter = new CustomerNameFormatter(customerName);
+        var customerFirstName = customerNameFormatter.FirstName;
+        var customerLastName = customerNameFormatter.LastName;
+
+        string? ValueOrNull(string? value) {
+          return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+        }
+
+        TelephoneNumber[]? TelephoneNumbersOrNull(string? telephone) {
+          if (string.IsNullOrWhiteSpace(telephone)) { return null; }
+          var phoneNumberUtil = PhoneNumbers.PhoneNumberUtil.GetInstance();
+          var p = phoneNumberUtil.Parse(telephone, "ZA");
+          var t = phoneNumberUtil.Format(p, PhoneNumbers.PhoneNumberFormat.NATIONAL);
+          if (t.Length < 10) { return null; }
+          return new TelephoneNumber[] { new TelephoneNumber { Phone = $"{t}" } };
+        }
+
+        if (createCustomer) {
+          var customerMasterResult = _apiClient.CreateCustomerWithAddress(new CreateCustomerRecord {
+            FirstName = $"{customerFirstName}",
+            LastName = $"{customerLastName}",
+            Address = ValueOrNull(evolutionCustomer.PhysicalAddress.Line1),
+            Address2 = ValueOrNull(evolutionCustomer.PhysicalAddress.Line2),
+            City = ValueOrNull(evolutionCustomer.PhysicalAddress.Line3),
+            StateCode = ValueOrNull(evolutionCustomer.PhysicalAddress.Line4),
+            ZipCode = ValueOrNull(evolutionCustomer.PhysicalAddress.PostalCode),
+            Emails = new EmailAddress[] { new EmailAddress { Email = evolutionEmailAddress } },
+            Phones = TelephoneNumbersOrNull(evolutionCustomer.Telephone)
+          });
+
+          if (customerMasterResult.IsFailure) {
+            return Result.Failure($"Could not create customer with ID {queueItem.CustomerId} in Commerce7. ({customerMasterResult.Error})");
           }
 
-          throw new Exception(commerce7Customer.Error);
+          customerMaster = customerMasterResult.Value.CustomerMasters?.First();
+        }
+        else {
+          // update the customer
         }
 
-        dynamic? customer = commerce7Customer.Value.CustomerMasters?.FirstOrDefault();
+        if (customerMaster == null) {
+          Logger.LogWarning("Did not receive a customer response object from Commerce7 for queue ID: {queueId}", queueItem.Oid);
+          return Result.Success();
+        }
 
-        if (customer == null) { _customerMasterLocalMappingService.DeleteMapping(queueItem.CustomerId); }
+        _customerMasterLocalMappingService.StoreMapping(queueItem.CustomerId, Commerce7CustomerId.Parse($"{customerMaster!.id}"));
 
-        return customer;
+        return Result.Success();
+
+        dynamic? TryFindUsingLocalMapping() {
+          var commerce7CustomerId = localMappingResult.Value;
+          var commerce7Customer = _apiClient.GetCustomerMasterById(commerce7CustomerId);
+
+          if (commerce7Customer.IsFailure) {
+            if (commerce7Customer.Error.Contains("404")) {
+              _customerMasterLocalMappingService.DeleteMapping(queueItem.CustomerId);
+              return null;
+            }
+
+            throw new Exception(commerce7Customer.Error);
+          }
+
+          dynamic? customer = commerce7Customer.Value.CustomerMasters?.FirstOrDefault();
+
+          if (customer == null) { _customerMasterLocalMappingService.DeleteMapping(queueItem.CustomerId); }
+
+          return customer;
+        }
+
+        dynamic? TryFindUsingEvolutionEmailAddress() {
+          if (string.IsNullOrWhiteSpace(evolutionEmailAddress)) { return null; }
+          var commerce7Customer = _apiClient.GetCustomerMasterByEmail(evolutionEmailAddress);
+          return commerce7Customer.IsFailure ? throw new Exception(commerce7Customer.Error) : commerce7Customer.Value.CustomerMasters?.FirstOrDefault();
+        }
       }
-
-      dynamic? TryFindUsingEvolutionEmailAddress() {
-        if (string.IsNullOrWhiteSpace(evolutionEmailAddress)) { return null; }
-        var commerce7Customer = _apiClient.GetCustomerMasterByEmail(evolutionEmailAddress);
-        return commerce7Customer.IsFailure ? throw new Exception(commerce7Customer.Error) : commerce7Customer.Value.CustomerMasters?.FirstOrDefault();
+      finally {
+        _processedIds.Add(queueItem.CustomerId);
       }
     }
   }
