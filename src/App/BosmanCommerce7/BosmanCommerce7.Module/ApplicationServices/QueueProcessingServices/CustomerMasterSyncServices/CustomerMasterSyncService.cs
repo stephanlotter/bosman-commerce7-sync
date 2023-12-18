@@ -83,47 +83,19 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
         }
 
         dynamic? customerMaster = null;
-
         var localMappingResult = _customerMasterLocalMappingService.GetLocalId(queueItem.CustomerId);
 
         if (localMappingResult.HasValue) { customerMaster = TryFindUsingLocalMapping(); }
 
         customerMaster ??= TryFindUsingEvolutionEmailAddress();
-
         var mustCreateCustomer = customerMaster == null;
-
         var customerName = $"{evolutionCustomer.Description.Trim()}";
         var customerNameFormatter = new CustomerNameFormatter(customerName);
         var customerFirstName = customerNameFormatter.FirstName;
         var customerLastName = customerNameFormatter.LastName;
 
-        string? ValueOrNull(string? value) {
-          return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
-        }
-
-        Commerce7CustomerId commerce7CustomerId(dynamic? c) => c != null ? Commerce7CustomerId.Parse($"{c!.id}") : Commerce7CustomerId.Empty;
-
-        TelephoneNumber[]? TelephoneNumbersOrNull(string? telephone) {
-          if (string.IsNullOrWhiteSpace(telephone)) { return null; }
-          var phoneNumberUtil = PhoneNumbers.PhoneNumberUtil.GetInstance();
-          var p = phoneNumberUtil.Parse(telephone, "ZA");
-          var t = phoneNumberUtil.Format(p, PhoneNumbers.PhoneNumberFormat.NATIONAL);
-          if (t.Length < 10) { return null; }
-          return new TelephoneNumber[] { new TelephoneNumber { Phone = $"{t}" } };
-        }
-
         if (mustCreateCustomer) {
-          var customerMasterResult = _apiClient.CreateCustomerWithAddress(new CreateCustomerRecord {
-            FirstName = $"{customerFirstName}",
-            LastName = $"{customerLastName}",
-            Address = ValueOrNull(evolutionCustomer.PhysicalAddress.Line1),
-            Address2 = ValueOrNull(evolutionCustomer.PhysicalAddress.Line2),
-            City = ValueOrNull(evolutionCustomer.PhysicalAddress.Line3),
-            StateCode = ValueOrNull(evolutionCustomer.PhysicalAddress.Line4),
-            ZipCode = ValueOrNull(evolutionCustomer.PhysicalAddress.PostalCode),
-            Emails = new EmailAddress[] { new EmailAddress { Email = evolutionEmailAddress } },
-            Phones = TelephoneNumbersOrNull(evolutionCustomer.Telephone)
-          });
+          var customerMasterResult = CreateCustomerWithAddress();
 
           if (customerMasterResult.IsFailure) {
             return Result.Failure($"Could not create customer with ID {queueItem.CustomerId} in Commerce7. ({customerMasterResult.Error})");
@@ -132,37 +104,10 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
           customerMaster = customerMasterResult.Value.Data?.First();
         }
         else {
-          var customerMasterResult = _apiClient.UpdateCustomer(new UpdateCustomerRecord {
-            Id = commerce7CustomerId(customerMaster),
-            FirstName = $"{customerFirstName}",
-            LastName = $"{customerLastName}",
-            Emails = new EmailAddress[] { new EmailAddress { Email = evolutionEmailAddress } },
-            Phones = TelephoneNumbersOrNull(evolutionCustomer.Telephone)
-          })
-          .Map(a => {
-            var customerDefaultAddressResult = _apiClient.GetCustomerDefaultAddress(commerce7CustomerId(customerMaster));
+          var customerUpdateResult = UpdateCustomer();
 
-            if (customerDefaultAddressResult.Value.DefaultAddress == null) {
-              return Result.Failure<CustomerAddressResponse>("Could not load customer default address from Commerce7.");
-            }
-            var customerDefaultAddressId = customerDefaultAddressResult.Value.DefaultAddress!.id;
-
-            var data = new UpdateCustomerAddressRecord {
-              Id = commerce7CustomerId(customerMaster),
-              AddressId = Commerce7CustomerId.Parse($"{customerDefaultAddressId}"),
-              Address = ValueOrNull(evolutionCustomer.PhysicalAddress.Line1),
-              Address2 = ValueOrNull(evolutionCustomer.PhysicalAddress.Line2),
-              City = ValueOrNull(evolutionCustomer.PhysicalAddress.Line3),
-              StateCode = ValueOrNull(evolutionCustomer.PhysicalAddress.Line4),
-              ZipCode = ValueOrNull(evolutionCustomer.PhysicalAddress.PostalCode),
-            };
-
-            return _apiClient.UpdateCustomerAddress(data);
-          })
-          ;
-
-          if (customerMasterResult.IsFailure) {
-            return Result.Failure($"Could not update customer with ID {queueItem.CustomerId} in Commerce7. ({customerMasterResult.Error})");
+          if (customerUpdateResult.IsFailure) {
+            return Result.Failure($"Could not update customer with ID {queueItem.CustomerId} in Commerce7. ({customerUpdateResult.Error})");
           }
         }
 
@@ -199,6 +144,66 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
           if (string.IsNullOrWhiteSpace(evolutionEmailAddress)) { return null; }
           var commerce7Customer = _apiClient.GetCustomerMasterByEmail(evolutionEmailAddress);
           return commerce7Customer.IsFailure ? throw new Exception(commerce7Customer.Error) : commerce7Customer.Value.Data?.FirstOrDefault();
+        }
+
+        string? ValueOrNull(string? value) {
+          return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+        }
+
+        Commerce7CustomerId commerce7CustomerId(dynamic? c) => c != null ? Commerce7CustomerId.Parse($"{c!.id}") : Commerce7CustomerId.Empty;
+
+        TelephoneNumber[]? TelephoneNumbersOrNull(string? telephone) {
+          if (string.IsNullOrWhiteSpace(telephone)) { return null; }
+          var phoneNumberUtil = PhoneNumbers.PhoneNumberUtil.GetInstance();
+          var p = phoneNumberUtil.Parse(telephone, "ZA");
+          var t = phoneNumberUtil.Format(p, PhoneNumbers.PhoneNumberFormat.NATIONAL);
+          if (t.Length < 10) { return null; }
+          return new TelephoneNumber[] { new TelephoneNumber { Phone = $"{t}" } };
+        }
+
+        Result<CustomerMasterResponse> CreateCustomerWithAddress() {
+          return _apiClient.CreateCustomerWithAddress(new CreateCustomerRecord {
+            FirstName = $"{customerFirstName}",
+            LastName = $"{customerLastName}",
+            Address = ValueOrNull(evolutionCustomer.PhysicalAddress.Line1),
+            Address2 = ValueOrNull(evolutionCustomer.PhysicalAddress.Line2),
+            City = ValueOrNull(evolutionCustomer.PhysicalAddress.Line3),
+            StateCode = ValueOrNull(evolutionCustomer.PhysicalAddress.Line4),
+            ZipCode = ValueOrNull(evolutionCustomer.PhysicalAddress.PostalCode),
+            Emails = new EmailAddress[] { new EmailAddress { Email = evolutionEmailAddress } },
+            Phones = TelephoneNumbersOrNull(evolutionCustomer.Telephone)
+          });
+        }
+
+        Result UpdateCustomer() {
+          return _apiClient.UpdateCustomer(new UpdateCustomerRecord {
+            Id = commerce7CustomerId(customerMaster),
+            FirstName = $"{customerFirstName}",
+            LastName = $"{customerLastName}",
+            Emails = new EmailAddress[] { new EmailAddress { Email = evolutionEmailAddress } },
+            Phones = TelephoneNumbersOrNull(evolutionCustomer.Telephone)
+          })
+          .Bind(a => {
+            var customerDefaultAddressResult = _apiClient.GetCustomerDefaultAddress(commerce7CustomerId(customerMaster));
+
+            if (customerDefaultAddressResult.Value.DefaultAddress == null) {
+              return Result.Failure<CustomerAddressResponse>("Could not load customer default address from Commerce7.");
+            }
+            var customerDefaultAddressId = customerDefaultAddressResult.Value.DefaultAddress!.id;
+
+            var data = new UpdateCustomerAddressRecord {
+              Id = commerce7CustomerId(customerMaster),
+              AddressId = Commerce7CustomerId.Parse($"{customerDefaultAddressId}"),
+              Address = ValueOrNull(evolutionCustomer.PhysicalAddress.Line1),
+              Address2 = ValueOrNull(evolutionCustomer.PhysicalAddress.Line2),
+              City = ValueOrNull(evolutionCustomer.PhysicalAddress.Line3),
+              StateCode = ValueOrNull(evolutionCustomer.PhysicalAddress.Line4),
+              ZipCode = ValueOrNull(evolutionCustomer.PhysicalAddress.PostalCode),
+            };
+
+            return _apiClient.UpdateCustomerAddress(data);
+          })
+          ;
         }
       }
       finally {
