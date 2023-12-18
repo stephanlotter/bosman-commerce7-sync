@@ -38,7 +38,6 @@
     <PackageReference Include="Bogus" Version="34.0.2" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ApplicationServices\QueueProcessingServices\InventoryStockLevelsSyncServices\RestApi\" />
     <Folder Include="Extensions\DataAccess\" />
   </ItemGroup>
   <ItemGroup>

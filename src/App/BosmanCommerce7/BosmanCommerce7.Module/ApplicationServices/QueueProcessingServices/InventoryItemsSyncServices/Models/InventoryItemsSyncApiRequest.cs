@@ -13,7 +13,7 @@ using RestSharp;
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.Models {
   public record InventoryItemsSyncApiRequest : ApiRequestBase {
     public InventoryItemsSyncApiRequest(DateTime orderSubmittedDate) {
-      Resource = $"/order?orderSubmittedDate=gt:{orderSubmittedDate:yyyy-MM-dd}";
+      Resource = $"";
       Method = Method.Get;
       IsPagedResponse = true;
     }

@@ -15,7 +15,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
   public record CustomerAddressUpdateApiRequest : ApiRequestBase {
     private readonly UpdateCustomerAddressRecord _updateCustomerAddressRecord;
 
-    override public object? Data => _updateCustomerAddressRecord;
+    public override object? Data => _updateCustomerAddressRecord;
 
     public CustomerAddressUpdateApiRequest(UpdateCustomerAddressRecord updateCustomerAddressRecord) {
       Resource = $"/customer/{updateCustomerAddressRecord.Id}/address/{updateCustomerAddressRecord.AddressId}";

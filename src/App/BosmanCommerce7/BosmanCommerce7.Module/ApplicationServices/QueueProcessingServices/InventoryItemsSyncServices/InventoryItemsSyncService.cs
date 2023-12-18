@@ -23,7 +23,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
   public class InventoryItemsSyncService : SyncMasterDataServiceBase, IInventoryItemsSyncService {
     private readonly InventoryItemsSyncJobOptions _inventorySyncJobOptions;
     private readonly IInventoryItemsLocalMappingService _inventoryLocalMappingService;
-    private readonly IInventoryItemsApiClient _apiClient;
+    private readonly IInventoryItemApiClient _apiClient;
     private readonly IEvolutionInventoryItemRepository _evolutionInventoryItemRepository;
 
     private List<EvolutionInventoryItemId> _processedIds = new();
@@ -31,7 +31,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
     public InventoryItemsSyncService(ILogger<InventoryItemsSyncService> logger,
         InventoryItemsSyncJobOptions inventorySyncJobOptions,
         IInventoryItemsLocalMappingService inventoryLocalMappingService,
-        IInventoryItemsApiClient apiClient,
+        IInventoryItemApiClient apiClient,
         IEvolutionInventoryItemRepository evolutionInventoryRepository,
         ILocalObjectSpaceEvolutionSdkProvider localObjectSpaceEvolutionSdkProvider
     ) : base(logger, localObjectSpaceEvolutionSdkProvider) {

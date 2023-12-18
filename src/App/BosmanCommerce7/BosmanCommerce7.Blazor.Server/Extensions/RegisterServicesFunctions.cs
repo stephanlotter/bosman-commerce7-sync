@@ -15,6 +15,7 @@ using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.RestApi;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.RestApi;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryStockLevelsSyncServices.RestApi;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventorySyncServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.RestApiClients;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices;
@@ -39,6 +40,7 @@ namespace BosmanCommerce7.Blazor.Server.Extensions
 
       RegisterCustomerMasterSyncServices(services);
       RegisterInventoryMasterSyncServices(services);
+      RegisterInventoryLevelsSyncServices(services);
 
       RegisterSalesOrderSyncServices(services);
       RegisterSalesOrderPostServices(services);
@@ -55,7 +57,8 @@ namespace BosmanCommerce7.Blazor.Server.Extensions
 
       services.AddTransient<ICustomerMasterApiClient, CustomerMasterApiClient>();
       
-      services.AddTransient<IInventoryItemsApiClient, InventoryItemsApiClient>();
+      services.AddTransient<IInventoryItemApiClient, InventoryItemApiClient>();
+      services.AddTransient<IInventoryLevelsApiClient, InventoryLevelsApiClient>();
 
       services.AddTransient<ISalesOrdersApiClient, SalesOrdersApiClient>();
     }
@@ -91,6 +94,12 @@ namespace BosmanCommerce7.Blazor.Server.Extensions
       services.AddTransient<IInventoryItemsSyncQueueService, InventoryItemsSyncQueueService>();
       services.AddTransient<IInventoryItemsSyncService, InventoryItemsSyncService>();
       services.AddTransient<IInventoryItemsLocalMappingService, InventoryItemsLocalMappingService>();
+    }
+
+    private static void RegisterInventoryLevelsSyncServices(IServiceCollection services) {
+      //services.AddTransient<IInventoryItemsSyncQueueService, InventoryItemsSyncQueueService>();
+      //services.AddTransient<IInventoryItemsSyncService, InventoryItemsSyncService>();
+      //services.AddTransient<IInventoryItemsLocalMappingService, InventoryItemsLocalMappingService>();
     }
 
     private static void RegisterSalesOrderSyncServices(IServiceCollection services) {

@@ -8,11 +8,16 @@
  */
 
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.Models;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.RestApiClients;
 using CSharpFunctionalExtensions;
+using Microsoft.Extensions.Logging;
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.RestApi {
 
-  public class InventoryItemsApiClient : IInventoryItemsApiClient {
+  public class InventoryItemApiClient : ApiClientBase, IInventoryItemApiClient {
+
+    public InventoryItemApiClient(ILogger<InventoryItemApiClient> logger, IApiClientService apiClientService) : base(logger, apiClientService) {
+    }
 
     public Result<InventoryItemsResponse> CreateInventoryItem(CreateInventoryItemsRecord inventoryItemsRecord) {
       throw new NotImplementedException();
@@ -23,6 +28,10 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
     }
 
     public Result<InventoryItemsResponse> GetInventoryItemBySku(string sku) {
+      throw new NotImplementedException();
+    }
+
+    public Result<InventoryLocationsResponse> GetLocations() {
       throw new NotImplementedException();
     }
   }

@@ -8,9 +8,5 @@
  */
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.Models {
-  public abstract record InventoryItemsRecordBase {
-    public required string Sku { get; init; }
-
-    public required string Description { get; init; }
-  }
+  public record CreateInventoryItemsRecord : InventoryItemsRecordBase { }
 }
