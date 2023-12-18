@@ -8,7 +8,6 @@
  */
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.RestApi {
-  public record CustomerMasterResponse {
-    public dynamic[]? CustomerMasters { get; init; }
+  public record CustomerMasterResponse : ResponseBase {
   }
 }

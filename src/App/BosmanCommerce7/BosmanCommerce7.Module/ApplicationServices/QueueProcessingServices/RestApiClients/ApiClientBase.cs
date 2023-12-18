@@ -25,6 +25,42 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Res
       _apiClientService = apiClientService;
     }
 
+    protected Result<ResponseBase> SendSingleResultRequest(ApiRequestBase apiRequest, Func<ResponseBase> apiResponseFactory) {
+      ResponseBase apiResponse = apiResponseFactory();
+      var list = new List<dynamic>();
+
+      return SendRequest(apiRequest, data => {
+        if (data == null) {
+          return (Result.Failure<ResponseBase>("Response body not valid JSON."), ApiRequestPaginationStatus.Completed);
+        }
+
+        list.Add(data);
+
+        apiResponse = apiResponse with { Data = list.ToArray() };
+
+        return (Result.Success(apiResponse), ApiRequestPaginationStatus.Completed);
+      });
+    }
+
+    protected Result<ResponseBase> SendListResultRequest(ApiRequestBase apiRequest, Func<ResponseBase> apiResponseFactory, string responseListPropertyName) {
+      ResponseBase apiResponse = apiResponseFactory();
+      var list = new List<dynamic>();
+
+      return SendRequest(apiRequest, data => {
+        if (data == null) {
+          return (Result.Failure<ResponseBase>("Response body not valid JSON."), ApiRequestPaginationStatus.Completed);
+        }
+
+        var totalRecords = (int)data!.total;
+
+        foreach (var order in data![responseListPropertyName]) { list.Add(order); }
+
+        apiResponse = apiResponse with { Data = list.ToArray() };
+
+        return (Result.Success(apiResponse), list.Count < totalRecords ? ApiRequestPaginationStatus.MorePages : ApiRequestPaginationStatus.Completed);
+      });
+    }
+
     protected Result<T> SendRequest<T>(ApiRequestBase apiRequest, Func<dynamic, (Result<T> result, ApiRequestPaginationStatus paginationStatus)> onSuccess, Action<RestRequest>? configRestRequest = null) {
       while (true) {
         if (apiRequest.IsPagedResponse) {

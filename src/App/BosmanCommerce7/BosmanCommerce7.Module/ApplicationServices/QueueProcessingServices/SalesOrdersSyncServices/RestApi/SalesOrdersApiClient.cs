@@ -33,7 +33,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
         foreach (var order in data!.orders) { list.Add(order); }
 
-        apiResponse = apiResponse with { SalesOrders = list.ToArray() };
+        apiResponse = apiResponse with { Data = list.ToArray() };
 
         return (Result.Success(apiResponse), list.Count < totalRecords ? ApiRequestPaginationStatus.MorePages : ApiRequestPaginationStatus.Completed);
       });

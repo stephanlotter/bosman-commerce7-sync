@@ -21,6 +21,11 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
 
     Result<CustomerMasterResponse> CreateCustomerWithAddress(CreateCustomerRecord customerRecord);
 
-    Result<CustomerMasterResponse> UpdateCustomerWithAddress(UpdateCustomerRecord customerRecord);
+    Result<CustomerMasterResponse> UpdateCustomer(UpdateCustomerRecord customerRecord);
+
+    Result<CustomerAddressResponse> GetCustomerDefaultAddress(Commerce7CustomerId commerce7CustomerId);
+
+    Result<CustomerAddressResponse> UpdateCustomerAddress(UpdateCustomerAddressRecord customerAddressRecord);
+
   }
 }

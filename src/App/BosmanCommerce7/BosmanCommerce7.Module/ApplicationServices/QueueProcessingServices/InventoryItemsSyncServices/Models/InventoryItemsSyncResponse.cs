@@ -8,7 +8,6 @@
  */
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.Models {
-  public record InventoryItemsSyncResponse {
-    //public dynamic[]? SalesOrders { get; init; }
+  public record InventoryItemsSyncResponse : ResponseBase {
   }
 }

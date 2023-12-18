@@ -72,7 +72,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
         var lastOrderDate = DateTime.MinValue;
 
-        if (response.SalesOrders == null || response.SalesOrders!.Length == 0) {
+        if (response.Data == null || response.Data!.Length == 0) {
           Logger.LogInformation("No sales orders found since: {orderSubmittedDate}", $"{orderSubmittedDate:yyyy-MM-dd HH:mm:ss}");
           return Result.Success(BuildResult("No new orders"));
         }
@@ -91,7 +91,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
         var channelsToProcess = _salesOrdersSyncJobOptions.ChannelsToProcess?.Select(c => c.ToLower()).ToList();
 
         var result = LocalObjectSpaceEvolutionSdkProvider.WrapInObjectSpaceTransaction(objectSpace => {
-          foreach (dynamic salesOrder in response.SalesOrders!) {
+          foreach (dynamic salesOrder in response.Data!) {
             if (!_processedOrders.Contains($"{salesOrder.id}")) {
               Logger.LogInformation("Sales order received: {orderNumber}", $"{salesOrder.orderNumber}");
             }

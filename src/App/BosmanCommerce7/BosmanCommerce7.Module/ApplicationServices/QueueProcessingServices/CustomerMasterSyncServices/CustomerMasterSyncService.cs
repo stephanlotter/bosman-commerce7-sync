@@ -63,7 +63,10 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
     protected override Result ProcessQueueItem(UpdateQueueBase updateQueueItem) {
       var queueItem = (CustomerUpdateQueue)updateQueueItem;
 
-      if (_processedIds.Contains(queueItem.CustomerId)) { return Result.Success(); }
+      if (_processedIds.Contains(queueItem.CustomerId)) {
+        queueItem.Status = QueueProcessingStatus.Skipped;
+        return Result.Success();
+      }
 
       try {
         var evolutionCustomerResult = _evolutionCustomerRepository.Get(new CustomerDescriptor { CustomerId = queueItem.CustomerId });
@@ -87,7 +90,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
 
         customerMaster ??= TryFindUsingEvolutionEmailAddress();
 
-        var createCustomer = customerMaster == null;
+        var mustCreateCustomer = customerMaster == null;
 
         var customerName = $"{evolutionCustomer.Description.Trim()}";
         var customerNameFormatter = new CustomerNameFormatter(customerName);
@@ -98,6 +101,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
           return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
         }
 
+        Commerce7CustomerId commerce7CustomerId(dynamic? c) => c != null ? Commerce7CustomerId.Parse($"{c!.id}") : Commerce7CustomerId.Empty;
+
         TelephoneNumber[]? TelephoneNumbersOrNull(string? telephone) {
           if (string.IsNullOrWhiteSpace(telephone)) { return null; }
           var phoneNumberUtil = PhoneNumbers.PhoneNumberUtil.GetInstance();
@@ -107,7 +112,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
           return new TelephoneNumber[] { new TelephoneNumber { Phone = $"{t}" } };
         }
 
-        if (createCustomer) {
+        if (mustCreateCustomer) {
           var customerMasterResult = _apiClient.CreateCustomerWithAddress(new CreateCustomerRecord {
             FirstName = $"{customerFirstName}",
             LastName = $"{customerLastName}",
@@ -124,26 +129,40 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
             return Result.Failure($"Could not create customer with ID {queueItem.CustomerId} in Commerce7. ({customerMasterResult.Error})");
           }
 
-          customerMaster = customerMasterResult.Value.CustomerMasters?.First();
+          customerMaster = customerMasterResult.Value.Data?.First();
         }
         else {
-          var customerMasterResult = _apiClient.UpdateCustomerWithAddress(new UpdateCustomerRecord {
-            Id = Commerce7CustomerId.Parse($"{customerMaster!.id}"),
+          var customerMasterResult = _apiClient.UpdateCustomer(new UpdateCustomerRecord {
+            Id = commerce7CustomerId(customerMaster),
             FirstName = $"{customerFirstName}",
             LastName = $"{customerLastName}",
-            Address = ValueOrNull(evolutionCustomer.PhysicalAddress.Line1),
-            Address2 = ValueOrNull(evolutionCustomer.PhysicalAddress.Line2),
-            City = ValueOrNull(evolutionCustomer.PhysicalAddress.Line3),
-            StateCode = ValueOrNull(evolutionCustomer.PhysicalAddress.Line4),
-            ZipCode = ValueOrNull(evolutionCustomer.PhysicalAddress.PostalCode),
             Emails = new EmailAddress[] { new EmailAddress { Email = evolutionEmailAddress } },
             Phones = TelephoneNumbersOrNull(evolutionCustomer.Telephone)
-          });
+          })
+          .Map(a => {
+            var customerDefaultAddressResult = _apiClient.GetCustomerDefaultAddress(commerce7CustomerId(customerMaster));
 
-          // TODO: This update needs to be split in two. One for the customer details and one for the address details.
+            if (customerDefaultAddressResult.Value.DefaultAddress == null) {
+              return Result.Failure<CustomerAddressResponse>("Could not load customer default address from Commerce7.");
+            }
+            var customerDefaultAddressId = customerDefaultAddressResult.Value.DefaultAddress!.Id;
+
+            var data = new UpdateCustomerAddressRecord {
+              Id = commerce7CustomerId(customerMaster),
+              AddressId = Commerce7CustomerId.Parse($"{customerDefaultAddressId}"),
+              Address = ValueOrNull(evolutionCustomer.PhysicalAddress.Line1),
+              Address2 = ValueOrNull(evolutionCustomer.PhysicalAddress.Line2),
+              City = ValueOrNull(evolutionCustomer.PhysicalAddress.Line3),
+              StateCode = ValueOrNull(evolutionCustomer.PhysicalAddress.Line4),
+              ZipCode = ValueOrNull(evolutionCustomer.PhysicalAddress.PostalCode),
+            };
+
+            return _apiClient.UpdateCustomerAddress(data);
+          })
+          ;
 
           if (customerMasterResult.IsFailure) {
-            return Result.Failure($"Could not create customer with ID {queueItem.CustomerId} in Commerce7. ({customerMasterResult.Error})");
+            return Result.Failure($"Could not update customer with ID {queueItem.CustomerId} in Commerce7. ({customerMasterResult.Error})");
           }
         }
 
@@ -152,7 +171,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
           return Result.Success();
         }
 
-        _customerMasterLocalMappingService.StoreMapping(queueItem.CustomerId, Commerce7CustomerId.Parse($"{customerMaster!.id}"));
+        _customerMasterLocalMappingService.StoreMapping(queueItem.CustomerId, commerce7CustomerId(customerMaster));
 
         return Result.Success();
 
@@ -169,7 +188,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
             throw new Exception(commerce7Customer.Error);
           }
 
-          dynamic? customer = commerce7Customer.Value.CustomerMasters?.FirstOrDefault();
+          dynamic? customer = commerce7Customer.Value.Data?.FirstOrDefault();
 
           if (customer == null) { _customerMasterLocalMappingService.DeleteMapping(queueItem.CustomerId); }
 
@@ -179,7 +198,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
         dynamic? TryFindUsingEvolutionEmailAddress() {
           if (string.IsNullOrWhiteSpace(evolutionEmailAddress)) { return null; }
           var commerce7Customer = _apiClient.GetCustomerMasterByEmail(evolutionEmailAddress);
-          return commerce7Customer.IsFailure ? throw new Exception(commerce7Customer.Error) : commerce7Customer.Value.CustomerMasters?.FirstOrDefault();
+          return commerce7Customer.IsFailure ? throw new Exception(commerce7Customer.Error) : commerce7Customer.Value.Data?.FirstOrDefault();
         }
       }
       finally {

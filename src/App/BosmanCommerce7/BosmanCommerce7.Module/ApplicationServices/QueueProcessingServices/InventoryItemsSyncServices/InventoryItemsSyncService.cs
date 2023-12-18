@@ -115,7 +115,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
             throw new Exception(commerce7Inventory.Error);
           }
 
-          dynamic? inventory = commerce7Inventory.Value.InventoryItems?.FirstOrDefault();
+          dynamic? inventory = commerce7Inventory.Value.Data?.FirstOrDefault();
 
           if (inventory == null) { _inventoryLocalMappingService.DeleteMapping(queueItem.InventoryItemId); }
 
@@ -125,7 +125,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
         dynamic? TryFindUsingEvolutionInventoryName() {
           if (string.IsNullOrWhiteSpace(evolutionInventoryItemSku)) { return null; }
           var commerce7Inventory = _apiClient.GetInventoryItemBySku(evolutionInventoryItemSku);
-          return commerce7Inventory.IsFailure ? throw new Exception(commerce7Inventory.Error) : commerce7Inventory.Value.InventoryItems?.FirstOrDefault();
+          return commerce7Inventory.IsFailure ? throw new Exception(commerce7Inventory.Error) : commerce7Inventory.Value.Data?.FirstOrDefault();
         }
       }
       finally {

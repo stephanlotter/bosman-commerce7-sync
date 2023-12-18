@@ -7,8 +7,7 @@
  *
  */
 
-namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.RestApi {
-  public record InventoryItemsResponse {
-    public dynamic[]? InventoryItems { get; init; }
+namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.RestApi {
+  public record InventoryItemsResponse : ResponseBase {
   }
 }

@@ -9,14 +9,12 @@
 
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.Models;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.RestApiClients;
-using BosmanCommerce7.Module.Models.RestApi;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 
-namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.RestApi
-{
+namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.RestApi {
 
-    public class CustomerMasterApiClient : ApiClientBase, ICustomerMasterApiClient {
+  public class CustomerMasterApiClient : ApiClientBase, ICustomerMasterApiClient {
 
     public CustomerMasterApiClient(ILogger<CustomerMasterApiClient> logger, IApiClientService apiClientService) : base(logger, apiClientService) {
     }
@@ -34,39 +32,34 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
 
         foreach (var customer in data!.customers) { list.Add(customer); }
 
-        apiResponse = apiResponse with { CustomerMasters = list.ToArray() };
+        apiResponse = apiResponse with { Data = list.ToArray() };
 
         return (Result.Success(apiResponse), list.Count < totalRecords ? ApiRequestPaginationStatus.MorePages : ApiRequestPaginationStatus.Completed);
       });
     }
 
+    private ResponseBase NewCustomerMasterResponse() => new CustomerMasterResponse();
+
+    private ResponseBase NewCustomerAddressResponse() => new CustomerAddressResponse();
+
     public Result<CustomerMasterResponse> GetCustomerMasterById(Commerce7CustomerId commerce7CustomerId) {
-      return SendSingleResultRequest(new CustomerMasterGetApiRequest(commerce7CustomerId));
+      return SendSingleResultRequest(new CustomerMasterGetApiRequest(commerce7CustomerId), NewCustomerMasterResponse).Map(r => (CustomerMasterResponse)r);
     }
 
     public Result<CustomerMasterResponse> CreateCustomerWithAddress(CreateCustomerRecord customerRecord) {
-      return SendSingleResultRequest(new CustomerMasterCreateApiRequest(customerRecord));
+      return SendSingleResultRequest(new CustomerMasterCreateApiRequest(customerRecord), NewCustomerMasterResponse).Map(r => (CustomerMasterResponse)r);
     }
 
-    public Result<CustomerMasterResponse> UpdateCustomerWithAddress(UpdateCustomerRecord customerRecord) {
-      return SendSingleResultRequest(new CustomerMasterUpdateApiRequest(customerRecord));
+    public Result<CustomerMasterResponse> UpdateCustomer(UpdateCustomerRecord customerRecord) {
+      return SendSingleResultRequest(new CustomerMasterUpdateApiRequest(customerRecord), NewCustomerMasterResponse).Map(r => (CustomerMasterResponse)r);
     }
 
-    public Result<CustomerMasterResponse> SendSingleResultRequest(ApiRequestBase apiRequest) {
-      CustomerMasterResponse apiResponse = new();
-      var list = new List<dynamic>();
+    public Result<CustomerAddressResponse> GetCustomerDefaultAddress(Commerce7CustomerId commerce7CustomerId) {
+      return SendListResultRequest(new CustomerAddressGetApiRequest(commerce7CustomerId), NewCustomerAddressResponse, "customerAddresses").Map(r => (CustomerAddressResponse)r);
+    }
 
-      return SendRequest(apiRequest, data => {
-        if (data == null) {
-          return (Result.Failure<CustomerMasterResponse>("Response body not valid JSON."), ApiRequestPaginationStatus.Completed);
-        }
-
-        list.Add(data);
-
-        apiResponse = apiResponse with { CustomerMasters = list.ToArray() };
-
-        return (Result.Success(apiResponse), ApiRequestPaginationStatus.Completed);
-      });
+    public Result<CustomerAddressResponse> UpdateCustomerAddress(UpdateCustomerAddressRecord customerAddressRecord) {
+      return SendSingleResultRequest(new CustomerAddressUpdateApiRequest(customerAddressRecord), NewCustomerAddressResponse).Map(r => (CustomerAddressResponse)r);
     }
   }
 }

@@ -11,9 +11,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
   public abstract record CustomerRecordBase {
     public string? Honorific { get; init; }
 
-    public required string FirstName { get; init; }
+    public string? FirstName { get; init; }
 
-    public required string LastName { get; init; }
+    public string? LastName { get; init; }
 
     public string? Address { get; init; }
 
@@ -27,16 +27,16 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
 
     public string CountryCode { get; init; } = "ZA";
 
-    public EmailAddress[] Emails { get; init; }
+    public EmailAddress[]? Emails { get; init; }
 
     public TelephoneNumber[]? Phones { get; init; }
   }
 
   public record EmailAddress {
-    public string Email { get; init; }
+    public required string Email { get; init; }
   }
 
   public record TelephoneNumber {
-    public string Phone { get; init; }
+    public required string Phone { get; init; }
   }
 }
