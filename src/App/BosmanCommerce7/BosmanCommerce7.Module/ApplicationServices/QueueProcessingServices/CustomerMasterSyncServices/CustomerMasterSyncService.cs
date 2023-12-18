@@ -145,7 +145,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
             if (customerDefaultAddressResult.Value.DefaultAddress == null) {
               return Result.Failure<CustomerAddressResponse>("Could not load customer default address from Commerce7.");
             }
-            var customerDefaultAddressId = customerDefaultAddressResult.Value.DefaultAddress!.Id;
+            var customerDefaultAddressId = customerDefaultAddressResult.Value.DefaultAddress!.id;
 
             var data = new UpdateCustomerAddressRecord {
               Id = commerce7CustomerId(customerMaster),

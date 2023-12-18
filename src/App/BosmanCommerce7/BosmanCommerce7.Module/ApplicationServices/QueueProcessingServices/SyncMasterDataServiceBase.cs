@@ -116,9 +116,13 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices {
         }
       }
       else {
+        var s = queueItem.Status;
         queueItem.ResetPostingStatus();
-        if (queueItem.Status != QueueProcessingStatus.Skipped) {
+        if (s != QueueProcessingStatus.Skipped) {
           queueItem.Status = QueueProcessingStatus.Processed;
+        }
+        else {
+          queueItem.Status = s;
         }
       }
     }
