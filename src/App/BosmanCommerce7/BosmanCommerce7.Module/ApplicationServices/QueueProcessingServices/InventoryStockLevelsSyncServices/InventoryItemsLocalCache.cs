@@ -11,7 +11,7 @@ using BosmanCommerce7.Module.ApplicationServices.AppDataServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.Models;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.RestApi;
 using CSharpFunctionalExtensions;
-using DevExpress.DataAccess.Native.Json;
+using CSharpFunctionalExtensions.ValueTasks;
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventorySyncServices {
 
@@ -19,13 +19,22 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
     private readonly IInventoryItemApiClient _inventoryItemApiClient;
     private readonly IAppDataFileManager _appDataFileManager;
 
+    private const string folderName = "ProductCache";
+    private const string fileName = "products.json";
+
     public InventoryItemsLocalCache(IInventoryItemApiClient inventoryItemApiClient, IAppDataFileManager appDataFileManager) {
       _inventoryItemApiClient = inventoryItemApiClient;
       _appDataFileManager = appDataFileManager;
     }
 
     public Result<ProductRecord> GetProduct(string sku) {
-      throw new NotImplementedException();
+      return _appDataFileManager
+        .LoadJson<ProductRecord[]>(folderName, fileName)
+        .Bind(a => {
+          var d = a?.FirstOrDefault(x => x.Variants?.Any(y => y.Sku == sku) ?? false);
+          return d != null ? Result.Success(d) : Result.Failure<ProductRecord>($"Product {sku} not found in cache.");
+        })
+        ;
     }
 
     public Result UpdateLocalCache() {
@@ -34,7 +43,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
            return MapProductsToProductRecords(x);
          })
          .Bind(y => {
-           _appDataFileManager.StoreJson("ProductCache", "products.json", y);
+           _appDataFileManager.StoreJson(folderName, fileName, y);
            return Result.Success();
          });
     }
