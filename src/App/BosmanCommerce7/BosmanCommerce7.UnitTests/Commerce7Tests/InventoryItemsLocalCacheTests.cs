@@ -7,10 +7,8 @@
  *
  */
 
-using BosmanCommerce7.Module.ApplicationServices.AppDataServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.RestApi;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventorySyncServices;
-using BosmanCommerce7.Module.Models;
 
 namespace BosmanCommerce7.UnitTests.Commerce7Tests {
 
@@ -22,8 +20,9 @@ namespace BosmanCommerce7.UnitTests.Commerce7Tests {
 
       var sut = new InventoryItemsLocalCache(apiClient, NewAppDataFileManager());
 
+      var result = sut.UpdateLocalCache();
 
-
+      result.IsSuccess.Should().BeTrue();
     }
   }
 }

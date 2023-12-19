@@ -11,6 +11,7 @@ using BosmanCommerce7.Module.ApplicationServices.AppDataServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.Models;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.RestApi;
 using CSharpFunctionalExtensions;
+using DevExpress.DataAccess.Native.Json;
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventorySyncServices {
 
@@ -39,18 +40,27 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
     }
 
     private Result<ProductRecord[]> MapProductsToProductRecords(InventoryItemsSyncServices.RestApi.InventoryItemsResponse value) {
-      var products = value.Data?.FirstOrDefault() ?? null;
+      var products = value.Data ?? null;
 
-      if (products == null || products?.products == null || !products!.products.Any()) { return Result.Failure<ProductRecord[]>("No data"); }
+      if (products == null || products == null || products!.Length == 0) { return Result.Failure<ProductRecord[]>("No data"); }
 
       var list = new List<ProductRecord>();
 
-      foreach (var product in products!.products!) {
+      bool HasElements(dynamic? v) {
+        try {
+          return v is not null && v.Count > 0;
+        }
+        catch {
+          return false;
+        }
+      }
+
+      foreach (var product in products!) {
         var productRecord = new ProductRecord {
           Id = Commerce7InventoryId.Parse($"{product.id}"),
         };
 
-        if (product.variants!.Any()) {
+        if (HasElements(product.variants)) {
           var productVariantRecords = new List<ProductVariantRecord>();
 
           foreach (var variant in product.variants) {
@@ -59,7 +69,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
               Sku = variant.sku,
             };
 
-            if (variant.inventory!.Any()) {
+            if (HasElements(variant.inventory)) {
               var productVariantInventoryRecords = new List<ProductVariantInventoryRecord>();
 
               foreach (var variantInventory in variant.inventory) {
