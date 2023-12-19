@@ -20,22 +20,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
     }
 
     public Result<CustomerMasterResponse> GetCustomerMasterByEmail(string emailAddress) {
-      CustomerMasterResponse apiResponse = new();
-      var list = new List<dynamic>();
-
-      return SendRequest(new CustomerMasterGetApiRequest(emailAddress), data => {
-        if (data == null) {
-          return (Result.Failure<CustomerMasterResponse>("Response body not valid JSON."), ApiRequestPaginationStatus.Completed);
-        }
-
-        var totalRecords = (int)data!.total;
-
-        foreach (var customer in data!.customers) { list.Add(customer); }
-
-        apiResponse = apiResponse with { Data = list.ToArray() };
-
-        return (Result.Success(apiResponse), list.Count < totalRecords ? ApiRequestPaginationStatus.MorePages : ApiRequestPaginationStatus.Completed);
-      });
+      return SendListResultRequest(new CustomerMasterGetApiRequest(emailAddress), () => new CustomerMasterResponse(), "customers").Map(r => (CustomerMasterResponse)r);
     }
 
     private ResponseBase NewCustomerMasterResponse() => new CustomerMasterResponse();

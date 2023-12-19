@@ -20,6 +20,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
 
     Result<InventoryItemsResponse> GetInventoryItemById(Commerce7InventoryId commerce7InventoryId);
 
+    Result<InventoryItemsResponse> GetAllInventoryItems();
+
     Result<InventoryLocationsResponse> GetLocations();
 
   }

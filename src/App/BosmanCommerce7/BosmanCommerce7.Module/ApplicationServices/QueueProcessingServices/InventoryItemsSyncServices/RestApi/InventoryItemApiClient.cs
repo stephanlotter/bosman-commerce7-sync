@@ -27,6 +27,10 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
       throw new NotImplementedException();
     }
 
+    public Result<InventoryItemsResponse> GetAllInventoryItems() {
+      return SendListResultRequest(new InventoryItemsGetAllApiRequest(), () => new InventoryItemsResponse(), "products").Map(r => (InventoryItemsResponse)r);
+    }
+
     public Result<InventoryItemsResponse> GetInventoryItemBySku(string sku) {
       throw new NotImplementedException();
     }

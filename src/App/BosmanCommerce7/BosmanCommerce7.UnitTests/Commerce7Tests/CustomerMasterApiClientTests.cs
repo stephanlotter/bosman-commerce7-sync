@@ -11,7 +11,6 @@ using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Custome
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.RestApi;
 
 namespace BosmanCommerce7.UnitTests.Commerce7Tests {
-
   public class CustomerMasterApiClientTests : Commerce7ClientApiTestsBase {
 
     private Commerce7CustomerId CustomerId { get; } = Commerce7CustomerId.Parse("d1a43fe5-2ed8-4048-bd29-99d1a0dbc9d0");
@@ -24,6 +23,15 @@ namespace BosmanCommerce7.UnitTests.Commerce7Tests {
       var sut = new CustomerMasterApiClient(A.Fake<ILogger<CustomerMasterApiClient>>(), ApiClientService);
 
       var result = sut.GetCustomerMasterById(CustomerId);
+
+      result.IsSuccess.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Fetch_customer_by_email() {
+      var sut = new CustomerMasterApiClient(A.Fake<ILogger<CustomerMasterApiClient>>(), ApiClientService);
+
+      var result = sut.GetCustomerMasterByEmail("stephan@neurasoft.co.za");
 
       result.IsSuccess.Should().BeTrue();
     }

@@ -24,10 +24,9 @@ using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOr
 using BosmanCommerce7.Module.Models;
 using BosmanCommerce7.Module.Models.EvolutionSdk;
 
-namespace BosmanCommerce7.Blazor.Server.Extensions
-{
+namespace BosmanCommerce7.Blazor.Server.Extensions {
 
-    public static class RegisterServicesFunctions {
+  public static class RegisterServicesFunctions {
 
     public static void RegisterServices(IServiceCollection services) {
       RegisterApiServices(services);
@@ -56,7 +55,7 @@ namespace BosmanCommerce7.Blazor.Server.Extensions
       services.AddTransient<IApiClientService, ApiClientService>();
 
       services.AddTransient<ICustomerMasterApiClient, CustomerMasterApiClient>();
-      
+
       services.AddTransient<IInventoryItemApiClient, InventoryItemApiClient>();
       services.AddTransient<IInventoryLevelsApiClient, InventoryLevelsApiClient>();
 
@@ -94,12 +93,13 @@ namespace BosmanCommerce7.Blazor.Server.Extensions
       services.AddTransient<IInventoryItemsSyncQueueService, InventoryItemsSyncQueueService>();
       services.AddTransient<IInventoryItemsSyncService, InventoryItemsSyncService>();
       services.AddTransient<IInventoryItemsLocalMappingService, InventoryItemsLocalMappingService>();
+      services.AddTransient<IInventoryItemsLocalCache, InventoryItemsLocalCache>();
     }
 
     private static void RegisterInventoryLevelsSyncServices(IServiceCollection services) {
-      //services.AddTransient<IInventoryItemsSyncQueueService, InventoryItemsSyncQueueService>();
-      //services.AddTransient<IInventoryItemsSyncService, InventoryItemsSyncService>();
-      //services.AddTransient<IInventoryItemsLocalMappingService, InventoryItemsLocalMappingService>();
+      services.AddTransient<IInventoryItemsSyncQueueService, InventoryItemsSyncQueueService>();
+      services.AddTransient<IInventoryItemsSyncService, InventoryItemsSyncService>();
+      services.AddTransient<IInventoryLevelsLocalMappingService, InventoryLevelsLocalMappingService>();
     }
 
     private static void RegisterSalesOrderSyncServices(IServiceCollection services) {

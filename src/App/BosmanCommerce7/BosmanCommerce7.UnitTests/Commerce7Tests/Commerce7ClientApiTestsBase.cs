@@ -7,6 +7,7 @@
  *
  */
 
+using BosmanCommerce7.Module.ApplicationServices.AppDataServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.RestApiClients;
 using BosmanCommerce7.Module.Models;
 
@@ -26,6 +27,13 @@ namespace BosmanCommerce7.UnitTests.Commerce7Tests {
 
       var restClientFactory = new RestClientFactory(apiOptions);
       ApiClientService = new ApiClientService(A.Fake<ILogger<ApiClientService>>(), restClientFactory);
+    }
+
+    protected IAppDataFileManager NewAppDataFileManager() {
+      var applicationOptions = new ApplicationOptions {
+        AppDataFolder = "C:\\dev\\client-development\\bosman-commerce7-sync\\src\\App\\App_Data"
+      };
+      return new AppDataFileManager(A.Fake<ILogger<AppDataFileManager>>(), applicationOptions);
     }
   }
 }
