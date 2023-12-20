@@ -50,16 +50,10 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
     }
 
     private Result LoadLocalCache() {
-      if (_productRecords is null) {
-        var result = _appDataFileManager.LoadJson<ProductRecord[]>(_folderName, _fileName);
-
-        if (result.IsFailure) {
-          return Result.Failure($"Unable to load local cache. {result.Error}");
-        }
-
-        _productRecords = result.Value;
-      }
-
+      if (_productRecords is not null || !_appDataFileManager.FileExists(_folderName, _fileName)) { return Result.Success(); }
+      var result = _appDataFileManager.LoadJson<ProductRecord[]>(_folderName, _fileName);
+      if (result.IsFailure) { return Result.Failure($"Unable to load local cache. {result.Error}"); }
+      _productRecords = result.Value;
       return Result.Success();
     }
 

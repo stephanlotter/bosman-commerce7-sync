@@ -1,41 +1,29 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Application Title="Bosman Commerce7 Sync">
-  <BOModel>
-    <Class Name="BosmanCommerce7.Module.BusinessObjects.OnlineSalesOrder">
-      <AppearanceRules>
-        <AppearanceRule Id="PostingStatus_New" TargetItems="PostingStatus" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New#" Index="0" IsNewNode="True" />
-        <AppearanceRule Id="PostingStatus_Retrying" Priority="0" TargetItems="PostingStatus" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" BackColor="255, 255, 128" FontColor="Black" Index="1" IsNewNode="True" />
-        <AppearanceRule Id="PostingStatus_Posted" TargetItems="PostingStatus" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Posted#" BackColor="0, 192, 0" FontColor="White" Index="2" IsNewNode="True" />
-        <AppearanceRule Id="PostingStatus_Skipped" Priority="0" TargetItems="PostingStatus" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Skipped#" BackColor="Silver" FontColor="Black" Index="3" IsNewNode="True" />
-        <AppearanceRule Id="PostingStatus_Failed" TargetItems="PostingStatus" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Failed#" BackColor="Red" FontColor="White" Index="4" IsNewNode="True" />
-        <AppearanceRule Id="Channel_Club_Colour" TargetItems="Channel" Criteria="[IsClubOrder] = True" BackColor="0, 255, 255" FontColor="0, 0, 0" IsNewNode="True" />
-        <AppearanceRule Id="Channel_Pos_Colour" Priority="0" TargetItems="Channel" Criteria="[IsPosOrder] = True" BackColor="0, 255, 0" FontColor="0, 0, 0" IsNewNode="True" />
-        <AppearanceRule Id="PurchaseType_Refund_Colour" TargetItems="PurchaseType" BackColor="255, 128, 128" FontColor="Black" Criteria="[IsRefund] = True" IsNewNode="True" />
-        <AppearanceRule Id="ReadOnlyAfterPosted" Enabled="False" TargetItems="*" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Posted#" IsNewNode="True" />
-      </AppearanceRules>
-      <OwnMembers>
-        <Member Name="OrderJson" RowCount="15" />
-      </OwnMembers>
-    </Class>
-    <Class Name="BosmanCommerce7.Module.BusinessObjects.OnlineSalesOrderProcessingLog">
-      <OwnMembers>
-        <Member Name="Details" RowCount="10" />
-      </OwnMembers>
-    </Class>
-  </BOModel>
   <NavigationItems>
     <Items>
-      <Item Id="Default">
+      <Item Id="Default" Index="0">
         <Items>
-          <Item Id="@d18733e5-bbb9-4176-831a-2b4aad58f610" ViewId="OnlineSalesOrder_ListView_Club" Caption="Club Orders" Index="0" IsNewNode="True" />
-          <Item Id="@0a472dc3-e79d-4e4f-815b-900b5c895170" ViewId="OnlineSalesOrder_ListView_Pos" Caption="POS Orders" Index="1" IsNewNode="True" />
+          <Item Id="@d18733e5-bbb9-4176-831a-2b4aad58f610" Caption="Club Orders" Index="0" ViewId="OnlineSalesOrder_ListView_Club" IsNewNode="True" />
+          <Item Id="@0a472dc3-e79d-4e4f-815b-900b5c895170" Caption="POS Orders" Index="1" ViewId="OnlineSalesOrder_ListView_POS" IsNewNode="True" />
           <Item Id="OnlineSalesOrder_ListView" Index="2" Caption="All Orders" />
-          <Item Id="OnlineSalesOrderProcessingLog_ListView" Index="3" />
+          <Item Id="InventoryLevelsUpdateQueue_ListView" Index="3" Caption="Inventory Level Updates" />
+          <Item Id="InventoryItemsUpdateQueue_ListView" Index="4" Caption="Inventory Item Updates" />
+          <Item Id="CustomerUpdateQueue_ListView" Index="5" Caption="Customer Updates" />
         </Items>
       </Item>
-      <Item Id="System">
+      <Item Id="Logs" Index="1">
+        <Items>
+          <Item Id="OnlineSalesOrderProcessingLog_ListView" Index="0" Caption="Online Sales Orders" />
+          <Item Id="InventoryLevelsUpdateQueueLog_ListView" Index="1" Caption="Inventory Level Updates" />
+          <Item Id="CustomerUpdateQueueLog_ListView" Index="2" Caption="Customer Updates" />
+          <Item Id="InventoryItemsUpdateQueueLog_ListView" Index="3" Caption="Inventory Item Updates" />
+        </Items>
+      </Item>
+      <Item Id="System" Index="2">
         <Items>
           <Item Id="BundleMapping_ListView" Index="0" />
+          <Item Id="WarehouseLocationMapping_ListView" Index="1" Caption="Warehouse/Location Mapping" />
           <Item Id="WarehousePostalCodeMapping_ListView" Index="1" Removed="True" />
           <Item Id="TaxMapping_ListView" Index="2" />
           <Item Id="ValueStore_ListView" Index="3" />
@@ -44,7 +32,7 @@
     </Items>
   </NavigationItems>
   <SchemaModules>
-    <SchemaModule Name="SystemModule" Version="23.1.5.0" IsNewNode="True" />
+    <SchemaModule Name="SystemModule" Version="23.1.6.0" IsNewNode="True" />
   </SchemaModules>
   <Views>
     <DetailView Id="BundleMapping_DetailView" FreezeLayout="True">
@@ -158,12 +146,14 @@
         <Filter Id="All" Index="5" IsNewNode="True" />
       </Filters>
     </ListView>
-    <ListView Id="OnlineSalesOrder_ListView_Club" ClassName="BosmanCommerce7.Module.BusinessObjects.OnlineSalesOrder" AllowDelete="False" AllowLink="False" AllowNew="False" IsFooterVisible="True" Criteria="[IsClubOrder] = True" IsNewNode="True">
+    <ListView Id="OnlineSalesOrder_ListView_Club" ClassName="BosmanCommerce7.Module.BusinessObjects.SalesOrders.OnlineSalesOrder" AllowDelete="False" AllowLink="False" AllowNew="False" IsFooterVisible="True" Criteria="[Channel] = 'club'" IsNewNode="True">
       <Columns IsNewNode="True">
-        <ColumnInfo Id="Channel" PropertyName="Channel" Index="-1" Width="103" IsNewNode="True" />
         <ColumnInfo Id="CustomerOnlineId" PropertyName="CustomerOnlineId" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="EmailAddress" PropertyName="EmailAddress" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="EvolutionSalesOrderNumber" PropertyName="EvolutionSalesOrderNumber" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="IsClubOrder" PropertyName="IsClubOrder" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="IsPosOrder" PropertyName="IsPosOrder" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="IsRefund" PropertyName="IsRefund" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="Oid" PropertyName="Oid" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="OnlineId" PropertyName="OnlineId" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="OrderDate" PropertyName="OrderDate" Index="-1" IsNewNode="True" />
@@ -177,18 +167,19 @@
         <ColumnInfo Id="ShipToAddressPostalCode" PropertyName="ShipToAddressPostalCode" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="ShipToAddressProvince" PropertyName="ShipToAddressProvince" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="ShipToPhoneNumber" PropertyName="ShipToPhoneNumber" Index="-1" IsNewNode="True" />
-        <ColumnInfo Id="PurchaseType" Index="0" PropertyName="PurchaseType" View="" Width="150" IsNewNode="True" />
-        <ColumnInfo Id="OrderNumber" PropertyName="OrderNumber" Index="1" Width="100" IsNewNode="True">
+        <ColumnInfo Id="Channel" PropertyName="Channel" Index="0" Width="100" IsNewNode="True" />
+        <ColumnInfo Id="PurchaseType" PropertyName="PurchaseType" Index="1" Width="150" IsNewNode="True" />
+        <ColumnInfo Id="OrderNumber" PropertyName="OrderNumber" Index="2" Width="100" IsNewNode="True">
           <Summary IsNewNode="True">
             <ColumnSummaryItem Id="NumberOfRows" SummaryType="Count" IsNewNode="True" />
           </Summary>
         </ColumnInfo>
-        <ColumnInfo Id="ShipToName" PropertyName="ShipToName" Index="2" IsNewNode="True" />
-        <ColumnInfo Id="RetryAfter" PropertyName="RetryAfter" Index="3" SortIndex="0" SortOrder="Ascending" Width="150" IsNewNode="True" />
-        <ColumnInfo Id="PostingStatus" PropertyName="PostingStatus" Index="4" Width="100" IsNewNode="True" />
-        <ColumnInfo Id="LastErrorMessage" PropertyName="LastErrorMessage" Index="5" IsNewNode="True" />
-        <ColumnInfo Id="DatePosted" PropertyName="DatePosted" Index="6" Width="150" IsNewNode="True" />
-        <ColumnInfo Id="RetryCount" PropertyName="RetryCount" Index="7" Width="90" IsNewNode="True" />
+        <ColumnInfo Id="ShipToName" PropertyName="ShipToName" Index="3" IsNewNode="True" />
+        <ColumnInfo Id="RetryAfter" PropertyName="RetryAfter" Index="4" SortIndex="0" SortOrder="Ascending" Width="150" IsNewNode="True" />
+        <ColumnInfo Id="PostingStatus" PropertyName="PostingStatus" Index="5" Width="100" IsNewNode="True" />
+        <ColumnInfo Id="LastErrorMessage" PropertyName="LastErrorMessage" Index="6" IsNewNode="True" />
+        <ColumnInfo Id="DatePosted" PropertyName="DatePosted" Index="7" Width="150" IsNewNode="True" />
+        <ColumnInfo Id="RetryCount" PropertyName="RetryCount" Index="8" Width="90" IsNewNode="True" />
       </Columns>
       <Filters CurrentFilterId="NewAndRetrying" IsNewNode="True">
         <Filter Id="NewAndRetrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New# Or [PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="0" Caption="New and Retrying" IsNewNode="True" />
@@ -199,12 +190,14 @@
         <Filter Id="All" Index="5" IsNewNode="True" />
       </Filters>
     </ListView>
-    <ListView Id="OnlineSalesOrder_ListView_Pos" ClassName="BosmanCommerce7.Module.BusinessObjects.OnlineSalesOrder" AllowDelete="False" AllowLink="False" AllowNew="False" IsFooterVisible="True" Criteria="[IsPosOrder] = True" IsNewNode="True">
+    <ListView Id="OnlineSalesOrder_ListView_POS" ClassName="BosmanCommerce7.Module.BusinessObjects.SalesOrders.OnlineSalesOrder" AllowDelete="False" AllowLink="False" AllowNew="False" IsFooterVisible="True" Criteria="[Channel] = 'pos'" IsNewNode="True">
       <Columns IsNewNode="True">
-        <ColumnInfo Id="Channel" PropertyName="Channel" Index="-1" Width="103" IsNewNode="True" />
         <ColumnInfo Id="CustomerOnlineId" PropertyName="CustomerOnlineId" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="EmailAddress" PropertyName="EmailAddress" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="EvolutionSalesOrderNumber" PropertyName="EvolutionSalesOrderNumber" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="IsClubOrder" PropertyName="IsClubOrder" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="IsPosOrder" PropertyName="IsPosOrder" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="IsRefund" PropertyName="IsRefund" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="Oid" PropertyName="Oid" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="OnlineId" PropertyName="OnlineId" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="OrderDate" PropertyName="OrderDate" Index="-1" IsNewNode="True" />
@@ -218,18 +211,19 @@
         <ColumnInfo Id="ShipToAddressPostalCode" PropertyName="ShipToAddressPostalCode" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="ShipToAddressProvince" PropertyName="ShipToAddressProvince" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="ShipToPhoneNumber" PropertyName="ShipToPhoneNumber" Index="-1" IsNewNode="True" />
-        <ColumnInfo Id="PurchaseType" Index="0" PropertyName="PurchaseType" View="" Width="150" IsNewNode="True" />
-        <ColumnInfo Id="OrderNumber" PropertyName="OrderNumber" Index="1" Width="100" IsNewNode="True">
+        <ColumnInfo Id="Channel" PropertyName="Channel" Index="0" Width="100" IsNewNode="True" />
+        <ColumnInfo Id="PurchaseType" PropertyName="PurchaseType" Index="1" Width="150" IsNewNode="True" />
+        <ColumnInfo Id="OrderNumber" PropertyName="OrderNumber" Index="2" Width="100" IsNewNode="True">
           <Summary IsNewNode="True">
             <ColumnSummaryItem Id="NumberOfRows" SummaryType="Count" IsNewNode="True" />
           </Summary>
         </ColumnInfo>
-        <ColumnInfo Id="ShipToName" PropertyName="ShipToName" Index="2" IsNewNode="True" />
-        <ColumnInfo Id="RetryAfter" PropertyName="RetryAfter" Index="3" SortIndex="0" SortOrder="Ascending" Width="150" IsNewNode="True" />
-        <ColumnInfo Id="PostingStatus" PropertyName="PostingStatus" Index="4" Width="100" IsNewNode="True" />
-        <ColumnInfo Id="LastErrorMessage" PropertyName="LastErrorMessage" Index="5" IsNewNode="True" />
-        <ColumnInfo Id="DatePosted" PropertyName="DatePosted" Index="6" Width="150" IsNewNode="True" />
-        <ColumnInfo Id="RetryCount" PropertyName="RetryCount" Index="7" Width="90" IsNewNode="True" />
+        <ColumnInfo Id="ShipToName" PropertyName="ShipToName" Index="3" IsNewNode="True" />
+        <ColumnInfo Id="RetryAfter" PropertyName="RetryAfter" Index="4" SortIndex="0" SortOrder="Ascending" Width="150" IsNewNode="True" />
+        <ColumnInfo Id="PostingStatus" PropertyName="PostingStatus" Index="5" Width="100" IsNewNode="True" />
+        <ColumnInfo Id="LastErrorMessage" PropertyName="LastErrorMessage" Index="6" IsNewNode="True" />
+        <ColumnInfo Id="DatePosted" PropertyName="DatePosted" Index="7" Width="150" IsNewNode="True" />
+        <ColumnInfo Id="RetryCount" PropertyName="RetryCount" Index="8" Width="90" IsNewNode="True" />
       </Columns>
       <Filters CurrentFilterId="NewAndRetrying" IsNewNode="True">
         <Filter Id="NewAndRetrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New# Or [PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="0" Caption="New and Retrying" IsNewNode="True" />
@@ -338,6 +332,27 @@
       <Columns>
         <ColumnInfo Id="KeyName" Index="0" />
         <ColumnInfo Id="KeyValue" Index="1" Width="341" />
+      </Columns>
+    </ListView>
+    <DetailView Id="WarehouseLocationMapping_DetailView">
+      <Layout>
+        <LayoutGroup Id="Main" RelativeSize="100">
+          <LayoutGroup Id="SimpleEditors" RelativeSize="100">
+            <LayoutGroup Id="WarehouseLocationMapping" RelativeSize="6.739130434782608">
+              <LayoutItem Id="LocationTitle" RelativeSize="51.61290322580645" />
+              <LayoutItem Id="WarehouseCode" RelativeSize="48.38709677419355" />
+            </LayoutGroup>
+            <LayoutGroup Id="XPObject" Caption="Oid" RelativeSize="93.26086956521739">
+              <LayoutItem Id="Oid" Removed="True" />
+            </LayoutGroup>
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <ListView Id="WarehouseLocationMapping_ListView">
+      <Columns>
+        <ColumnInfo Id="LocationTitle" Width="254" />
+        <ColumnInfo Id="WarehouseCode" Width="290" />
       </Columns>
     </ListView>
     <DetailView Id="WarehousePostalCodeMapping_DetailView" FreezeLayout="True">

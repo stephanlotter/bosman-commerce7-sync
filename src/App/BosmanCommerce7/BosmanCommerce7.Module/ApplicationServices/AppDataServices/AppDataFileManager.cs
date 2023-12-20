@@ -1,9 +1,9 @@
-﻿/* 
+﻿/*
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
  * Date created: 2023-08-17 * Author	: Stephan J Lotter
- * Notes	: 
- *  
+ * Notes	:
+ *
  */
 
 using BosmanCommerce7.Module.Extensions;
@@ -12,6 +12,7 @@ using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 
 namespace BosmanCommerce7.Module.ApplicationServices.AppDataServices {
+
   public class AppDataFileManager : IAppDataFileManager {
     private readonly ILogger<AppDataFileManager> _logger;
     private readonly ApplicationOptions _applicationOptions;
@@ -22,6 +23,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.AppDataServices {
       _logger = logger;
       _applicationOptions = applicationOptions;
     }
+
+    public bool FileExists(string subfolderName, string filename) => File.Exists(BuildFilename(subfolderName, filename));
 
     public Result<T?> LoadJson<T>(string subfolderName, string filename) {
       try {
@@ -86,6 +89,5 @@ namespace BosmanCommerce7.Module.ApplicationServices.AppDataServices {
       var file = Path.Combine(path, filename);
       return file;
     }
-
   }
 }

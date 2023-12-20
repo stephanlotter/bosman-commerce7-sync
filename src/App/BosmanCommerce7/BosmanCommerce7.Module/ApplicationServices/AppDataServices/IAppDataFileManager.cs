@@ -1,15 +1,19 @@
-﻿/* 
+﻿/*
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
  * Date created: 2023-08-17 * Author	: Stephan J Lotter
- * Notes	: 
- *  
+ * Notes	:
+ *
  */
 
 using CSharpFunctionalExtensions;
 
 namespace BosmanCommerce7.Module.ApplicationServices.AppDataServices {
+
   public interface IAppDataFileManager {
+
+    bool FileExists(string subfolderName, string filename);
+
     Result<T?> LoadJson<T>(string subfolderName, string filename);
 
     Result<string> LoadText(string subfolderName, string filename);
@@ -19,6 +23,5 @@ namespace BosmanCommerce7.Module.ApplicationServices.AppDataServices {
     Result<string> StoreJson(string subfolderName, string filename, object? data);
 
     Result<string> StoreText(string subfolderName, string filename, string data);
-
   }
 }

@@ -15,6 +15,7 @@ using BosmanCommerce7.Module.Extensions;
 using BosmanCommerce7.Module.Models;
 using CSharpFunctionalExtensions;
 using DevExpress.Data.Filtering;
+using DevExpress.ExpressApp;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -27,6 +28,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices {
 
     private Regex regexErrorMessage = new Regex(@"(.*?)(?=Response body:)", RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
+    protected IObjectSpace? ObjectSpace { get; private set; }
+
     public SyncMasterDataServiceBase(ILogger logger, ILocalObjectSpaceEvolutionSdkProvider localObjectSpaceEvolutionSdkProvider) : base(logger, localObjectSpaceEvolutionSdkProvider) {
     }
 
@@ -37,6 +40,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices {
       try {
         return LocalObjectSpaceEvolutionSdkProvider.WrapInObjectSpaceEvolutionSdkTransaction((objectSpace, connection) => {
           CriteriaOperator? criteria = context.Criteria;
+          ObjectSpace = objectSpace;
           var now = DateTime.Now;
 
           if (criteria is null) {
