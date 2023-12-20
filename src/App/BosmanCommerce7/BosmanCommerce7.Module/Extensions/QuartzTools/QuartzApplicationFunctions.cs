@@ -25,6 +25,7 @@ namespace BosmanCommerce7.Module.Extensions.QuartzTools {
 
       ScheduleCustomerMasterSyncJobQueueService(context, _scheduler);
       ScheduleInventoryItemsSyncJobQueueService(context, _scheduler);
+      ScheduleInventoryLevelsSyncJobQueueService(context, _scheduler);
       ScheduleSalesOrdersSyncJobQueueService(context, _scheduler);
       ScheduleSalesOrdersPostJobQueueService(context, _scheduler);
 
@@ -45,7 +46,17 @@ namespace BosmanCommerce7.Module.Extensions.QuartzTools {
       var jobOptions = context.Options.InventoryItemsSyncJobOptions as JobOptionsBase ?? throw new Exception($"{nameof(context.Options.InventoryItemsSyncJobOptions)} not defined in appsettings.json.");
 
       ScheduleSyncQueueService<IInventoryItemsSyncQueueService>(context, new QuartzStartJobDescriptor {
-        JobId = JobIds.CustomerMasterSyncJob,
+        JobId = JobIds.InventoryItemsSyncJob,
+        JobOptions = jobOptions,
+        Scheduler = scheduler
+      });
+    }
+
+    private static void ScheduleInventoryLevelsSyncJobQueueService(QuartzStartJobContext context, IScheduler scheduler) {
+      var jobOptions = context.Options.InventoryLevelsSyncJobOptions as JobOptionsBase ?? throw new Exception($"{nameof(context.Options.InventoryLevelsSyncJobOptions)} not defined in appsettings.json.");
+
+      ScheduleSyncQueueService<IInventoryLevelsSyncQueueService>(context, new QuartzStartJobDescriptor {
+        JobId = JobIds.InventoryLevelsSyncJob,
         JobOptions = jobOptions,
         Scheduler = scheduler
       });

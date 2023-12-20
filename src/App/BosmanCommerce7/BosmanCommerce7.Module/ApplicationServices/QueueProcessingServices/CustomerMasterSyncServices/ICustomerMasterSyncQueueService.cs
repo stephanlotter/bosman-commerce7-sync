@@ -9,10 +9,8 @@
 
 using BosmanCommerce7.Module.Extensions.QuartzTools;
 
-namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices
-{
+namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices {
 
-    public interface ICustomerMasterSyncQueueService : ISyncQueueService
-    {
-    }
+  public interface ICustomerMasterSyncQueueService : ISyncQueueService {
+  }
 }

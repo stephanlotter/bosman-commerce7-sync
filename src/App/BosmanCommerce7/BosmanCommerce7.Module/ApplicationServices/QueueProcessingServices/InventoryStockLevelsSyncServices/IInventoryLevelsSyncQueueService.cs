@@ -7,7 +7,10 @@
  *
  */
 
+using BosmanCommerce7.Module.Extensions.QuartzTools;
+
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventorySyncServices {
-  public interface IInventoryLevelsSyncQueueService {
+
+  public interface IInventoryLevelsSyncQueueService : ISyncQueueService {
   }
 }

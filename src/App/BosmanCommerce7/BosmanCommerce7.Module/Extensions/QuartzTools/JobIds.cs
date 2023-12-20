@@ -15,6 +15,10 @@ namespace BosmanCommerce7.Module.Extensions.QuartzTools {
 
     public const string CustomerMasterSyncJob = nameof(CustomerMasterSyncJob);
 
+    public const string InventoryItemsSyncJob = nameof(InventoryItemsSyncJob);
+
+    public const string InventoryLevelsSyncJob = nameof(InventoryLevelsSyncJob);
+
     public const string SalesOrdersSyncJob = nameof(SalesOrdersSyncJob);
 
     public const string SalesOrdersPostJob = nameof(SalesOrdersPostJob);

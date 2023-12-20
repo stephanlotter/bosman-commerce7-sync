@@ -10,12 +10,10 @@
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.Models;
 using CSharpFunctionalExtensions;
 
-namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices
-{
+namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices {
 
-    public interface ICustomerMasterSyncService
-    {
+  public interface ICustomerMasterSyncService {
 
-        Result<CustomerMasterSyncResult> Execute(CustomerMasterSyncContext context);
-    }
+    Result<CustomerMasterSyncResult> Execute(CustomerMasterSyncContext context);
+  }
 }

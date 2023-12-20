@@ -1,0 +1,37 @@
+use BosmanBFV
+
+declare @sku Nvarchar(20) = 'UHACHA15',
+		@warehouseCode Nvarchar(20) = '035',
+		@InventoryItemId Int,
+		@WarehouseId Int;
+
+select @InventoryItemId = StockLink
+	from StkItem
+	where cSimpleCode = @sku;
+
+--select StockLink,
+--	   Code,
+--	   cSimpleCode,
+--	   Description_1,
+--	   ServiceItem,
+--	   ItemActive
+--	from StkItem
+--	where StockLink = 976;
+
+
+select @WarehouseId = wm.WhseLink
+	from WhseMst wm
+	where wm.Code = @warehouseCode;
+
+select ws.WHWhseID,
+	   ws.WHStockLink,
+	   ws.WHQtyOnHand QuantityOnHand,
+	   ws.WHQtyOnSO QuantityOnSalesOrder,
+	   ws.WHQtyReserved QuantityReserved
+	from WhseStk ws
+	where 1 = 1
+		--and ws.WHQtyOnHand > 0
+		and ws.WHWhseID = @WarehouseId
+		and ws.WHStockLink = @InventoryItemId;
+
+

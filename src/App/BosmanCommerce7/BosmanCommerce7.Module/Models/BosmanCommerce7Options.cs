@@ -21,6 +21,8 @@ namespace BosmanCommerce7.Module.Models {
 
     public InventoryItemsSyncJobOptions InventoryItemsSyncJobOptions { get; init; } = default!;
 
+    public InventoryLevelsSyncJobOptions InventoryLevelsSyncJobOptions { get; init; } = default!;
+
     public SalesOrdersSyncJobOptions SalesOrdersSyncJobOptions { get; init; } = default!;
 
     public SalesOrdersPostJobOptions SalesOrdersPostJobOptions { get; init; } = default!;
@@ -63,6 +65,9 @@ namespace BosmanCommerce7.Module.Models {
   }
 
   public record InventoryItemsSyncJobOptions : JobOptionsBase {
+  }
+
+  public record InventoryLevelsSyncJobOptions : JobOptionsBase {
   }
 
   public record ConnectionStrings : ILocalDatabaseConnectionStringProvider, IEvolutionDatabaseConnectionStringProvider {

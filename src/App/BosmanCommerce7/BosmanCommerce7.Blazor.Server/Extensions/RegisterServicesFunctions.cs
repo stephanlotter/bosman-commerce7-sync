@@ -15,6 +15,7 @@ using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.RestApi;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.RestApi;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryStockLevelsSyncServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryStockLevelsSyncServices.RestApi;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventorySyncServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.RestApiClients;
@@ -97,8 +98,8 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
     }
 
     private static void RegisterInventoryLevelsSyncServices(IServiceCollection services) {
-      services.AddTransient<IInventoryItemsSyncQueueService, InventoryItemsSyncQueueService>();
-      services.AddTransient<IInventoryItemsSyncService, InventoryItemsSyncService>();
+      services.AddTransient<IInventoryLevelsSyncQueueService, InventoryLevelsSyncQueueService>();
+      services.AddTransient<IInventoryLevelsSyncService, InventoryLevelsSyncService>();
       services.AddTransient<IInventoryLevelsLocalMappingService, InventoryLevelsLocalMappingService>();
     }
 
@@ -128,6 +129,7 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
       services.AddSingleton<IEvolutionDatabaseConnectionStringProvider>(options.ConnectionStrings);
       services.AddSingleton(options.CustomerMasterSyncJobOptions);
       services.AddSingleton(options.InventoryItemsSyncJobOptions);
+      services.AddSingleton(options.InventoryLevelsSyncJobOptions);
       services.AddSingleton(options.SalesOrdersSyncJobOptions);
       services.AddSingleton(options.SalesOrdersPostJobOptions);
       services.AddSingleton(options.ApiOptions);
