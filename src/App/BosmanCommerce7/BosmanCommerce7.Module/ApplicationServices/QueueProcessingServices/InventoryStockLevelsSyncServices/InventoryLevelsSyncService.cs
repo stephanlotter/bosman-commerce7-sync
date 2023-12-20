@@ -8,27 +8,32 @@
  */
 
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
+using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.Models;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.RestApi;
 using BosmanCommerce7.Module.BusinessObjects;
 using BosmanCommerce7.Module.BusinessObjects.InventoryItems;
+using BosmanCommerce7.Module.Models;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventorySyncServices {
 
   public class InventoryLevelsSyncService : SyncMasterDataServiceBase, IInventoryLevelsSyncService {
-    private readonly IInventoryItemApiClient _inventoryItemApiClient;
+    private readonly IInventoryLevelsApiClient _inventoryLevelsApiClient;
     private readonly IInventoryItemsLocalCache _inventoryItemsLocalCache;
+    private readonly IEvolutionInventoryRepository _evolutionInventoryRepository;
     private List<(EvolutionInventoryItemId, EvolutionWarehouseId)> _processedIds = new();
 
     public InventoryLevelsSyncService(ILogger<InventoryLevelsSyncService> logger,
       ILocalObjectSpaceEvolutionSdkProvider localObjectSpaceEvolutionSdkProvider,
-      IInventoryItemApiClient inventoryItemApiClient,
-      IInventoryItemsLocalCache inventoryItemsLocalCache) :
+      IInventoryLevelsApiClient inventoryLevelsApiClient,
+      IInventoryItemsLocalCache inventoryItemsLocalCache,
+      IEvolutionInventoryRepository evolutionInventoryRepository) :
       base(logger, localObjectSpaceEvolutionSdkProvider) {
-      _inventoryItemApiClient = inventoryItemApiClient;
+      _inventoryLevelsApiClient = inventoryLevelsApiClient;
       _inventoryItemsLocalCache = inventoryItemsLocalCache;
+      _evolutionInventoryRepository = evolutionInventoryRepository;
     }
 
     public Result<InventoryLevelsSyncResult> Execute(InventoryLevelsSyncContext context) {
@@ -52,7 +57,31 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
     protected override Result ProcessQueueItem(UpdateQueueBase updateQueueItem) {
       var queueItem = (InventoryLevelsUpdateQueue)updateQueueItem;
 
-      return Result.Success();
+      if (_processedIds.Contains((queueItem.InventoryItemId, queueItem.WarehouseId))) {
+        queueItem.Status = QueueProcessingStatus.Skipped;
+        return Result.Success();
+      }
+
+      return _evolutionInventoryRepository.Get(queueItem.InventoryItemId, queueItem.WarehouseId)
+      .Map(evolutionInventoryLevel => {
+        return _inventoryItemsLocalCache.GetProduct(evolutionInventoryLevel.Sku).Map(a => (a, evolutionInventoryLevel));
+      })
+      .Bind(a => {
+        var (productRecord, evolutionInventoryLevel) = a;
+        // initialise inventory if not initialised for product.
+        // update local cache after initialisation.
+
+        return a;
+      })
+      .Bind(a => {
+        var (productRecord, evolutionInventoryLevel) = a;
+        // set inventory levels for product.
+
+        return Result.Success();
+      })
+        ;
+
+      
     }
   }
 }

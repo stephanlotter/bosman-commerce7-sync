@@ -1,10 +1,10 @@
-﻿/* 
+﻿/*
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
  * Date created: 2023-08-22
  * Author	: Stephan J Lotter
- * Notes	: 
- *  
+ * Notes	:
+ *
  */
 
 using BosmanCommerce7.Module.Models.EvolutionSdk;
@@ -12,10 +12,9 @@ using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Pastel.Evolution;
 
-namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk
-{
+namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
 
-    public class EvolutionPriceListRepository : EvolutionRepositoryBase, IEvolutionPriceListRepository {
+  public class EvolutionPriceListRepository : EvolutionRepositoryBase, IEvolutionPriceListRepository {
     private readonly ILogger<EvolutionPriceListRepository> _logger;
 
     public EvolutionPriceListRepository(ILogger<EvolutionPriceListRepository> logger) {
@@ -24,7 +23,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk
 
     public Result<EvolutionPriceListPrice> Get(int inventoryItemId, int? priceListId) {
       const string sql = @"
-if not exists(select 1 from _etblPriceListPrices where iPriceListNameID = @priceListId) 
+if not exists(select 1 from _etblPriceListPrices where iPriceListNameID = @priceListId)
   select -1;
 else
   select fInclPrice PriceValue
@@ -55,5 +54,4 @@ else
         : Result.Failure<EvolutionPriceListPrice>($"Could not find price list ID:{priceListId} in database.");
     }
   }
-
 }

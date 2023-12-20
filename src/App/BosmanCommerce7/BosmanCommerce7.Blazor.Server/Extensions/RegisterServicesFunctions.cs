@@ -75,6 +75,7 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
       services.AddTransient<IEvolutionWarehouseRepository, EvolutionWarehouseRepository>();
       services.AddTransient<IEvolutionPriceListRepository, EvolutionPriceListRepository>();
       services.AddTransient<IEvolutionGeneralLedgerAccountRepository, EvolutionGeneralLedgerAccountRepository>();
+      services.AddTransient<IEvolutionInventoryRepository, EvolutionInventoryRepository>();
     }
 
     private static void RegisterUtilityServices(IServiceCollection services) {

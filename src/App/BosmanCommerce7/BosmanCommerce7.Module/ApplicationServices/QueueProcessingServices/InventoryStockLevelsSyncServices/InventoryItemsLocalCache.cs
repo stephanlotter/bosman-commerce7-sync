@@ -18,9 +18,10 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
   public class InventoryItemsLocalCache : IInventoryItemsLocalCache {
     private readonly IInventoryItemApiClient _inventoryItemApiClient;
     private readonly IAppDataFileManager _appDataFileManager;
+    private ProductRecord[]? _productRecords;
 
-    private const string folderName = "ProductCache";
-    private const string fileName = "products.json";
+    private const string _folderName = "ProductCache";
+    private const string _fileName = "products.json";
 
     public InventoryItemsLocalCache(IInventoryItemApiClient inventoryItemApiClient, IAppDataFileManager appDataFileManager) {
       _inventoryItemApiClient = inventoryItemApiClient;
@@ -28,13 +29,38 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
     }
 
     public Result<ProductRecord> GetProduct(string sku) {
-      return _appDataFileManager
-        .LoadJson<ProductRecord[]>(folderName, fileName)
-        .Bind(a => {
-          var d = a?.FirstOrDefault(x => x.Variants?.Any(y => y.Sku == sku) ?? false);
-          return d != null ? Result.Success(d) : Result.Failure<ProductRecord>($"Product {sku} not found in cache.");
-        })
-        ;
+      var tryCount = 0;
+      while (true) {
+        var r = LoadLocalCache();
+        if (r.IsFailure) { return Result.Failure<ProductRecord>(r.Error); }
+
+        var product = _productRecords?.FirstOrDefault(x => x.Variants?.Any(y => y.Sku == sku) ?? false);
+
+        if (product != null) { return Result.Success(product); }
+
+        if (tryCount == 0) {
+          r = UpdateLocalCache();
+          if (r.IsFailure) { return Result.Failure<ProductRecord>($"Unable to update local product cache. {r.Error}"); }
+        }
+        else {
+          return Result.Failure<ProductRecord>($"SKU {sku} not found on Commerce7.");
+        }
+        tryCount++;
+      }
+    }
+
+    private Result LoadLocalCache() {
+      if (_productRecords is null) {
+        var result = _appDataFileManager.LoadJson<ProductRecord[]>(_folderName, _fileName);
+
+        if (result.IsFailure) {
+          return Result.Failure($"Unable to load local cache. {result.Error}");
+        }
+
+        _productRecords = result.Value;
+      }
+
+      return Result.Success();
     }
 
     public Result UpdateLocalCache() {
@@ -43,12 +69,13 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
            return MapProductsToProductRecords(x);
          })
          .Bind(y => {
-           _appDataFileManager.StoreJson(folderName, fileName, y);
+           _appDataFileManager.StoreJson(_folderName, _fileName, y);
+           _productRecords = y;
            return Result.Success();
          });
     }
 
-    private Result<ProductRecord[]> MapProductsToProductRecords(InventoryItemsSyncServices.RestApi.InventoryItemsResponse value) {
+    private Result<ProductRecord[]> MapProductsToProductRecords(InventoryItemsResponse value) {
       var products = value.Data ?? null;
 
       if (products == null || products == null || products!.Length == 0) { return Result.Failure<ProductRecord[]>("No data"); }
