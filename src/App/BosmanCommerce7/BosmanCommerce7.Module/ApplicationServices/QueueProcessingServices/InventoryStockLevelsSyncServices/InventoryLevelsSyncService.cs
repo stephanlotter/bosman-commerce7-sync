@@ -8,11 +8,10 @@
  */
 
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
-using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices.Models;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.Models;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.RestApi;
 using BosmanCommerce7.Module.BusinessObjects;
-using BosmanCommerce7.Module.BusinessObjects.Customers;
+using BosmanCommerce7.Module.BusinessObjects.InventoryItems;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 
@@ -21,6 +20,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
   public class InventoryLevelsSyncService : SyncMasterDataServiceBase, IInventoryLevelsSyncService {
     private readonly IInventoryItemApiClient _inventoryItemApiClient;
     private readonly IInventoryItemsLocalCache _inventoryItemsLocalCache;
+    private List<(EvolutionInventoryItemId, EvolutionWarehouseId)> _processedIds = new();
 
     public InventoryLevelsSyncService(ILogger<InventoryLevelsSyncService> logger,
       ILocalObjectSpaceEvolutionSdkProvider localObjectSpaceEvolutionSdkProvider,
@@ -37,20 +37,22 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
 
       Logger.LogDebug("Start {SyncService} records sync.", this.GetType().Name);
 
-      return ProcessQueueItems<CustomerUpdateQueue>(context)
+      return ProcessQueueItems<InventoryLevelsUpdateQueue>(context)
         .Bind(() => BuildResult())
         .Finally(result => {
           Logger.LogDebug("End {SyncService} records sync.", this.GetType().Name);
           return result;
         });
 
-      Result<CustomerMasterSyncResult> BuildResult() {
-        return _errorCount == 0 ? Result.Success(new CustomerMasterSyncResult { }) : Result.Failure<CustomerMasterSyncResult>($"Completed with {_errorCount} errors.");
+      Result<InventoryLevelsSyncResult> BuildResult() {
+        return _errorCount == 0 ? Result.Success(new InventoryLevelsSyncResult { }) : Result.Failure<InventoryLevelsSyncResult>($"Completed with {_errorCount} errors.");
       }
     }
 
     protected override Result ProcessQueueItem(UpdateQueueBase updateQueueItem) {
-      throw new NotImplementedException();
+      var queueItem = (InventoryLevelsUpdateQueue)updateQueueItem;
+
+      return Result.Success();
     }
   }
 }
