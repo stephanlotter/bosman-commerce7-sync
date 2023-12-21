@@ -7,6 +7,7 @@
  *
  */
 
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryStockLevelsSyncServices.Models;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryStockLevelsSyncServices.RestApi;
 using CSharpFunctionalExtensions;
 
@@ -18,6 +19,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
 
     Result<InitializeInventoryResponse> InitializeInventory();
 
-    Result<ResetInventoryResponse> ResetInventory();
+    Result<ResetInventoryResponse> ResetInventory(ResetInventoryContext resetInventoryContext);
   }
 }

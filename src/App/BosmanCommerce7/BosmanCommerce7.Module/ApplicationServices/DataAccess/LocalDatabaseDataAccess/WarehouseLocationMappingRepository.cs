@@ -22,8 +22,14 @@ namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDat
     }
 
     public Result<WarehouseLocationMapping?> FindMapping(IObjectSpace objectSpace, EvolutionWarehouseCode warehouseCode) {
-      var mapping = objectSpace.FindObject<WarehouseLocationMapping>("WarehouseCode".IsEqualToOperator(warehouseCode));
-      return mapping;
+      try {
+        var mapping = objectSpace.FindObject<WarehouseLocationMapping>("WarehouseCode".IsEqualToOperator(warehouseCode));
+        return mapping;
+      }
+      catch (Exception ex) {
+        Logger.LogError(ex, "Error finding warehouse location mapping.");
+        return Result.Failure<WarehouseLocationMapping?>(ex.Message);
+      }
     }
   }
 }

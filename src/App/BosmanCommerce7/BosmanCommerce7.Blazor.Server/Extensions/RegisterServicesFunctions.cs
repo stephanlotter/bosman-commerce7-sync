@@ -103,6 +103,7 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
       services.AddTransient<IInventoryLevelsSyncQueueService, InventoryLevelsSyncQueueService>();
       services.AddTransient<IInventoryLevelsSyncService, InventoryLevelsSyncService>();
       services.AddTransient<IInventoryLevelsLocalMappingService, InventoryLevelsLocalMappingService>();
+      services.AddTransient<IInventoryLocationsLocalCache, InventoryLocationsLocalCache>();
     }
 
     private static void RegisterSalesOrderSyncServices(IServiceCollection services) {

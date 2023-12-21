@@ -12,16 +12,27 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
     public Commerce7InventoryId Id { get; init; }
 
     public ProductVariantRecord[]? Variants { get; init; }
+
+    public ProductVariantRecord? GetProductVariant(Commerce7Sku sku) {
+      return Variants?.FirstOrDefault(x => x.Sku == sku);
+    }
   }
 
   public record ProductVariantRecord {
     public required Commerce7InventoryId Id { get; init; }
+
     public required string Sku { get; init; }
+
     public ProductVariantInventoryRecord[]? Inventory { get; init; }
+
+    public ProductVariantInventoryRecord? GetProductVariantInventoryRecord(Commerce7LocationId inventoryLocationId) {
+      return Inventory?.FirstOrDefault(x => x.InventoryLocationId == inventoryLocationId);
+    }
   }
 
   public record ProductVariantInventoryRecord {
-    public required string ProductVariantId { get; set; }
-    public required string InventoryLocationId { get; set; }
+    public required Commerce7InventoryId ProductVariantId { get; set; }
+
+    public required Commerce7LocationId InventoryLocationId { get; set; }
   }
 }

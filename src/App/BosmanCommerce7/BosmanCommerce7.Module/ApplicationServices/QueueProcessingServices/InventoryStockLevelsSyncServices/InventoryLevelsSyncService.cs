@@ -11,6 +11,7 @@ using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAcc
 using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.Models;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.RestApi;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryStockLevelsSyncServices.Models;
 using BosmanCommerce7.Module.BusinessObjects;
 using BosmanCommerce7.Module.BusinessObjects.InventoryItems;
 using BosmanCommerce7.Module.Models;
@@ -66,42 +67,20 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
       }
 
       return _evolutionInventoryRepository.Get(queueItem.InventoryItemId, queueItem.WarehouseId)
-      .Map(evolutionInventoryLevel => {
-        return _inventoryItemsLocalCache.GetProduct(evolutionInventoryLevel.Sku).Map(a => (a, evolutionInventoryLevel));
-      })
+
+      .Bind(evolutionInventoryLevel => _inventoryItemsLocalCache.GetProduct(evolutionInventoryLevel.Sku).Map(a => (a, evolutionInventoryLevel)))
+
       .Bind(a => {
         var (productRecord, evolutionInventoryLevel) = a;
 
-        var result = GetLocationId(productRecord);
-
-        // initialise inventory if not initialised for product.
-        // update local cache after initialisation.
-
-        return a;
-      })
-      .Bind(a => {
-        var (productRecord, evolutionInventoryLevel) = a;
-        
-        _warehouseLocationMappingRepository.FindMapping(ObjectSpace!, evolutionInventoryLevel.WarehouseCode)
-        .Bind(locationMapping => {
-          if (locationMapping == null) { return Result.Failure($"Warehouse location mapping not found for warehouse code {evolutionInventoryLevel.WarehouseCode}.");  }
-          return Result.Success(locationMapping);
-          })
-        .Bind(locationMapping => {
-          // set inventory levels for product.
-          
-          return Result.Success(locationMapping);
-          
+        return _warehouseLocationMappingRepository.FindMapping(ObjectSpace!, evolutionInventoryLevel.WarehouseCode)
+          .Bind(locationMapping => {
+            if (locationMapping == null) { return Result.Failure<ResetInventoryContext>($"Warehouse location mapping not found for warehouse code {evolutionInventoryLevel.WarehouseCode}."); }
+            return Result.Success(new ResetInventoryContext(productRecord, evolutionInventoryLevel, locationMapping));
           });
-        return Result.Success();
       })
-        ;
 
-      
-    }
-
-    private Result GetLocationId(bool productRecord) {
-      throw new NotImplementedException();
+      .Bind(a => _inventoryLevelsApiClient.ResetInventory(a));
     }
   }
 }

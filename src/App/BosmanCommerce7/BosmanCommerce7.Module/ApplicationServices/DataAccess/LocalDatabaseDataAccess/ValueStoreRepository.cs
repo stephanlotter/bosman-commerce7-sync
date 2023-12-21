@@ -33,7 +33,7 @@ if exists(select 1 from ValueStore where lower(KeyName) = lower(@keyName))
         return Result.Success();
       }
       catch (Exception ex) {
-        _logger.LogError(ex, "While DeleteKey");
+        Logger.LogError(ex, "While DeleteKey");
         return Result.Failure(ex.Message);
       }
     }
@@ -63,7 +63,7 @@ else
         return Result.Success(data);
       }
       catch (Exception ex) {
-        _logger.LogError(ex, "While GetValue");
+        Logger.LogError(ex, "While GetValue");
         return Result.Failure<string?>(ex.Message);
       }
     }
@@ -83,7 +83,7 @@ else
         return Result.Success(data);
       }
       catch (Exception ex) {
-        _logger.LogError(ex, "While KeyExists");
+        Logger.LogError(ex, "While KeyExists");
         return Result.Failure<bool>(ex.Message);
       }
     }
@@ -107,7 +107,7 @@ else
         return Result.Success();
       }
       catch (Exception ex) {
-        _logger.LogError(ex, "While SetValue");
+        Logger.LogError(ex, "While SetValue");
         return Result.Failure(ex.Message);
       }
     }
