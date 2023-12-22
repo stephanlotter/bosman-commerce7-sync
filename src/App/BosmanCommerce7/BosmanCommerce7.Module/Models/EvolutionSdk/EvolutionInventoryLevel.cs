@@ -15,6 +15,7 @@ namespace BosmanCommerce7.Module.Models.EvolutionSdk {
     EvolutionWarehouseId warehouseId,
     Quantity QuantityOnHand,
     Quantity QuantityOnSalesOrder,
-    Quantity QuantityReserved
-  );
+    Quantity QuantityReserved) {
+    public Quantity AvailableForSaleCount => QuantityOnHand - QuantityOnSalesOrder;
+  };
 }

@@ -10,7 +10,7 @@
 using BosmanCommerce7.Module.Models.RestApi;
 using RestSharp;
 
-namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.Models {
+namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryItemsSyncServices.RestApi {
   public record InventoryItemsGetAllApiRequest : ApiRequestBase {
     public InventoryItemsGetAllApiRequest() {
       Resource = $"/product";

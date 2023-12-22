@@ -7,10 +7,11 @@
  *
  */
 
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryStockLevelsSyncServices.Models;
 using BosmanCommerce7.Module.Models.RestApi;
 using RestSharp;
 
-namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryStockLevelsSyncServices.Models {
+namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventoryStockLevelsSyncServices.RestApi {
   public record InventoryLevelsInitializeApiRequest : ApiRequestBase {
     private readonly InitializeInventoryLevelsRecord _initializeInventoryLevelsRecord;
 

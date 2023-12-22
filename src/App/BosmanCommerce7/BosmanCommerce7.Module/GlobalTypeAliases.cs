@@ -5,6 +5,7 @@ global using Commerce7Sku = System.String;
 global using Commerce7LocationId = System.Guid;
 global using Commerce7LocationTitle = System.String;
 global using Commerce7InventoryId = System.Guid;
+global using Commerce7InventoryPolicy = System.String;
 
 global using EvolutionCustomerId = System.Int32;
 global using EvolutionInventoryItemCode = System.String;
