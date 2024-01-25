@@ -18,6 +18,7 @@ using BosmanCommerce7.Module.Models.EvolutionSdk.Customers;
 using CSharpFunctionalExtensions;
 using CSharpFunctionalExtensions.ValueTasks;
 using Microsoft.Extensions.Logging;
+using Pastel.Evolution;
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.CustomerMasterSyncServices {
 
@@ -161,13 +162,18 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
           return new TelephoneNumber[] { new TelephoneNumber { Phone = $"{t}" } };
         }
 
+        string? GetCity(Address address) {
+          string? line(string? line) => string.IsNullOrWhiteSpace(line) ? null : line.Trim();
+          return ValueOrNull(line(address.Line3) ?? line(address.Line4) ?? line(address.Line5));
+        }
+
         Result<CustomerMasterResponse> CreateCustomerWithAddress() {
           return _apiClient.CreateCustomerWithAddress(new CreateCustomerRecord {
             FirstName = $"{customerFirstName}",
             LastName = $"{customerLastName}",
             Address = ValueOrNull(evolutionCustomer.PhysicalAddress.Line1),
             Address2 = ValueOrNull(evolutionCustomer.PhysicalAddress.Line2),
-            City = ValueOrNull(evolutionCustomer.PhysicalAddress.Line3),
+            City = GetCity(evolutionCustomer.PhysicalAddress),
             StateCode = ValueOrNull(evolutionCustomer.PhysicalAddress.Line4),
             ZipCode = ValueOrNull(evolutionCustomer.PhysicalAddress.PostalCode),
             Emails = new EmailAddress[] { new EmailAddress { Email = evolutionEmailAddress } },
@@ -196,7 +202,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Cus
               AddressId = Commerce7CustomerId.Parse($"{customerDefaultAddressId}"),
               Address = ValueOrNull(evolutionCustomer.PhysicalAddress.Line1),
               Address2 = ValueOrNull(evolutionCustomer.PhysicalAddress.Line2),
-              City = ValueOrNull(evolutionCustomer.PhysicalAddress.Line3),
+              City = GetCity(evolutionCustomer.PhysicalAddress),
               StateCode = ValueOrNull(evolutionCustomer.PhysicalAddress.Line4),
               ZipCode = ValueOrNull(evolutionCustomer.PhysicalAddress.PostalCode),
             };

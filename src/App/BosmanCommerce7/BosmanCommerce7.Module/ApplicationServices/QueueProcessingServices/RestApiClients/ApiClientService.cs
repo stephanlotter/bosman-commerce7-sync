@@ -30,7 +30,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Res
       var json = JsonFunctions.Serialize(apiRequest.Data);
       var useJson = apiRequest.Data != null && !string.IsNullOrWhiteSpace(json) && json != "null";
 
-      _logger.LogInformation("Send Commerce7 request {method}:{resource}{json}", apiRequest.Method, requestResource, $":\r\n{json}" ?? "");
+      _logger.LogInformation("Send Commerce7 request {method}:{resource}{json}", apiRequest.Method, requestResource, (json == null ? " No JSON payload" : $" with JSON:\r\n{json}"));
 
       try {
         var result = _restClient.NewRestClient(configOptions)

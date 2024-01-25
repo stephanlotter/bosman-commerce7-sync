@@ -14,11 +14,12 @@ namespace BosmanCommerce7.Module.Extensions {
   public static class JsonFunctions {
 
     public static string? Serialize(object? data) {
+      if (data is null) { return null; }
       if (data is string) { return $"{data ?? ""}"; }
 
       var settings = new JsonSerializerSettings {
         NullValueHandling = NullValueHandling.Ignore,
-        ContractResolver = new CamelCasePropertyNamesContractResolver()        
+        ContractResolver = new CamelCasePropertyNamesContractResolver()
       };
       return data != null ? JsonConvert.SerializeObject(data, settings) : null;
     }

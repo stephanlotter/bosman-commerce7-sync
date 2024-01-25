@@ -11,6 +11,7 @@ after insert, update
 as
 begin
 	-- Change History
+	-- 2024-01-25: Changed trigger to work with bulk update.
 	-- 2023-11-25 08:57: Trigger Created
 
 	set nocount on;
@@ -22,11 +23,11 @@ begin
 		return;
 
 	if not update(ubARbIsPosCustomer)
-		and (select isnull(ubARbIsPosCustomer, 0) from inserted) = 0
+		and not exists (select 1 from inserted where isnull(ubARbIsPosCustomer, 0) = 1) 
 		return;
 
 	if not update(ON_HOLD)
-		and (select isnull(ON_HOLD, 0) from inserted) = 1
+		and not exists (select 1 from inserted where isnull(ON_HOLD, 0) = 0)
 		return;
 
 	-- Define columns to check for update
