@@ -32,8 +32,9 @@
           <Item Id="BundleMapping_ListView" Index="0" />
           <Item Id="WarehouseLocationMapping_ListView" Index="1" Caption="Warehouse/Location Mapping" />
           <Item Id="WarehousePostalCodeMapping_ListView" Index="1" Removed="True" />
-          <Item Id="TaxMapping_ListView" Index="2" />
-          <Item Id="ValueStore_ListView" Index="3" />
+          <Item Id="SalesPersonMapping_ListView" Index="2" />
+          <Item Id="TaxMapping_ListView" Index="3" />
+          <Item Id="ValueStore_ListView" Index="4" />
         </Items>
       </Item>
     </Items>
@@ -307,6 +308,25 @@
       </Layout>
     </DetailView>
     <ListView Id="OnlineSalesOrderProcessingLog_ListView" AllowDelete="False" AllowLink="False" AllowNew="False" />
+    <DetailView Id="SalesPersonMapping_DetailView" FreezeLayout="True">
+      <Layout IsNewNode="True" Removed="True">
+        <LayoutGroup Id="Main" Index="0" ShowCaption="False" RelativeSize="100" IsNewNode="True">
+          <LayoutGroup Id="SimpleEditors" Index="0" ShowCaption="False" RelativeSize="100" IsNewNode="True">
+            <LayoutGroup Id="SalesPersonMapping" Index="0" ShowCaption="False" RelativeSize="5.016181229773463" IsNewNode="True">
+              <LayoutItem Id="EvolutionSalesRepCode" ViewItem="EvolutionSalesRepCode" ShowCaption="" Index="0" RelativeSize="51.61290322580645" IsNewNode="True" />
+              <LayoutItem Id="Commerce7SalesAssociateName" ViewItem="Commerce7SalesAssociateName" ShowCaption="" Index="1" RelativeSize="48.38709677419355" IsNewNode="True" />
+            </LayoutGroup>
+            <LayoutGroup Id="XPObject" Index="1" ShowCaption="False" Caption="Oid" RelativeSize="94.98381877022653" IsNewNode="True" />
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <ListView Id="SalesPersonMapping_ListView">
+      <Columns>
+        <ColumnInfo Id="EvolutionSalesRepCode" Width="230" Index="0" SortIndex="0" SortOrder="Ascending" />
+        <ColumnInfo Id="Commerce7SalesAssociateName" Index="1" SortIndex="-1" SortOrder="None" />
+      </Columns>
+    </ListView>
     <DetailView Id="TaxMapping_DetailView" FreezeLayout="True">
       <Layout IsNewNode="True" Removed="True">
         <LayoutGroup Id="Main" Index="0" ShowCaption="False" RelativeSize="100" IsNewNode="True">

@@ -84,6 +84,7 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
       services.AddTransient<IWarehouseRepository, WarehouseRepository>();
       services.AddTransient<IBundleMappingRepository, BundleMappingRepository>();
       services.AddTransient<IWarehouseLocationMappingRepository, WarehouseLocationMappingRepository>();
+      services.AddTransient<ISalesPersonMappingRepository, SalesPersonMappingRepository>();
     }
 
     private static void RegisterCustomerMasterSyncServices(IServiceCollection services) {

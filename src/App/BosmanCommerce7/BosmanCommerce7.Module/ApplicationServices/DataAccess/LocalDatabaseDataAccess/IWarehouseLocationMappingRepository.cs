@@ -12,6 +12,7 @@ using CSharpFunctionalExtensions;
 using DevExpress.ExpressApp;
 
 namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess {
+
   public interface IWarehouseLocationMappingRepository {
 
     Result<WarehouseLocationMapping?> FindMapping(IObjectSpace objectSpace, EvolutionWarehouseCode warehouseCode);
