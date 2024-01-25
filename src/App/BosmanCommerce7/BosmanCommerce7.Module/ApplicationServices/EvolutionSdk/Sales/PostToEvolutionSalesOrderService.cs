@@ -80,7 +80,11 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
             onlineSalesOrder.RetryCount = 0;
             onlineSalesOrder.DatePosted = DateTime.Now;
             return Result.Success(onlineSalesOrder);
-          });
+          })
+
+          // TODO: Add logic to post payment and tip amounts. For POS orders
+
+          ;
         }
         catch (Exception ex) {
           _logger.LogError(ex, "Error posting sales order Online Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
@@ -90,6 +94,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
     }
 
     private Result<SalesOrder> CreateSalesOrderHeader(PostToEvolutionSalesOrderContext context, OnlineSalesOrder onlineSalesOrder) {
+
+      // TODO: Add support for refunds. For CLub and POS orders
+
       return NewSalesOrder()
 
         .Bind(salesOrder => {
@@ -99,6 +106,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
         .Bind(salesOrder => RepositoryGetFromCode(salesOrder, onlineSalesOrder.ProjectCode, _evolutionProjectRepository.Get, project => salesOrder.Project = project))
 
+        // TODO: Assign sales rep for POS orders based on salesAssociate / sales rep mapping
         .Bind(salesOrder => _salesOrdersPostValueStoreService
           .GetDefaultSalesRepresentativeCode()
           .Bind(code => RepositoryGetFromCode(salesOrder, code, _evolutionSalesRepresentativeRepository.Get, representative => salesOrder.Representative = representative))

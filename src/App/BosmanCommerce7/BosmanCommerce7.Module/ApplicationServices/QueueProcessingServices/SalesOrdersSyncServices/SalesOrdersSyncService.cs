@@ -146,8 +146,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
             localSalesOrder.PurchaseType = salesOrder.purchaseType;
 
             if (localSalesOrder.PurchaseType.Equals("refund", StringComparison.InvariantCultureIgnoreCase)) {
-              localSalesOrder.LinkedOrderNumber = salesOrder.linkedOrderNumber;
-              localSalesOrder.LinkedOnlineId = salesOrder.linkedOrderId;
+              localSalesOrder.LinkedOrderNumber = salesOrder.previousOrderNumber;
+              localSalesOrder.LinkedOnlineId = salesOrder.previousOrderId;
             }
 
             localSalesOrder.OrderDate = orderDate;
