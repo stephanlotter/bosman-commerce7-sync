@@ -144,6 +144,12 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
             localSalesOrder.OnlineId = salesOrder.id;
             localSalesOrder.Channel = channel;
             localSalesOrder.PurchaseType = salesOrder.purchaseType;
+
+            if (localSalesOrder.PurchaseType.Equals("refund", StringComparison.InvariantCultureIgnoreCase)) {
+              localSalesOrder.LinkedOrderNumber = salesOrder.linkedOrderNumber;
+              localSalesOrder.LinkedOnlineId = salesOrder.linkedOrderId;
+            }
+
             localSalesOrder.OrderDate = orderDate;
             localSalesOrder.ProjectCode = channelProjectCode.Value;
 

@@ -24,10 +24,12 @@ namespace BosmanCommerce7.Module.BusinessObjects.SalesOrders {
     private string? _customerId;
     private string? _emailAddress;
     private string? _onlineId;
+    private string? _linkedOnlineId;
     private string? _channel;
     private string? _purchaseType;
     private DateTime _orderDate;
     private int? _orderNumber;
+    private int? _linkedOrderNumber;
     private string? _evolutionSalesOrderNumber;
     private double _orderValueInVat;
     private string? _projectCode;
@@ -63,6 +65,13 @@ namespace BosmanCommerce7.Module.BusinessObjects.SalesOrders {
     public string? OnlineId {
       get => _onlineId;
       set => SetPropertyValue(nameof(OnlineId), ref _onlineId, value);
+    }
+
+    [Size(40)]
+    [ModelDefault("AllowEdit", "false")]
+    public string? LinkedOnlineId {
+      get => _linkedOnlineId;
+      set => SetPropertyValue(nameof(LinkedOnlineId), ref _linkedOnlineId, value);
     }
 
     [ModelDefault("AllowEdit", "false")]
@@ -108,6 +117,12 @@ namespace BosmanCommerce7.Module.BusinessObjects.SalesOrders {
     public int? OrderNumber {
       get => _orderNumber;
       set => SetPropertyValue(nameof(OrderNumber), ref _orderNumber, value);
+    }
+
+    [ModelDefault("AllowEdit", "false")]
+    public int? LinkedOrderNumber {
+      get => _linkedOrderNumber;
+      set => SetPropertyValue(nameof(LinkedOrderNumber), ref _linkedOrderNumber, value);
     }
 
     public string? ShipToName {

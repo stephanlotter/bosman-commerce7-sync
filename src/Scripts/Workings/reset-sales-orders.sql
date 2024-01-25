@@ -54,6 +54,6 @@ update OnlineSalesOrder set RetryAfter = getdate(),
 delete from OnlineSalesOrderLine
 delete from OnlineSalesOrderProcessingLog
 delete from OnlineSalesOrder
-update ValueStore set KeyValue='2023-11-01'  where KeyName='sales-orders-sync-last-synced'
+update ValueStore set KeyValue='2023-06-01'  where KeyName='sales-orders-sync-last-synced'
 
 */
