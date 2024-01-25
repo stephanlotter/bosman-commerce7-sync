@@ -8,14 +8,21 @@
  */
 
 namespace BosmanCommerce7.Module.Models.EvolutionSdk {
-  public record EvolutionInventoryLevel(
-    EvolutionInventoryItemCode Sku,
-    EvolutionWarehouseCode WarehouseCode,
-    EvolutionInventoryItemId inventoryItemId,
-    EvolutionWarehouseId warehouseId,
-    Quantity QuantityOnHand,
-    Quantity QuantityOnSalesOrder,
-    Quantity QuantityReserved) {
+  public record EvolutionInventoryLevel {
+    public required EvolutionInventoryItemCode Sku { get; init; }
+
+    public required EvolutionWarehouseCode WarehouseCode { get; init; }
+
+    public required EvolutionInventoryItemId inventoryItemId { get; init; }
+
+    public required EvolutionWarehouseId warehouseId { get; init; }
+
+    public Quantity QuantityOnHand { get; init; }
+
+    public Quantity QuantityOnSalesOrder { get; init; }
+
+    public Quantity QuantityReserved { get; init; }
+
     public Quantity AvailableForSaleCount => QuantityOnHand - QuantityOnSalesOrder;
   };
 }

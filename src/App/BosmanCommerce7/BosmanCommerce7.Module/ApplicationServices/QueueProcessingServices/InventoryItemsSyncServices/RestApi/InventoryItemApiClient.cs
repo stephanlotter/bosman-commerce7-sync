@@ -36,7 +36,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
     }
 
     public Result<InventoryLocationsResponse> GetLocations() {
-      throw new NotImplementedException();
+      return SendListResultRequest(new InventoryLocationsGetAllApiRequest(), () => new InventoryLocationsResponse(), "inventoryLocations").Map(r => (InventoryLocationsResponse)r);
     }
   }
 }

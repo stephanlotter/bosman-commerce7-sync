@@ -52,16 +52,14 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
     private Result LoadLocalCache() {
       if (_productRecords is not null || !_appDataFileManager.FileExists(_folderName, _fileName)) { return Result.Success(); }
       var result = _appDataFileManager.LoadJson<ProductRecord[]>(_folderName, _fileName);
-      if (result.IsFailure) { return Result.Failure($"Unable to load local cache. {result.Error}"); }
+      if (result.IsFailure) { return Result.Failure($"Unable to load local cache. [{_folderName}\\{_fileName}] {result.Error}"); }
       _productRecords = result.Value;
       return Result.Success();
     }
 
     public Result UpdateLocalCache() {
       return _inventoryItemApiClient.GetAllInventoryItems()
-         .Bind(x => {
-           return MapProductsToProductRecords(x);
-         })
+         .Bind(MapProductsToProductRecords)
          .Bind(y => {
            _appDataFileManager.StoreJson(_folderName, _fileName, y);
            _productRecords = y;

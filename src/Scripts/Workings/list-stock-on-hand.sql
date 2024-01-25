@@ -1,7 +1,7 @@
 use BosmanBFV
 
-declare @sku Nvarchar(20) = 'UHACHA15',
-		@warehouseCode Nvarchar(20) = '035',
+declare @sku Nvarchar(20) = 'BOSCAS14U',
+		@warehouseCode Nvarchar(20) = '026',
 		@InventoryItemId Int,
 		@WarehouseId Int;
 
@@ -36,7 +36,7 @@ select si.cSimpleCode Sku,
 	  join WhseMst wm
 		  on wm.WhseLink = ws.WHWhseID
 	where 1 = 1
-		--and ws.WHQtyOnHand > 0
+		and ws.WHQtyOnHand > 0
 		and ws.WHWhseID = @WarehouseId
 		and ws.WHStockLink = @InventoryItemId;
 
