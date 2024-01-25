@@ -28,6 +28,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
     private readonly ISalesOrdersPostValueStoreService _salesOrdersPostValueStoreService;
     private readonly IBundleMappingRepository _bundleMappingRepository;
     private readonly IWarehouseRepository _warehouseRepository;
+    private readonly ISalesPersonMappingRepository _salesPersonMappingRepository;
     private readonly IEvolutionCustomerRepository _evolutionCustomerRepository;
     private readonly IEvolutionProjectRepository _evolutionProjectRepository;
     private readonly IEvolutionDeliveryMethodRepository _evolutionDeliveryMethodRepository;
@@ -36,12 +37,15 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
     private readonly IEvolutionWarehouseRepository _evolutionWarehouseRepository;
     private readonly IEvolutionPriceListRepository _evolutionPriceListRepository;
     private readonly IEvolutionGeneralLedgerAccountRepository _evolutionGeneralLedgerAccountRepository;
+    private readonly IPostToEvolutionCustomerPaymentService _postToEvolutionCustomerPaymentService;
+    private readonly IPostToEvolutionSalesAssociateTipService _postToEvolutionSalesAssociateTipService;
 
     public PostToEvolutionSalesOrderService(ILogger<PostToEvolutionSalesOrderService> logger,
       IEvolutionSdk evolutionSdk,
       ISalesOrdersPostValueStoreService salesOrdersPostValueStoreService,
       IBundleMappingRepository bundleMappingRepository,
       IWarehouseRepository warehouseRepository,
+      ISalesPersonMappingRepository salesPersonMappingRepository,
       IEvolutionCustomerRepository evolutionCustomerRepository,
       IEvolutionProjectRepository evolutionProjectRepository,
       IEvolutionDeliveryMethodRepository evolutionDeliveryMethodRepository,
@@ -49,12 +53,15 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
       IEvolutionInventoryItemRepository evolutionInventoryItemRepository,
       IEvolutionWarehouseRepository evolutionWarehouseRepository,
       IEvolutionPriceListRepository evolutionPriceListRepository,
-      IEvolutionGeneralLedgerAccountRepository evolutionGeneralLedgerAccountRepository) {
+      IEvolutionGeneralLedgerAccountRepository evolutionGeneralLedgerAccountRepository,
+      IPostToEvolutionCustomerPaymentService postToEvolutionCustomerPaymentService,
+      IPostToEvolutionSalesAssociateTipService postToEvolutionSalesAssociateTipService) {
       _logger = logger;
       _evolutionSdk = evolutionSdk;
       _salesOrdersPostValueStoreService = salesOrdersPostValueStoreService;
       _bundleMappingRepository = bundleMappingRepository;
       _warehouseRepository = warehouseRepository;
+      _salesPersonMappingRepository = salesPersonMappingRepository;
       _evolutionCustomerRepository = evolutionCustomerRepository;
       _evolutionProjectRepository = evolutionProjectRepository;
       _evolutionDeliveryMethodRepository = evolutionDeliveryMethodRepository;
@@ -63,6 +70,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
       _evolutionWarehouseRepository = evolutionWarehouseRepository;
       _evolutionPriceListRepository = evolutionPriceListRepository;
       _evolutionGeneralLedgerAccountRepository = evolutionGeneralLedgerAccountRepository;
+      _postToEvolutionCustomerPaymentService = postToEvolutionCustomerPaymentService;
+      _postToEvolutionSalesAssociateTipService = postToEvolutionSalesAssociateTipService;
     }
 
     public Result<OnlineSalesOrder> Post(PostToEvolutionSalesOrderContext context, OnlineSalesOrder onlineSalesOrder) {
@@ -79,12 +88,17 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
             onlineSalesOrder.LastErrorMessage = null;
             onlineSalesOrder.RetryCount = 0;
             onlineSalesOrder.DatePosted = DateTime.Now;
-            return Result.Success(onlineSalesOrder);
+            return Result.Success((onlineSalesOrder, salesOrder));
           })
+          .Bind(orderDetails => {
+            var (onlineSalesOrder, salesOrder) = orderDetails;
+            if (!onlineSalesOrder.IsPosOrder) { return Result.Success(onlineSalesOrder); }
 
-          // TODO: Add logic to post payment and tip amounts. For POS orders
-
-          ;
+            return _postToEvolutionCustomerPaymentService
+              .Post(context, orderDetails)
+              .Bind(a => _postToEvolutionSalesAssociateTipService.Post(context, a))
+              .Bind(a => Result.Success(a.onlineSalesOrder));
+          });
         }
         catch (Exception ex) {
           _logger.LogError(ex, "Error posting sales order Online Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
@@ -94,9 +108,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
     }
 
     private Result<SalesOrder> CreateSalesOrderHeader(PostToEvolutionSalesOrderContext context, OnlineSalesOrder onlineSalesOrder) {
-
-      // TODO: Add support for refunds. For CLub and POS orders
-
       return NewSalesOrder()
 
         .Bind(salesOrder => {
@@ -106,11 +117,12 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
         .Bind(salesOrder => RepositoryGetFromCode(salesOrder, onlineSalesOrder.ProjectCode, _evolutionProjectRepository.Get, project => salesOrder.Project = project))
 
-        // TODO: Assign sales rep for POS orders based on salesAssociate / sales rep mapping
-        .Bind(salesOrder => _salesOrdersPostValueStoreService
-          .GetDefaultSalesRepresentativeCode()
-          .Bind(code => RepositoryGetFromCode(salesOrder, code, _evolutionSalesRepresentativeRepository.Get, representative => salesOrder.Representative = representative))
-        )
+        .Bind(salesOrder => {
+          return (onlineSalesOrder.IsPosOrder
+            ? _salesPersonMappingRepository.FindMapping(context.ObjectSpace, onlineSalesOrder.JsonProperties.SalesAssociateName()).Map(a => a?.EvolutionSalesRepCode)
+            : _salesOrdersPostValueStoreService.GetDefaultSalesRepresentativeCode())
+            .Bind(code => RepositoryGetFromCode(salesOrder, code, _evolutionSalesRepresentativeRepository.Get, representative => salesOrder.Representative = representative));
+        })
 
         .Bind(salesOrder => _salesOrdersPostValueStoreService
           .GetDefaultDeliveryMethodCode()

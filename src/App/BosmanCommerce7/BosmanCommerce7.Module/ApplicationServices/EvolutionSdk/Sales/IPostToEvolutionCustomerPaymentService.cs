@@ -1,7 +1,7 @@
 ﻿/*
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
- * Date created: 2023-08-21
+ * Date created: 2024-01-25
  * Author	: Stephan J Lotter
  * Notes	:
  *
@@ -10,11 +10,12 @@
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices.Models;
 using BosmanCommerce7.Module.BusinessObjects.SalesOrders;
 using CSharpFunctionalExtensions;
+using Pastel.Evolution;
 
 namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
-  public interface IPostToEvolutionSalesOrderService {
+  public interface IPostToEvolutionCustomerPaymentService {
 
-    Result<OnlineSalesOrder> Post(PostToEvolutionSalesOrderContext context, OnlineSalesOrder onlineSalesOrder);
+    Result<(OnlineSalesOrder onlineSalesOrder, SalesOrder salesOrder)> Post(PostToEvolutionSalesOrderContext context, (OnlineSalesOrder onlineSalesOrder, SalesOrder salesOrder) orderDetails);
   }
 }

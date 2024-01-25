@@ -8,6 +8,7 @@
  */
 
 using System.ComponentModel;
+using BosmanCommerce7.Module.ApplicationServices.OnlineSalesOrderServices;
 using BosmanCommerce7.Module.Extensions;
 using BosmanCommerce7.Module.Models;
 using DevExpress.ExpressApp.Model;
@@ -221,6 +222,9 @@ namespace BosmanCommerce7.Module.BusinessObjects.SalesOrders {
       get => _orderJson;
       set => SetPropertyValue(nameof(OrderJson), ref _orderJson, value);
     }
+
+    [Browsable(false)]
+    public OnlineSalesOrderJsonProperties JsonProperties => new(OrderJson ?? "");
 
     [Browsable(false)]
     public bool IsStoreOrder => Channel?.Equals("web", StringComparison.InvariantCultureIgnoreCase) ?? false;

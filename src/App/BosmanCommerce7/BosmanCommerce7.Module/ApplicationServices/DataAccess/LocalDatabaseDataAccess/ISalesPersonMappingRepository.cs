@@ -7,7 +7,13 @@
  *
  */
 
+using BosmanCommerce7.Module.BusinessObjects.Settings;
+using CSharpFunctionalExtensions;
+using DevExpress.ExpressApp;
+
 namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess {
 
-  public interface ISalesPersonMappingRepository { }
+  public interface ISalesPersonMappingRepository {
+    Result<SalesPersonMapping?> FindMapping(IObjectSpace objectSpace, string? commerce7SalesAssociateName);
+  }
 }

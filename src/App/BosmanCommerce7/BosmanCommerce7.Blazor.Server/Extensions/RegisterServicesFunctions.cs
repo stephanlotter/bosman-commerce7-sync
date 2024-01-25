@@ -67,6 +67,8 @@ namespace BosmanCommerce7.Blazor.Server.Extensions {
       services.AddSingleton<IEvolutionCompanyDescriptor, EvolutionCompanyDescriptor>(serviceProvider => Instance(serviceProvider));
       services.AddTransient<IEvolutionSdk, EvolutionSdk>();
       services.AddTransient<IPostToEvolutionSalesOrderService, PostToEvolutionSalesOrderService>();
+      services.AddTransient<IPostToEvolutionCustomerPaymentService, PostToEvolutionCustomerPaymentService>();
+      services.AddTransient<IPostToEvolutionSalesAssociateTipService, PostToEvolutionSalesAssociateTipService>();
       services.AddTransient<IEvolutionCustomerRepository, EvolutionCustomerRepository>();
       services.AddTransient<IEvolutionProjectRepository, EvolutionProjectRepository>();
       services.AddTransient<IEvolutionSalesRepresentativeRepository, EvolutionSalesRepresentativeRepository>();
