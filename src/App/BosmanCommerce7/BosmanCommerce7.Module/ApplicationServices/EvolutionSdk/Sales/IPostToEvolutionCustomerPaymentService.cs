@@ -16,6 +16,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
   public interface IPostToEvolutionCustomerPaymentService {
 
-    Result<(OnlineSalesOrder onlineSalesOrder, SalesOrder salesOrder)> Post(PostToEvolutionSalesOrderContext context, (OnlineSalesOrder onlineSalesOrder, SalesOrder salesOrder) orderDetails);
+    Result<(OnlineSalesOrder onlineSalesOrder, SalesDocumentBase customerDocument)> Post(PostToEvolutionSalesOrderContext context, (OnlineSalesOrder onlineSalesOrder, SalesDocumentBase customerDocument) orderDetails);
   }
 }

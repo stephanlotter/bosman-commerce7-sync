@@ -77,6 +77,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
     public Result<OnlineSalesOrder> Post(PostToEvolutionSalesOrderContext context, OnlineSalesOrder onlineSalesOrder) {
       return _evolutionSdk.WrapInSdkTransaction(connection => {
         try {
+
+          // TODO: Modify this code to handle refunds as CreditNote
+
           return CreateSalesOrderHeader(context, onlineSalesOrder)
 
           .Bind(salesOrder => AddSalesOrderLines(context, salesOrder, onlineSalesOrder))
@@ -108,6 +111,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
     }
 
     private Result<SalesOrder> CreateSalesOrderHeader(PostToEvolutionSalesOrderContext context, OnlineSalesOrder onlineSalesOrder) {
+      //var c = new CreditNote();
+
       return NewSalesOrder()
 
         .Bind(salesOrder => {
