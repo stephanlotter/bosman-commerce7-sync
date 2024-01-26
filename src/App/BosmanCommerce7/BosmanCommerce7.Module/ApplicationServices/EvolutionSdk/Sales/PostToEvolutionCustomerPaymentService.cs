@@ -33,12 +33,12 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
       var (onlineSalesOrder, customerDocument) = orderDetails;
 
-      var logMessage = onlineSalesOrder.IsRefund ? "customer refund" : "customer receipt";
-      var receiptId = onlineSalesOrder.IsRefund
+      var logTransactionType = onlineSalesOrder.IsRefund ? "customer refund" : "customer receipt";
+      var logTransactionIdentifier = onlineSalesOrder.IsRefund
         ? $"[Evolution Reference:{customerDocument.OrderNo}][POS Reference:{onlineSalesOrder.OrderNumber}][POS Refunded Order Reference:{onlineSalesOrder.LinkedOrderNumber}]"
         : $"[Evolution Reference:{customerDocument.OrderNo}][POS Reference:{onlineSalesOrder.OrderNumber}]";
 
-      _logger.LogInformation("START: Posting {logMessage} {receiptId}", logMessage, receiptId);
+      _logger.LogInformation("START: Posting {logTransactionType} {logTransactionIdentifier}", logTransactionType, logTransactionIdentifier);
 
       OrderDetail? GetFirstLineWithWarehouse() {
         foreach (OrderDetail line in customerDocument!.Detail) {
@@ -49,29 +49,49 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
         return null;
       }
 
-      try {
+      Result<string> WarehouseCode() {
         var salesOrderLine = GetFirstLineWithWarehouse();
 
         if (salesOrderLine == null) {
-          _logger.LogError("Cannot post customer receipt. No warehouse linked line found on the sales order. {logMessage} {receiptId}", logMessage, receiptId);
-          return Result.Failure<(OnlineSalesOrder onlineSalesOrder, SalesDocumentBase salesOrder)>("Cannot post customer receipt.");
+          _logger.LogError("Cannot post customer receipt. No warehouse linked line found on the sales order. {logTransactionType} {logTransactionIdentifier}", logTransactionType, logTransactionIdentifier);
+          return Result.Failure<string>("Cannot post customer receipt.");
         }
 
-        var warehouseCode = salesOrderLine.Warehouse.Code;
-        var transactionCodeKey = $"sales-orders-post-pos-payment-{(onlineSalesOrder.IsRefund ? "refund" : "receipt")}-transaction-code-{warehouseCode}";
+        return salesOrderLine.Warehouse.Code;
+      }
+
+      Result<string> GetTransactionCode(string warehouseCode) {
+        var transactionCodeKey = $"sales-orders-post-pos-payment-{(onlineSalesOrder!.IsRefund ? "refund" : "receipt")}-transaction-code-{warehouseCode}";
         var transactionCodeResult = _valueStoreRepository.GetValue(transactionCodeKey);
+
+        if (transactionCodeResult.IsFailure) {
+          return Result.Failure<string>(transactionCodeResult.Error);
+        }
+
+        if (string.IsNullOrWhiteSpace(transactionCodeResult.Value)) {
+          return Result.Failure<string>($"Could not find a transaction code entry in ValueStore for {transactionCodeKey}");
+        }
+
+        return transactionCodeResult.Value.Trim().ToUpper();
+      }
+
+      try {
+        var warehouseCodeResult = WarehouseCode();
+
+        if (warehouseCodeResult.IsFailure) {
+          return Result.Failure<(OnlineSalesOrder onlineSalesOrder, SalesDocumentBase salesOrder)>(warehouseCodeResult.Error);
+        }
+
+        var warehouseCode = warehouseCodeResult.Value;
+        var transactionCodeResult = GetTransactionCode(warehouseCode);
 
         if (transactionCodeResult.IsFailure) {
           return Result.Failure<(OnlineSalesOrder onlineSalesOrder, SalesDocumentBase salesOrder)>(transactionCodeResult.Error);
         }
 
-        if (string.IsNullOrWhiteSpace(transactionCodeResult.Value)) {
-          return Result.Failure<(OnlineSalesOrder onlineSalesOrder, SalesDocumentBase salesOrder)>($"Could not find a transaction code entry in ValueStore for {transactionCodeKey}");
-        }
-
+        var transactionCode = $"{transactionCodeResult.Value}";
         var transactionAmountInVat = customerDocument.TotalIncl;
         var transactionDate = customerDocument.OrderDate;
-        var transactionCode = $"{transactionCodeResult.Value}".Trim().ToUpper();
 
         var receipt = new CustomerTransaction {
           Customer = new Customer(customerDocument.Customer.ID),
@@ -90,11 +110,11 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
         return Result.Success((onlineSalesOrder, customerDocument));
       }
       catch (Exception ex) {
-        _logger.LogError(ex, "While posting {logMessage} {receiptId}", logMessage, receiptId);
+        _logger.LogError(ex, "While posting {logTransactionType} {logTransactionIdentifier}", logTransactionType, logTransactionIdentifier);
         return Result.Failure<(OnlineSalesOrder onlineSalesOrder, SalesDocumentBase salesOrder)>(ex.Message);
       }
       finally {
-        _logger.LogInformation("END: Posting {logMessage} {receiptId}", logMessage, receiptId);
+        _logger.LogInformation("END: Posting {logTransactionType} {logTransactionIdentifier}", logTransactionType, logTransactionIdentifier);
       }
     }
   }
