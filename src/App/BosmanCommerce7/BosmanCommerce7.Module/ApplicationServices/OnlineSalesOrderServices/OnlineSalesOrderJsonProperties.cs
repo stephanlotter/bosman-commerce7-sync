@@ -20,5 +20,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.OnlineSalesOrderServices {
     }
 
     public string? SalesAssociateName() => _data?.salesAssociate?.Name;
+
+    public double TipAmount() => _data?.tipTotal ?? 0;
+
   }
 }
