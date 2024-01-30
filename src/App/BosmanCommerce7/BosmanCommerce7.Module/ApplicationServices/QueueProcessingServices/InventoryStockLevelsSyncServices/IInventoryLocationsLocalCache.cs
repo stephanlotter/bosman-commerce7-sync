@@ -17,5 +17,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
     Result UpdateLocalCache();
 
     Result<InventoryLocationRecord> GetLocationByTitle(Commerce7LocationTitle locationTitle);
+
+    Result<InventoryLocationRecord> GetLocationById(Commerce7LocationId? locationId);
   }
 }

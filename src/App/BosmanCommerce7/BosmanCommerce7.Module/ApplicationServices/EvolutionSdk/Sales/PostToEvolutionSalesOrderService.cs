@@ -10,6 +10,7 @@
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
 using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Customers;
 using BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Inventory;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.InventorySyncServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices.Models;
 using BosmanCommerce7.Module.BusinessObjects.SalesOrders;
@@ -29,6 +30,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
     private readonly IBundleMappingRepository _bundleMappingRepository;
     private readonly IWarehouseRepository _warehouseRepository;
     private readonly ISalesPersonMappingRepository _salesPersonMappingRepository;
+    private readonly IInventoryLocationsLocalCache _inventoryLocationsLocalCache;
+    private readonly IWarehouseLocationMappingRepository _warehouseLocationMappingRepository;
     private readonly IEvolutionCustomerRepository _evolutionCustomerRepository;
     private readonly IEvolutionProjectRepository _evolutionProjectRepository;
     private readonly IEvolutionDeliveryMethodRepository _evolutionDeliveryMethodRepository;
@@ -46,6 +49,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
       IBundleMappingRepository bundleMappingRepository,
       IWarehouseRepository warehouseRepository,
       ISalesPersonMappingRepository salesPersonMappingRepository,
+      IInventoryLocationsLocalCache inventoryLocationsLocalCache,
+      IWarehouseLocationMappingRepository warehouseLocationMappingRepository,
       IEvolutionCustomerRepository evolutionCustomerRepository,
       IEvolutionProjectRepository evolutionProjectRepository,
       IEvolutionDeliveryMethodRepository evolutionDeliveryMethodRepository,
@@ -62,6 +67,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
       _bundleMappingRepository = bundleMappingRepository;
       _warehouseRepository = warehouseRepository;
       _salesPersonMappingRepository = salesPersonMappingRepository;
+      _inventoryLocationsLocalCache = inventoryLocationsLocalCache;
+      _warehouseLocationMappingRepository = warehouseLocationMappingRepository;
       _evolutionCustomerRepository = evolutionCustomerRepository;
       _evolutionProjectRepository = evolutionProjectRepository;
       _evolutionDeliveryMethodRepository = evolutionDeliveryMethodRepository;
@@ -77,9 +84,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
     public Result<OnlineSalesOrder> Post(PostToEvolutionSalesOrderContext context, OnlineSalesOrder onlineSalesOrder) {
       return _evolutionSdk.WrapInSdkTransaction(connection => {
         try {
-
-          // TODO: Modify this code to handle refunds as CreditNote
-
           return CreateSalesOrderHeader(context, onlineSalesOrder)
 
           .Bind(salesOrder => AddSalesOrderLines(context, salesOrder, onlineSalesOrder))
@@ -110,9 +114,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
       });
     }
 
-    private Result<SalesOrder> CreateSalesOrderHeader(PostToEvolutionSalesOrderContext context, OnlineSalesOrder onlineSalesOrder) {
-      //var c = new CreditNote();
-
+    private Result<SalesDocumentBase> CreateSalesOrderHeader(PostToEvolutionSalesOrderContext context, OnlineSalesOrder onlineSalesOrder) {
       return NewSalesOrder()
 
         .Bind(salesOrder => {
@@ -145,8 +147,16 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
           return Result.Success(salesOrder);
         });
 
-      Result<SalesOrder> NewSalesOrder() {
-        return Result.Success(new SalesOrder {
+      Result<SalesDocumentBase> NewSalesOrder() {
+        if (onlineSalesOrder.IsRefund) {
+          return Result.Success((SalesDocumentBase)new CreditNote {
+            ExternalOrderNo = $"{onlineSalesOrder.OrderNumber}",
+            OrderDate = onlineSalesOrder.OrderDate,
+            TaxMode = TaxMode.Inclusive
+          });
+        }
+
+        return Result.Success((SalesDocumentBase)new SalesOrder {
           ExternalOrderNo = $"{onlineSalesOrder.OrderNumber}",
           OrderDate = onlineSalesOrder.OrderDate,
           TaxMode = TaxMode.Inclusive
@@ -154,7 +164,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
       }
     }
 
-    private Result<SalesOrder> AddSalesOrderLines(PostToEvolutionSalesOrderContext context, SalesOrder salesOrder, OnlineSalesOrder onlineSalesOrder) {
+    private Result<SalesDocumentBase> AddSalesOrderLines(PostToEvolutionSalesOrderContext context, SalesDocumentBase salesOrder, OnlineSalesOrder onlineSalesOrder) {
       foreach (var onlineSalesOrderLine in onlineSalesOrder.SalesOrderLines.OrderBy(a => a.LineType)) {
         var result = onlineSalesOrderLine.LineType switch {
           SalesOrderLineType.Inventory => AddSalesOrderInventoryLine(context, salesOrder, onlineSalesOrder, onlineSalesOrderLine),
@@ -168,10 +178,10 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
       return Result.Success(salesOrder);
     }
 
-    private Result<SalesOrder> AddSalesOrderInventoryLine(PostToEvolutionSalesOrderContext context, SalesOrder salesOrder, OnlineSalesOrder onlineSalesOrder, OnlineSalesOrderLine onlineSalesOrderLine) {
+    private Result<SalesDocumentBase> AddSalesOrderInventoryLine(PostToEvolutionSalesOrderContext context, SalesDocumentBase salesOrder, OnlineSalesOrder onlineSalesOrder, OnlineSalesOrderLine onlineSalesOrderLine) {
       try {
         if (string.IsNullOrWhiteSpace(onlineSalesOrderLine.Sku)) {
-          return Result.Failure<SalesOrder>($"Sku on line with Oid {onlineSalesOrderLine.Oid} is blank");
+          return Result.Failure<SalesDocumentBase>($"Sku on line with Oid {onlineSalesOrderLine.Oid} is blank");
         }
 
         return NewSalesOrderLine(salesOrder)
@@ -189,6 +199,16 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
           })
 
           .Bind(salesOrderLine => {
+            if (onlineSalesOrder.IsPosOrder) {
+
+              // TODO:  Test this. Add location ID "b0639f8a-c0b5-4f7a-9ec5-ce64220fd3ca" with title "Shop 1" to local cache.
+
+              return _inventoryLocationsLocalCache
+                .GetLocationById(onlineSalesOrder.JsonProperties.ShipInventoryLocationId())
+                .Bind(a => _warehouseLocationMappingRepository.FindMappingByLocationTitle(context.ObjectSpace, a.Title))
+                .Bind(warehouseMapping => RepositoryGetFromCode(salesOrderLine, warehouseMapping.WarehouseCode, _evolutionWarehouseRepository.Get, warehouse => salesOrderLine.Warehouse = warehouse));
+            }
+
             return _warehouseRepository.FindWarehouseCode(new FindWarehouseCodeDescriptor {
               IsStoreOrder = onlineSalesOrder.IsStoreOrder,
               PostalCode = onlineSalesOrder.ShipToAddressPostalCode,
@@ -211,7 +231,10 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
           .Bind(salesOrderLine => {
             salesOrderLine.Quantity = onlineSalesOrderLine.Quantity;
-            salesOrderLine.Reserved = Math.Min(salesOrderLine.WarehouseContext.QtyFree, onlineSalesOrderLine.Quantity);
+
+            if (!onlineSalesOrder.IsRefund) {
+              salesOrderLine.Reserved = Math.Min(salesOrderLine.WarehouseContext.QtyFree, onlineSalesOrderLine.Quantity);
+            }
 
             if (!string.IsNullOrWhiteSpace(onlineSalesOrderLine.LineNotes)) {
               salesOrderLine.Note = onlineSalesOrderLine.LineNotes;
@@ -226,11 +249,11 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
         var message = $"Error adding inventory line with code '{onlineSalesOrderLine.Sku}' (Oid:{onlineSalesOrderLine.Oid}): {ex.Message}";
         _logger.LogError("{error}", message);
         _logger.LogError(ex, "Error adding inventory line");
-        return Result.Failure<SalesOrder>(message);
+        return Result.Failure<SalesDocumentBase>(message);
       }
     }
 
-    private Result<SalesOrder> AddSalesOrderGeneralLedgerLine(PostToEvolutionSalesOrderContext context, SalesOrder salesOrder, OnlineSalesOrder onlineSalesOrder, OnlineSalesOrderLine onlineSalesOrderLine) {
+    private Result<SalesDocumentBase> AddSalesOrderGeneralLedgerLine(PostToEvolutionSalesOrderContext context, SalesDocumentBase salesOrder, OnlineSalesOrder onlineSalesOrder, OnlineSalesOrderLine onlineSalesOrderLine) {
       try {
         return NewSalesOrderLine(salesOrder)
 
@@ -257,11 +280,11 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
         var message = $"Error adding general ledger line with code '{onlineSalesOrderLine.Sku}' (Oid:{onlineSalesOrderLine.Oid}): {ex.Message}";
         _logger.LogError("{error}", message);
         _logger.LogError(ex, "Error adding general ledger line");
-        return Result.Failure<SalesOrder>(message);
+        return Result.Failure<SalesDocumentBase>(message);
       }
     }
 
-    private Result<OrderDetail> NewSalesOrderLine(SalesOrder salesOrder) {
+    private Result<OrderDetail> NewSalesOrderLine(SalesDocumentBase salesOrder) {
       return Result.Success(new OrderDetail {
         TaxMode = salesOrder.TaxMode
       })
@@ -271,15 +294,15 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
       });
     }
 
-    private Result<SalesOrder> RepositoryGet<T>(SalesOrder salesOrder, object parameters, Func<object, Result<T>> get, Action<T> onSuccess) {
+    private Result<SalesDocumentBase> RepositoryGet<T>(SalesDocumentBase salesOrder, object parameters, Func<object, Result<T>> get, Action<T> onSuccess) {
       return get(parameters).Bind(result => {
         onSuccess(result);
         return Result.Success(salesOrder);
       });
     }
 
-    private Result<SalesOrder> RepositoryGetFromCode<T>(SalesOrder salesOrder, string? parameters, Func<string, Result<T>> get, Action<T> onSuccess) {
-      return parameters != null ? RepositoryGet(salesOrder, parameters, p => get((string)p), onSuccess) : Result.Failure<SalesOrder>("Parameters may not be null");
+    private Result<SalesDocumentBase> RepositoryGetFromCode<T>(SalesDocumentBase salesOrder, string? parameters, Func<string, Result<T>> get, Action<T> onSuccess) {
+      return parameters != null ? RepositoryGet(salesOrder, parameters, p => get((string)p), onSuccess) : Result.Failure<SalesDocumentBase>("Parameters may not be null");
     }
 
     private Result<OrderDetail> RepositoryGetFromCode<T>(OrderDetail salesOrderLine, string? parameters, Func<string, Result<T>> get, Action<T> onSuccess) {

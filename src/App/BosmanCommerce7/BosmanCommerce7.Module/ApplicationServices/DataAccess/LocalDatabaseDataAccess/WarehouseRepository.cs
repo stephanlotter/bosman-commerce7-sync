@@ -22,6 +22,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDat
     }
 
     public Result<string?> FindWarehouseCode(FindWarehouseCodeDescriptor findWarehouseCodeDescriptor) {
+
       return _valueStoreRepository.GetValue("default-ship-from-warehouse-code");
 
       //if (!findWarehouseCodeDescriptor.IsStoreOrder) {

@@ -1,36 +1,31 @@
-﻿/* 
+﻿/*
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
  * Date created: 2023-08-22
  * Author	: Stephan J Lotter
- * Notes	: 
- *  
+ * Notes	:
+ *
  */
 
 using CSharpFunctionalExtensions;
 using Pastel.Evolution;
 
-namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Inventory
-{
-    public class EvolutionWarehouseRepository : EvolutionRepositoryBase, IEvolutionWarehouseRepository
-    {
+namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Inventory {
 
-        public Result<Warehouse> Get(string? code)
-        {
-            if (string.IsNullOrWhiteSpace(code))
-            {
-                return Result.Failure<Warehouse>($"Warehouse lookup: code may not be empty.");
-            }
+  public class EvolutionWarehouseRepository : EvolutionRepositoryBase, IEvolutionWarehouseRepository {
 
-            int? id = GetId("select WhseLink from WhseMst where lower(Code)=lower(@code)", new { code });
+    public Result<Warehouse> Get(string? code) {
+      if (string.IsNullOrWhiteSpace(code)) {
+        return Result.Failure<Warehouse>($"Warehouse lookup: code may not be empty.");
+      }
 
-            if (id == null)
-            {
-                return Result.Failure<Warehouse>($"Warehouse with code {code} not found");
-            }
+      int? id = GetId("select WhseLink from WhseMst where lower(Code)=lower(@code)", new { code });
 
-            return new Warehouse(id.Value);
-        }
+      if (id == null) {
+        return Result.Failure<Warehouse>($"Warehouse with code {code} not found");
+      }
+
+      return new Warehouse(id.Value);
     }
-
+  }
 }

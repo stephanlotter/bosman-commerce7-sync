@@ -16,6 +16,7 @@ using BosmanCommerce7.Module.Models;
 using CSharpFunctionalExtensions;
 using DevExpress.Data.Filtering;
 using DevExpress.ExpressApp;
+using DevExpress.Xpo;
 using Microsoft.Extensions.Logging;
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices {
@@ -99,7 +100,12 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
     private List<OnlineSalesOrder> GetOnlineSalesOrders(IObjectSpace objectSpace, SalesOrdersPostContext context) {
       CriteriaOperator? criteria = BuildCriteria(context);
-      return objectSpace.GetObjects<OnlineSalesOrder>(criteria).ToList();
+
+      var sort = new List<SortProperty> {
+        new SortProperty(nameof(OnlineSalesOrder.OrderNumber), DevExpress.Xpo.DB.SortingDirection.Ascending)
+      };
+
+      return objectSpace.GetObjects<OnlineSalesOrder>(criteria, (IList<SortProperty>)sort, false).ToList();
     }
 
     private CriteriaOperator BuildCriteria(SalesOrdersPostContext context) {

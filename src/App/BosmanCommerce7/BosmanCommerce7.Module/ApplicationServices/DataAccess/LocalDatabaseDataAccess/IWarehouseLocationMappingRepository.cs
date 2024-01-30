@@ -15,6 +15,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDat
 
   public interface IWarehouseLocationMappingRepository {
 
-    Result<WarehouseLocationMapping?> FindMapping(IObjectSpace objectSpace, EvolutionWarehouseCode warehouseCode);
+    Result<WarehouseLocationMapping?> FindMappingByWarehouseCode(IObjectSpace objectSpace, EvolutionWarehouseCode warehouseCode);
+
+    Result<WarehouseLocationMapping> FindMappingByLocationTitle(IObjectSpace objectSpace, Commerce7LocationTitle locationTile);
   }
 }

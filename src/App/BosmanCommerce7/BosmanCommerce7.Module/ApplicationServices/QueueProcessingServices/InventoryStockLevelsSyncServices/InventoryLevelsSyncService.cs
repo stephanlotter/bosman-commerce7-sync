@@ -73,7 +73,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
       .Bind(a => {
         var (productRecord, evolutionInventoryLevel) = a;
 
-        return _warehouseLocationMappingRepository.FindMapping(ObjectSpace!, evolutionInventoryLevel.WarehouseCode)
+        return _warehouseLocationMappingRepository.FindMappingByWarehouseCode(ObjectSpace!, evolutionInventoryLevel.WarehouseCode)
           .Bind(locationMapping => {
             if (locationMapping == null) { return Result.Failure<ResetInventoryContext>($"Warehouse location mapping not found for warehouse code {evolutionInventoryLevel.WarehouseCode}."); }
             return Result.Success(new ResetInventoryContext(productRecord, evolutionInventoryLevel, locationMapping));

@@ -21,7 +21,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDat
     public WarehouseLocationMappingRepository(ILogger<WarehouseLocationMappingRepository> logger, ILocalDatabaseConnectionStringProvider connectionStringProvider) : base(logger, connectionStringProvider) {
     }
 
-    public Result<WarehouseLocationMapping?> FindMapping(IObjectSpace objectSpace, EvolutionWarehouseCode warehouseCode) {
+    public Result<WarehouseLocationMapping?> FindMappingByWarehouseCode(IObjectSpace objectSpace, EvolutionWarehouseCode warehouseCode) {
       try {
         var mapping = objectSpace.FindObject<WarehouseLocationMapping>("WarehouseCode".IsEqualToOperator(warehouseCode));
         return mapping;
@@ -29,6 +29,23 @@ namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDat
       catch (Exception ex) {
         Logger.LogError(ex, "Error finding warehouse location mapping.");
         return Result.Failure<WarehouseLocationMapping?>(ex.Message);
+      }
+    }
+
+    public Result<WarehouseLocationMapping> FindMappingByLocationTitle(IObjectSpace objectSpace, Commerce7LocationTitle locationTile) {
+      try {
+        if (locationTile == null) {
+          return Result.Failure<WarehouseLocationMapping>("Cannot find warehouse location mapping. Location title is empty.");
+        }
+
+        var mapping = objectSpace.FindObject<WarehouseLocationMapping>("LocationTitle".IsEqualToOperator(locationTile));
+        return mapping == null
+          ? Result.Failure<WarehouseLocationMapping>($"There is no warehouse location mapping for location title: '{locationTile}'")
+          : Result.Success(mapping);
+      }
+      catch (Exception ex) {
+        Logger.LogError(ex, "Error finding warehouse location mapping.");
+        return Result.Failure<WarehouseLocationMapping>(ex.Message);
       }
     }
   }

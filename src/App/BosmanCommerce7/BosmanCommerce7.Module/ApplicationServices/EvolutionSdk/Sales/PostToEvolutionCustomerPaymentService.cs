@@ -52,7 +52,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
         }
 
         var transactionCode = $"{transactionCodeResult.Value}";
-        var transactionAmountInVat = Math.Abs(customerDocument.TotalIncl);
+        var transactionAmountInVat = Math.Abs(onlineSalesOrder.JsonProperties.PaymentAmount());
         var transactionDate = customerDocument.OrderDate;
 
         var receipt = new CustomerTransaction {

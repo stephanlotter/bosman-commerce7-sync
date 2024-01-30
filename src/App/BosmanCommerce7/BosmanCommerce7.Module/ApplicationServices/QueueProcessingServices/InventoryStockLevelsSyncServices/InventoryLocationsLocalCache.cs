@@ -27,6 +27,27 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
       _appDataFileManager = appDataFileManager;
     }
 
+    public Result<InventoryLocationRecord> GetLocationById(Commerce7LocationId? locationId) {
+      var tryCount = 0;
+      while (true) {
+        var r = LoadLocalCache();
+        if (r.IsFailure) { return Result.Failure<InventoryLocationRecord>(r.Error); }
+
+        var location = _locationRecords?.FirstOrDefault(x => x.Id.Equals(locationId));
+
+        if (location != null) { return Result.Success(location); }
+
+        if (tryCount == 0) {
+          r = UpdateLocalCache();
+          if (r.IsFailure) { return Result.Failure<InventoryLocationRecord>($"Unable to update local location cache. {r.Error}"); }
+        }
+        else {
+          return Result.Failure<InventoryLocationRecord>($"Location {locationId} not found on Commerce7.");
+        }
+        tryCount++;
+      }
+    }
+
     public Result<InventoryLocationRecord> GetLocationByTitle(string locationTitle) {
       var tryCount = 0;
       while (true) {
