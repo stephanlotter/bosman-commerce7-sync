@@ -25,7 +25,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
   public class PostToEvolutionSalesOrderService : IPostToEvolutionSalesOrderService {
     private readonly ILogger<PostToEvolutionSalesOrderService> _logger;
-    private readonly IEvolutionSdk _evolutionSdk;
     private readonly ISalesOrdersPostValueStoreService _salesOrdersPostValueStoreService;
     private readonly IBundleMappingRepository _bundleMappingRepository;
     private readonly IWarehouseRepository _warehouseRepository;
@@ -44,7 +43,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
     private readonly IPostToEvolutionSalesAssociateTipService _postToEvolutionSalesAssociateTipService;
 
     public PostToEvolutionSalesOrderService(ILogger<PostToEvolutionSalesOrderService> logger,
-      IEvolutionSdk evolutionSdk,
       ISalesOrdersPostValueStoreService salesOrdersPostValueStoreService,
       IBundleMappingRepository bundleMappingRepository,
       IWarehouseRepository warehouseRepository,
@@ -62,7 +60,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
       IPostToEvolutionCustomerPaymentService postToEvolutionCustomerPaymentService,
       IPostToEvolutionSalesAssociateTipService postToEvolutionSalesAssociateTipService) {
       _logger = logger;
-      _evolutionSdk = evolutionSdk;
       _salesOrdersPostValueStoreService = salesOrdersPostValueStoreService;
       _bundleMappingRepository = bundleMappingRepository;
       _warehouseRepository = warehouseRepository;
@@ -82,36 +79,40 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
     }
 
     public Result<OnlineSalesOrder> Post(PostToEvolutionSalesOrderContext context, OnlineSalesOrder onlineSalesOrder) {
-      return _evolutionSdk.WrapInSdkTransaction(connection => {
-        try {
-          return CreateSalesOrderHeader(context, onlineSalesOrder)
+      try {
+        return CreateSalesOrderHeader(context, onlineSalesOrder)
 
-          .Bind(salesOrder => AddSalesOrderLines(context, salesOrder, onlineSalesOrder))
+        .Bind(salesOrder => AddSalesOrderLines(context, salesOrder, onlineSalesOrder))
 
-          .Bind(salesOrder => {
+        .Bind(salesOrder => {
+          if (onlineSalesOrder.IsRefund) {
+            salesOrder.Complete();
+          }
+          else {
             salesOrder.Save();
-            onlineSalesOrder.EvolutionSalesOrderNumber = salesOrder.OrderNo;
-            onlineSalesOrder.PostingStatus = SalesOrderPostingStatus.Posted;
-            onlineSalesOrder.LastErrorMessage = null;
-            onlineSalesOrder.RetryCount = 0;
-            onlineSalesOrder.DatePosted = DateTime.Now;
-            return Result.Success((onlineSalesOrder, salesOrder));
-          })
-          .Bind(orderDetails => {
-            var (onlineSalesOrder, salesOrder) = orderDetails;
-            if (!onlineSalesOrder.IsPosOrder) { return Result.Success(onlineSalesOrder); }
+          }
 
-            return _postToEvolutionCustomerPaymentService
-              .Post(context, orderDetails)
-              .Bind(a => _postToEvolutionSalesAssociateTipService.Post(context, a))
-              .Bind(a => Result.Success(a.onlineSalesOrder));
-          });
-        }
-        catch (Exception ex) {
-          _logger.LogError(ex, "Error posting sales order Online Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
-          return Result.Failure<OnlineSalesOrder>(ex.Message);
-        }
-      });
+          onlineSalesOrder.EvolutionSalesOrderNumber = salesOrder.Reference;
+          onlineSalesOrder.PostingStatus = SalesOrderPostingStatus.Posted;
+          onlineSalesOrder.LastErrorMessage = null;
+          onlineSalesOrder.RetryCount = 0;
+          onlineSalesOrder.DatePosted = DateTime.Now;
+          return Result.Success((onlineSalesOrder, salesOrder));
+        })
+        .Bind(orderDetails => {
+          var (onlineSalesOrder, salesOrder) = orderDetails;
+          if (!onlineSalesOrder.IsPosOrder) { return Result.Success(onlineSalesOrder); }
+
+          return _postToEvolutionCustomerPaymentService
+            .Post(context, orderDetails)
+            .Bind(a => _postToEvolutionSalesAssociateTipService.Post(context, a))
+            .Bind(a => Result.Success(a.onlineSalesOrder));
+        });
+      }
+      catch (Exception ex) {
+        _logger.LogError(ex, "Error posting sales order Online Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
+        return Result.Failure<OnlineSalesOrder>(ex.Message);
+      }
     }
 
     private Result<SalesDocumentBase> CreateSalesOrderHeader(PostToEvolutionSalesOrderContext context, OnlineSalesOrder onlineSalesOrder) {
@@ -200,9 +201,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
           .Bind(salesOrderLine => {
             if (onlineSalesOrder.IsPosOrder) {
-
-              // TODO:  Test this. Add location ID "b0639f8a-c0b5-4f7a-9ec5-ce64220fd3ca" with title "Shop 1" to local cache.
-
               return _inventoryLocationsLocalCache
                 .GetLocationById(onlineSalesOrder.JsonProperties.ShipInventoryLocationId())
                 .Bind(a => _warehouseLocationMappingRepository.FindMappingByLocationTitle(context.ObjectSpace, a.Title))
@@ -218,6 +216,11 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
           })
 
           .Bind(salesOrderLine => {
+            if (onlineSalesOrder.IsPosOrder) {
+              salesOrderLine.UnitSellingPrice = onlineSalesOrderLine.UnitPriceInVat;
+              return Result.Success(salesOrderLine);
+            }
+
             int? customerPriceListId = salesOrder.Customer.DefaultPriceListID > 0 ? salesOrder.Customer.DefaultPriceListID : null;
 
             return _evolutionPriceListRepository
@@ -230,7 +233,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
           })
 
           .Bind(salesOrderLine => {
-            salesOrderLine.Quantity = onlineSalesOrderLine.Quantity;
+            salesOrderLine.Quantity = (onlineSalesOrder.IsRefund ? -1 : 1) * onlineSalesOrderLine.Quantity;
 
             if (!onlineSalesOrder.IsRefund) {
               salesOrderLine.Reserved = Math.Min(salesOrderLine.WarehouseContext.QtyFree, onlineSalesOrderLine.Quantity);

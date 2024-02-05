@@ -37,16 +37,36 @@ select *
     order by Sku;
 
 
+-- Evolution Database
+/*
+
+delete from BosmanBFV..PostAR where ExtOrderNum in ('1511', '1512');
+delete from BosmanBFV..PostGL where ExtOrderNum in ('1511', '1512');
+delete from BosmanBFV.._btblInvoiceLines where iInvoiceID in (select AutoIndex from BosmanBFV..InvNum where ExtOrderNum in ('1511', '1512'));
+delete from BosmanBFV..InvNum where ExtOrderNum in ('1511', '1512');
+
+*/
+
+
+-- BosmanCommerce7 Database
 
 /*
 update OnlineSalesOrderLine set Sku='BOSNER14' where LineType=1
 */
 
 /*
-update OnlineSalesOrder set RetryAfter = getdate(),
+
+update OnlineSalesOrder 
+	set RetryAfter = getdate(),
       RetryCount = 0,
       PostingStatus = 0,
-      LastErrorMessage = null;
+      LastErrorMessage = null,
+	  EvolutionSalesOrderNumber = null
+	where 1=1
+		--and OID in (3427, 3428)
+		and OrderNumber in (1511, 1512)
+	  
+	  ;
 */
 
 /*

@@ -26,8 +26,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
       var logTransactionType = onlineSalesOrder.IsRefund ? "tip refund" : "tip receipt";
       var logTransactionIdentifier = onlineSalesOrder.IsRefund
-        ? $"[Evolution Reference:{customerDocument.OrderNo}][POS Reference:{onlineSalesOrder.OrderNumber}][POS Refunded Order Reference:{onlineSalesOrder.LinkedOrderNumber}]"
-        : $"[Evolution Reference:{customerDocument.OrderNo}][POS Reference:{onlineSalesOrder.OrderNumber}]";
+        ? $"[Evolution Reference:{customerDocument.Reference}][POS Reference:{onlineSalesOrder.OrderNumber}][POS Refunded Order Reference:{onlineSalesOrder.LinkedOrderNumber}]"
+        : $"[Evolution Reference:{customerDocument.Reference}][POS Reference:{onlineSalesOrder.OrderNumber}]";
 
       _logger.LogInformation("START: Posting {logTransactionType} {logTransactionIdentifier}", logTransactionType, logTransactionIdentifier);
 
@@ -71,6 +71,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
         }
 
         var transactionDate = customerDocument.OrderDate;
+        var evolutionReference = onlineSalesOrder.IsRefund ? customerDocument.Reference : customerDocument.OrderNo;
 
         Result PostTransaction(Result<string> accountResult, double debitAmount, double creditAmount) {
           if (accountResult.IsFailure) { return accountResult; }
@@ -80,11 +81,11 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
             Debit = debitAmount,
             Credit = creditAmount,
             Date = transactionDate,
-            Description = $"POS Tip {onlineSalesOrder.OrderNumber} {customerDocument.OrderNo} {warehouseCode}",
+            Description = $"POS Tip {onlineSalesOrder.OrderNumber} {evolutionReference} {warehouseCode}",
             ExtOrderNo = $"{onlineSalesOrder.OrderNumber}",
-            OrderNo = customerDocument.OrderNo,
+            OrderNo = evolutionReference,
             Reference2 = $"{onlineSalesOrder.JsonProperties.SalesAssociateName}",
-            Reference = customerDocument.OrderNo,
+            Reference = evolutionReference,
             TransactionCode = new TransactionCode(Pastel.Evolution.Module.GL, transactionCode)
           };
 

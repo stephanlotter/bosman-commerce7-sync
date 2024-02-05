@@ -33,12 +33,14 @@ namespace BosmanCommerce7.Module.ApplicationServices.OnlineSalesOrderServices {
       var tenders = _data?.tenders ?? null;
       if (tenders == null) { return _orderTenders; }
 
+      double Amount(dynamic amount) => ((double)amount) / 100;
+
       foreach (var tender in tenders) {
         var t = new OrderTender {
           TenderType = tender.tenderType,
           ChargeStatus = tender.chargeStatus,
-          AmountTendered = tender.amountTendered,
-          TipAmount = tender.tip
+          AmountTendered = Amount(tender.amountTendered),
+          TipAmount = Amount(tender.tip)
         };
 
         _orderTenders.Add(t);

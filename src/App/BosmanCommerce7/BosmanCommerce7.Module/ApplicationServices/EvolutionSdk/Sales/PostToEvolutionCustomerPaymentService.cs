@@ -26,8 +26,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
       var logTransactionType = onlineSalesOrder.IsRefund ? "customer refund" : "customer receipt";
       var logTransactionIdentifier = onlineSalesOrder.IsRefund
-        ? $"[Evolution Reference:{customerDocument.OrderNo}][POS Reference:{onlineSalesOrder.OrderNumber}][POS Refunded Order Reference:{onlineSalesOrder.LinkedOrderNumber}]"
-        : $"[Evolution Reference:{customerDocument.OrderNo}][POS Reference:{onlineSalesOrder.OrderNumber}]";
+        ? $"[Evolution Reference:{customerDocument.Reference}][POS Reference:{onlineSalesOrder.OrderNumber}][POS Refunded Order Reference:{onlineSalesOrder.LinkedOrderNumber}]"
+        : $"[Evolution Reference:{customerDocument.Reference}][POS Reference:{onlineSalesOrder.OrderNumber}]";
 
       _logger.LogInformation("START: Posting {logTransactionType} {logTransactionIdentifier}", logTransactionType, logTransactionIdentifier);
 
@@ -55,15 +55,17 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
         var transactionAmountInVat = Math.Abs(onlineSalesOrder.JsonProperties.PaymentAmount());
         var transactionDate = customerDocument.OrderDate;
 
+        var evolutionReference = onlineSalesOrder.IsRefund ? customerDocument.Reference : customerDocument.OrderNo;
+
         var receipt = new CustomerTransaction {
           Customer = new Customer(customerDocument.Customer.ID),
           Amount = transactionAmountInVat,
           Date = transactionDate,
-          Description = $"POS Order {onlineSalesOrder.OrderNumber} {customerDocument.OrderNo} {warehouseCode}",
+          Description = $"POS Order payment {onlineSalesOrder.OrderNumber} {evolutionReference} {warehouseCode}",
           ExtOrderNo = $"{onlineSalesOrder.OrderNumber}",
-          OrderNo = customerDocument.OrderNo,
+          OrderNo = evolutionReference,
           Reference2 = $"{onlineSalesOrder.LinkedOrderNumber}",
-          Reference = customerDocument.OrderNo,
+          Reference = evolutionReference,
           TransactionCode = new TransactionCode(Pastel.Evolution.Module.AR, transactionCode)
         };
 
