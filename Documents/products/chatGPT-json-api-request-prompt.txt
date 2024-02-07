@@ -1,0 +1,22 @@
+Please read the following page to get details on creating a new product using the Commerce7 web api: https://developer.commerce7.com/docs/products
+
+Now please write a Python script to read product data from a JSON file and the create the products using a REST API. Remember to map the JSON read from the file to the JSON required by the WEB API.
+
+# JSON input file details
+- Filename: `C:\dev\client-development\bosman-commerce7-sync\Documents\products\Commerce7-products-production.json`
+
+# API Details
+- Endpoint: https://api.commerce7.com/v1/product
+- Method: POST
+- Authorization: Basic Auth
+- Headers: 
+  - tenant: neurasoft-sandbox
+
+# Notes
+- Define a variables for the Basic Auth username and password.
+- Add the product payload as JSON to the body
+- Only one product can be created at a time.
+- Terminate the script if the WEB API does not return HTTP 200.
+- Terminate the script if there is an error.
+
+

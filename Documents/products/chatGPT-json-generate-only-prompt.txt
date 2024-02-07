@@ -1,0 +1,11 @@
+Please write a Python script to read product data from a JSON file and then create a new JSON file in the same folder that contains JSON for submitting a web request for creating new products.
+
+# JSON input file details
+- Filename: `C:\dev\client-development\bosman-commerce7-sync\Documents\products\Commerce7-products-production.json`
+
+Read the following web page for details on the JSON format for creating new products: https://developer.commerce7.com/docs/products
+
+
+
+
+

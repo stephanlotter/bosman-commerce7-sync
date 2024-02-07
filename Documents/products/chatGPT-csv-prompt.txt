@@ -1,0 +1,118 @@
+Please write a Python script to read data from a CSV file and convert it to JSON. The first line in the CSV file contains the column headings. Please note that the CSV file data rows contain Linefeeds that are part of the data and do not necceseraly indicate the end of the CSV line.
+
+Each CSV data row starts with a GUID. Use the GUID to know when each data row starts.
+
+# Here is a sample of the contents of a CSV file.
+
+```CSV
+Id,Title,Sub Title,Image,Type,Teaser,Content,Web Status,Admin Status,Department,Vendor,Variant Title,SKU,UPC Code,Cost of Good,Price,Compare Price,Has Inventory,Inventory Policy,Has Shipping,Tax Type,Weight,Security,SEO Title,SEO Description,Slug,Created At,Updated At
+00f31182-2cff-4f11-b82c-015cf889c1f5,Chickpea fries,Chickpea fries,,General Merchandise,,,Not Available,Available,,,Chickpea fries,CHICKPEAFRIES,,10.00,90.00,,,Back Order,1,General Merchandise,0.2,Public,Chickpea fries,,chickpea-fries,2024-01-31 14:11:00,2024-01-31 14:11:00
+01359436-10f5-4a0e-9e4b-1ace05a20893,Pork Saltimbocca,saltimbocca,,General Merchandise,,,Not Available,Available,,,Pork Saltimbocca,PORKSALTIM,,40.00,120.00,,,Back Order,1,General Merchandise,0.1,Public,Pork Saltimbocca,,pork-saltimbocca,2024-01-31 14:05:35,2024-01-31 14:05:35
+0164c893-2cc9-47cd-990f-1361806212c5,Cappuccino,Cappuccino,,General Merchandise,,,Not Available,Available,,,Double cappuccino,cappuccino,,10.00,30.00,,,Back Order,,General Merchandise,0.01,Public,Cappuccino,,cappuccino,2024-01-31 13:50:37,2024-01-31 13:51:23
+0b815776-afda-453f-b78c-6895f8484791,Upper Hemel-en-Aarde Chardonnay 2022,,https://images.commerce7.com/bosman-family-vineyards/images/original/untitled-design-8-1707144149979.png,Wine,"The lively combination of subtle oak and bright fruit exhibits aromas of white flowers, citrus, pear and brioche.","<p>A lightly oaked wine that tastes of butterscotch and pear and will go well with roast chicken or a creamy seafood pasta.</p>
+<p><span class=""TextRun SCXW190730114 BCX8"" lang=""EN-ZA"" xml:lang=""EN-ZA"" data-contrast=""auto""><span class=""NormalTextRun SCXW190730114 BCX8"">The cooled grapes are </span></span><span class=""TrackChangeTextInsertion TrackedChange SCXW190730114 BCX8""><span class=""TextRun SCXW190730114 BCX8"" lang=""EN-ZA"" xml:lang=""EN-ZA"" data-contrast=""auto""><span class=""NormalTextRun SCXW190730114 BCX8"">hand </span><span class=""NormalTextRun ContextualSpellingAndGrammarErrorV2Themed SCXW190730114 BCX8"">sorted ,</span><span class=""NormalTextRun SCXW190730114 BCX8""> destemmed and </span></span></span><span class=""TextRun SCXW190730114 BCX8"" lang=""EN-ZA"" xml:lang=""EN-ZA"" data-contrast=""auto""><span class=""NormalTextRun SCXW190730114 BCX8"">pressed <span class=""TrackChangeTextInsertion TrackedChange SCXW190730114 BCX8"">settle and clear ove</span><span class=""TrackChangeTextInsertion TrackedChange SCXW190730114 BCX8"">rnight</span>. 15% of the settled juice is then fermented and matured in new <span class=""TrackChangeTextInsertion TrackedChange SCXW190730114 BCX8"">French ceramic toasted</span> oak for <span class=""TrackChangeTextInsertion TrackedChange SCXW233638285 BCX8""><span class=""TextRun SCXW233638285 BCX8"" lang=""EN-ZA"" xml:lang=""EN-ZA"" data-contrast=""auto""><span class=""NormalTextRun SCXW233638285 BCX8"">8</span></span></span><span class=""TextRun SCXW233638285 BCX8"" lang=""EN-ZA"" xml:lang=""EN-ZA"" data-contrast=""auto""><span class=""NormalTextRun SCXW233638285 BCX8""> months </span><span class=""NormalTextRun SCXW233638285 BCX8""><span class=""TrackChangeTextInsertion TrackedChange SCXW116181183 BCX8""><span class=""TextRun SCXW116181183 BCX8"" lang=""EN-ZA"" xml:lang=""EN-ZA"" data-contrast=""auto""><span class=""NormalTextRun SCXW116181183 BCX8"">w</span></span></span><span class=""TrackChangeTextInsertion TrackedChange SCXW116181183 BCX8""><span class=""TextRun SCXW116181183 BCX8"" lang=""EN-ZA"" xml:lang=""EN-ZA"" data-contrast=""auto""><span class=""NormalTextRun SCXW116181183 BCX8"">hich </span><span class=""NormalTextRun SCXW116181183 BCX8"">re</span></span></span><span class=""TrackChangeTextInsertion TrackedChange SCXW116181183 BCX8""><span class=""TextRun SCXW116181183 BCX8"" lang=""EN-ZA"" xml:lang=""EN-ZA"" data-contrast=""auto""><span class=""NormalTextRun SCXW116181183 BCX8"">tained</span><span class=""NormalTextRun SCXW116181183 BCX8""> the bright fruit </span></span></span><span class=""TrackChangeTextInsertion TrackedChange SCXW116181183 BCX8""><span class=""TextRun SCXW116181183 BCX8"" lang=""EN-ZA"" xml:lang=""EN-ZA"" data-contrast=""auto""><span class=""NormalTextRun SCXW116181183 BCX8"">aromas</span></span></span><span class=""TrackChangeTextDeletionMarker TrackedChange SCXW116181183 BCX8""><span class=""TrackedChange SCXW116181183 BCX8""><span class=""TextRun Highlight SCXW116181183 BCX8"" lang=""EN-ZA"" xml:lang=""EN-ZA"" data-contrast=""auto""><span class=""NormalTextRun TrackChangeTextDeletion SCXW116181183 BCX8"">.</span></span></span></span> <span class=""TrackChangeTextInsertion TrackedChange TrackChangeHoverSelectColorRed SCXW116181183 BCX8""><span class=""TextRun SCXW116181183 BCX8"" lang=""EN-ZA"" xml:lang=""EN-ZA"" data-contrast=""auto""><span class=""NormalTextRun TrackChangeHoverSelectHighlightRed SCXW116181183 BCX8"">Only</span></span></span><span class=""TrackChangeTextInsertion TrackedChange TrackChangeHoverSelectColorRed SCXW116181183 BCX8""><span class=""TextRun SCXW116181183 BCX8"" lang=""EN-ZA"" xml:lang=""EN-ZA"" data-contrast=""auto""><span class=""NormalTextRun TrackChangeHoverSelectHighlightRed SCXW116181183 BCX8""> partial </span></span></span><span class=""TrackChangeTextInsertion TrackedChange SCXW116181183 BCX8""><span class=""TextRun SCXW116181183 BCX8"" lang=""EN-ZA"" xml:lang=""EN-ZA"" data-contrast=""auto""><span class=""NormalTextRun SCXW116181183 BCX8"">s</span></span></span><span class=""TextRun SCXW116181183 BCX8"" lang=""EN-ZA"" xml:lang=""EN-ZA"" data-contrast=""auto""><span class=""NormalTextRun SCXW116181183 BCX8"">pontaneous malolactic fermentation </span><span class=""NormalTextRun SCXW116181183 BCX8"">occurred in the barrels.</span></span></span></span></span></span></p>
+<p><span class=""TextRun SCXW190730114 BCX8"" lang=""EN-ZA"" xml:lang=""EN-ZA"" data-contrast=""auto""><span class=""NormalTextRun SCXW190730114 BCX8""><span class=""EOP TrackedChange SCXW233638285 BCX8"" data-ccp-props=""{&quot;201341983&quot;:0,&quot;335551550&quot;:6,&quot;335551620&quot;:6,&quot;335559739&quot;:0,&quot;335559740&quot;:240}""><span class=""TextRun SCXW183508408 BCX8"" lang=""EN-GB"" xml:lang=""EN-GB"" data-contrast=""auto""><span class=""NormalTextRun SCXW183508408 BCX8"">Pale gold. <span class=""TextRun SCXW70837907 BCX8"" lang=""EN-GB"" xml:lang=""EN-GB"" data-contrast=""auto""><span class=""NormalTextRun SCXW70837907 BCX8"">The lively combination of </span></span><span class=""TrackChangeTextInsertion TrackedChange SCXW70837907 BCX8""><span class=""TextRun SCXW70837907 BCX8"" lang=""EN-GB"" xml:lang=""EN-GB"" data-contrast=""auto""><span class=""NormalTextRun SCXW70837907 BCX8"">subtle </span></span></span><span class=""TextRun SCXW70837907 BCX8"" lang=""EN-GB"" xml:lang=""EN-GB"" data-contrast=""auto""><span class=""NormalTextRun SCXW70837907 BCX8"">oak and bright fruit exhibits aromas of </span></span><span class=""TrackChangeTextInsertion TrackedChange SCXW70837907 BCX8""><span class=""TextRun SCXW70837907 BCX8"" lang=""EN-GB"" xml:lang=""EN-GB"" data-contrast=""auto""><span class=""NormalTextRun SCXW70837907 BCX8"">white flowers, citrus</span></span></span><span class=""TextRun SCXW70837907 BCX8"" lang=""EN-GB"" xml:lang=""EN-GB"" data-contrast=""auto""><span class=""NormalTextRun SCXW70837907 BCX8"">, pear and brioche. <span class=""NormalTextRun SCXW184417232 BCX8"">Beautiful mouth feel with </span><span class=""NormalTextRun SCXW184417232 BCX8"">a long creamy </span><span class=""NormalTextRun SCXW184417232 BCX8"">finish.</span></span></span></span></span></span></span></span></p>
+<p><span class=""TextRun SCXW190730114 BCX8"" lang=""EN-ZA"" xml:lang=""EN-ZA"" data-contrast=""auto""><span class=""NormalTextRun SCXW190730114 BCX8""><span class=""EOP TrackedChange SCXW233638285 BCX8"" data-ccp-props=""{&quot;201341983&quot;:0,&quot;335551550&quot;:6,&quot;335551620&quot;:6,&quot;335559739&quot;:0,&quot;335559740&quot;:240}""><span class=""TextRun SCXW183508408 BCX8"" lang=""EN-GB"" xml:lang=""EN-GB"" data-contrast=""auto""><span class=""NormalTextRun SCXW183508408 BCX8""><span class=""TextRun SCXW70837907 BCX8"" lang=""EN-GB"" xml:lang=""EN-GB"" data-contrast=""auto""><span class=""NormalTextRun SCXW70837907 BCX8""><span class=""NormalTextRun SCXW184417232 BCX8""><strong><span class=""TextRun SCXW265016811 BCX8"" lang=""EN-GB"" xml:lang=""EN-GB"" data-contrast=""auto""><span class=""NormalTextRun SCXW265016811 BCX8"">VARIETAL:</span></span></strong><span class=""TextRun SCXW265016811 BCX8"" lang=""EN-GB"" xml:lang=""EN-GB"" data-contrast=""auto""><strong> </strong><span class=""NormalTextRun SCXW265016811 BCX8"">Chardonnay 100%.</span></span></span></span></span></span></span></span></span></span></p>
+<p><a href=""https://bosmanwines.com/wp-content/uploads/2023/05/Fact_Sheet_Upper_Hemel-en-Aarde-Chardonnay_2022.pdf"">Upper Hemel-en-Aarde Chardonnay 2022 Tasting Note</a></p>",Available,Available,,,750ml,UHACHA22,,42.96,220.00,,,Back Order,1,Wine,0,Public,Upper Hemel-en-Aarde Chardonnay 2022,"A lightly oaked wine that tastes of butterscotch and pear and will go well with roast chicken or a creamy seafood pasta.
+The cooled grapes are hand sorted ,...",upper-hemel-en-aarde-chardonnay-2021,2023-03-27 14:32:12,2024-02-05 16:42:46
+1f57681f-bfbc-460d-8d22-4b90445e0ec9,Hello Summer Selection,SPECIAL PRICE R2192 | SAVE R548,https://images.commerce7.com/bosman-family-vineyards/images/original/peartree_debos-5-1701340155017.jpg,Bundle,We've secured a line up of 12 of our best selling wines to have on hand to serve your guests as they pop in over the holidays!,"<p><strong>We've secured a line up of 12 of our best selling wines to have on hand to serve your guests as they pop in over the holidays!</strong></p>
+<p>1x Pet Nat Weisser Riesling 2023</p>
+<p>1x Chasing Rabbits Grenache Blanc 2021</p>
+<p>1x Generaiton 8 Chenin Blanc 2023</p>
+<p>1x Generation 8 Rose 2022</p>
+<p>1x Optenhorst Chenin Blanc 2022 | 5* Platter</p>
+<p>1x Generation 8 Shiraz 2022</p>
+<p>1x Twyfeling Cinsaut 2021</p>
+<p>1x Upper Hemel-en-Aarde Pinot Noir 2022</p>
+<p>1x Adama Red 2021</p>
+<p>1x Magnum Opus Pinot Noir 2018</p>
+<p>1x Bosman Nero 2019</p>
+<p>1x Dolce Primitivo 2017 | Limited Edition&nbsp;</p>
+<p><strong>SPECIAL PRICE R2192 | SAVE R548</strong></p>",Not Available,Available,,,12 bottle selection,SUMSEL12,,,2192.00,2740.00,,Back Order,,Not Taxable,0,Public,Hello Summer Selection,"We've secured a line up of 12 of our best selling wines to have on hand to serve your guests as they pop in over the holidays!
+1x Pet Nat Weisser Riesling...",hello-summer-selection,2023-11-30 12:29:38,2023-12-21 10:51:48
+```
+
+# CSV column to JSON mapping
+
+Note:
+- CSV Columns mapped to ignore must not be added to the JSON.
+- CSV Columns mapped to instances of variants are under the sub-heading of `Variante mapping`
+- Variants of the same product must be added to the `variants` array. 
+- Variants are mapped in the form of `variant.proeprty_name` where `varaint` is a instance of a variant.
+
+CSV Column  => JSON Property
+Id  => ignore
+Title => title
+Sub Title => subTitle
+Image => ignore
+Type => type
+Teaser => teaser
+Content => content
+Web Status => webStatus
+Admin Status => adminStatus
+Department => ignore
+Vendor => ignore
+Security => security.availableTo
+SEO Title => seo.title
+SEO Description => seo.description
+Slug => slug
+Created At => ignore
+Updated At => ignore
+
+## Variante mapping
+Variant Title => variant.title
+SKU => variant.sku
+UPC Code => variant.upcCode
+Cost of Good => variant.costOfGood
+Price => variant.price
+Compare Price => variant.comparePrice
+Has Inventory => variant.hasInventory
+Inventory Policy => variant.inventoryPolicy
+Has Shipping => variant.hasShipping
+Tax Type => variant.taxType
+Weight  => variant.weight
+
+
+# Here is a sample of the JSON output format.
+
+```JSON
+{
+    "type": "Wine",
+    "title": "Spectra Red",
+    "subTitle": "Blend of the best!",
+    "slug": "spectra-red",
+    "webStatus": "Available",
+    "adminStatus": "Available",
+    "collections": [],
+    "wine": {
+        "type": "Red",
+        "varietal": "Blend",
+        "countryCode": "US",
+        "region": "California",
+        "appellation": "Alexander Valley",
+        "vintage": 2019
+    },
+    "seo": {
+        "title": "Spectra Red"
+    },
+    "variants": [{
+        "title": "750ml",
+        "sku": "458392858",
+        "upcCode": "294837564810",
+        "price": 1500,
+        "comparePrice": 1700,
+        "sortOrder": 1,
+        "hasShipping": true,
+        "weight": 3,
+        "costOfGood": 300,
+        "hasInventory": false,
+        "inventoryPolicy": "Back Order",
+        "taxType": "Wine",
+        "volumeInML": 750,
+        "bottleDeposit": 0
+    }],
+    "security": {
+        "availableTo": "Public"
+    }
+}
+```
