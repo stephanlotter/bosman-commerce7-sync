@@ -22,8 +22,8 @@ begin
 	if update(DCBalance)
 		return;
 
-	if not update(ubARbIsPosCustomer)
-		and not exists (select 1 from inserted where isnull(ubARbIsPosCustomer, 0) = 1) 
+	if not update(ubARIsPOSCustomer)
+		and not exists (select 1 from inserted where isnull(ubARIsPOSCustomer, 0) = 1) 
 		return;
 
 	if not update(ON_HOLD)
@@ -32,7 +32,7 @@ begin
 
 	-- Define columns to check for update
 	if update(On_Hold)
-		or update(ubARbIsPosCustomer)
+		or update(ubARIsPOSCustomer)
 		or update(name)
 		or update(contact_person)
 		or update(email)
