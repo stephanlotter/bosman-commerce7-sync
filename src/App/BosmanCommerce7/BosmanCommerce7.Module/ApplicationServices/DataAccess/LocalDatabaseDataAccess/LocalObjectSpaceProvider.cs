@@ -8,7 +8,9 @@
  */
 
 using System.Data.SqlClient;
+using BosmanCommerce7.Module.BusinessObjects.InventoryItems;
 using BosmanCommerce7.Module.BusinessObjects.SalesOrders;
+using BosmanCommerce7.Module.BusinessObjects.Settings;
 using BosmanCommerce7.Module.Models;
 using CSharpFunctionalExtensions;
 using DevExpress.ExpressApp;
@@ -26,10 +28,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDat
     public void WrapInObjectSpaceTransaction(Action<IObjectSpace> action) {
       using var connection = new SqlConnection(_localDatabaseConnectionStringProvider.LocalDatabase);
       using var osp = new XPObjectSpaceProvider(_localDatabaseConnectionStringProvider.LocalDatabase, connection, threadSafe: true, useSeparateDataLayers: true);
+      RegisterClasses(osp);
 
       using IObjectSpace objectSpace = osp.CreateObjectSpace();
-
-      osp.TypesInfo.RegisterEntity(typeof(OnlineSalesOrder));
 
       try {
         action(objectSpace);
@@ -45,9 +46,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDat
       using var connection = new SqlConnection(_localDatabaseConnectionStringProvider.LocalDatabase);
       using var osp = new XPObjectSpaceProvider(_localDatabaseConnectionStringProvider.LocalDatabase, connection, threadSafe: true, useSeparateDataLayers: true);
 
-      using IObjectSpace objectSpace = osp.CreateObjectSpace();
+      RegisterClasses(osp);
 
-      osp.TypesInfo.RegisterEntity(typeof(OnlineSalesOrder));
+      using IObjectSpace objectSpace = osp.CreateObjectSpace();
 
       try {
         var result = func(objectSpace);
@@ -63,10 +64,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDat
     public Result<T> WrapInObjectSpaceTransaction<T>(Func<IObjectSpace, Result<T>> func) {
       using var connection = new SqlConnection(_localDatabaseConnectionStringProvider.LocalDatabase);
       using var osp = new XPObjectSpaceProvider(_localDatabaseConnectionStringProvider.LocalDatabase, connection, threadSafe: true, useSeparateDataLayers: true);
+      RegisterClasses(osp);
 
       using IObjectSpace objectSpace = osp.CreateObjectSpace();
-
-      osp.TypesInfo.RegisterEntity(typeof(OnlineSalesOrder));
 
       try {
         var result = func(objectSpace);
@@ -78,5 +78,12 @@ namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDat
         throw;
       }
     }
+
+    private static void RegisterClasses(XPObjectSpaceProvider osp) {
+      osp.TypesInfo.RegisterEntity(typeof(OnlineSalesOrder));
+      osp.TypesInfo.RegisterEntity(typeof(InventoryLevelsUpdateQueue));
+      osp.TypesInfo.RegisterEntity(typeof(WarehouseLocationMapping));
+    }
+
   }
 }

@@ -23,7 +23,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
 
     public Result<EvolutionInventoryLevel> Get(EvolutionInventoryItemId inventoryItemId, EvolutionWarehouseId warehouseId) {
       const string sql = @"
-select si.cSimpleCode Sku,
+select REPLACE(si.cSimpleCode,'/','') Sku,
 	   wm.Code WarehouseCode,
 	   ws.WHWhseID,
 	   ws.WHStockLink,

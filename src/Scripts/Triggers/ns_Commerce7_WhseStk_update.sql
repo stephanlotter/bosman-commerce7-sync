@@ -1,4 +1,4 @@
-use BosmanBFV;
+use BAWINE;
 
 -- Check if the trigger 'ns_Commerce7_WhseStk_update' already exists and drop it if it does
 drop trigger if exists ns_Commerce7_WhseStk_update;
@@ -26,9 +26,9 @@ begin
 				and wm.Code in ('035', '002'))
 		return;
 
-	insert into BosmanCommerce7.dbo.StockLevelUpdateQueue (
+	insert into BosmanCommerce7.dbo.InventoryLevelsUpdateQueue (
 					WarehouseId,
-					ItemId,
+					InventoryItemId,
 					Status,
 					RetryCount,
 					DateTimeAdded,

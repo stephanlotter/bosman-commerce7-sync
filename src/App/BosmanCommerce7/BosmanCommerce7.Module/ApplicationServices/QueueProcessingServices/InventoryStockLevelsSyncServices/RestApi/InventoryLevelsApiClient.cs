@@ -62,7 +62,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
 
       var data = new InitializeInventoryLevelsRecord {
         Sku = sku,
-        InventoryPolicy = Commerce7InventoryPolicies.DoNotSell,
+        InventoryPolicy = Commerce7InventoryPolicies.BackOrder,
         InitialInventory = new[] {
           new Initialinventory {
             InventoryLocationId = locationId,

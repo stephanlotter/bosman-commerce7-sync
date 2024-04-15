@@ -1,4 +1,4 @@
-use BosmanBFV;
+use BAWINE;
 -- Drops the trigger if it already exists
 drop trigger if exists ns_Commerce7_StkItem_update;
 go
@@ -41,9 +41,9 @@ begin
 		and not update(ubIIReSubmit)
 		return;
 
-	-- Logic to insert into StockItemUpdateQueue
-	insert into BosmanCommerce7..StockItemUpdateQueue (
-					ItemId,
+	-- Logic to insert into InventoryItemsUpdateQueue
+	insert into BosmanCommerce7..InventoryItemsUpdateQueue (
+					InventoryItemId,
 					Status,
 					RetryCount,
 					DateTimeAdded,

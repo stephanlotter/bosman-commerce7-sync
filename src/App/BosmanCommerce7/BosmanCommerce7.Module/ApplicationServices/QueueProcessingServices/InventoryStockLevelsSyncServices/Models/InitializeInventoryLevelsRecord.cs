@@ -25,6 +25,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
   public static class Commerce7InventoryPolicies {
     public const string DoNotSell = "Don't sell";
 
-    public const string BackOrder = "backorder";
+    public const string BackOrder = "Back Order";
   }
 }

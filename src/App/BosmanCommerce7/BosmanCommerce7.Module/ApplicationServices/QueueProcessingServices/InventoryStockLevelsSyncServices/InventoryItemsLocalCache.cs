@@ -30,6 +30,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Inv
 
     public Result<ProductRecord> GetProduct(string sku) {
       var tryCount = 0;
+
       while (true) {
         var r = LoadLocalCache();
         if (r.IsFailure) { return Result.Failure<ProductRecord>(r.Error); }
