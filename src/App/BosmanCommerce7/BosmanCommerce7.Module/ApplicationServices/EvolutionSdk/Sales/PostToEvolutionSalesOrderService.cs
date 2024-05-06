@@ -85,7 +85,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
         .Bind(salesOrder => AddSalesOrderLines(context, salesOrder, onlineSalesOrder))
 
         .Bind(salesOrder => {
-          if (onlineSalesOrder.IsRefund || onlineSalesOrder.IsPosOrder) {
+          //if (onlineSalesOrder.IsRefund || onlineSalesOrder.IsPosOrder) { // Turned off for now because of lot tracking that needs to be handled.
+          if (onlineSalesOrder.IsRefund) {
             salesOrder.Complete();
           }
           else {
@@ -238,6 +239,10 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
             if (!onlineSalesOrder.IsRefund) {
               salesOrderLine.Reserved = Math.Min(salesOrderLine.WarehouseContext.QtyFree, onlineSalesOrderLine.Quantity);
             }
+
+            // TODO: if this item IsLotTracked then we need to allocate lots to this line.
+            //salesOrderLine.WarehouseContext.InventoryItem.IsLotTracked
+
 
             if (!string.IsNullOrWhiteSpace(onlineSalesOrderLine.LineNotes)) {
               salesOrderLine.Note = onlineSalesOrderLine.LineNotes;
