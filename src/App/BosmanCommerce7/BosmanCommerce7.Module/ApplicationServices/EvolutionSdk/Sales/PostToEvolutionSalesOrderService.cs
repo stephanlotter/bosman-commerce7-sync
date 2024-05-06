@@ -85,7 +85,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
         .Bind(salesOrder => AddSalesOrderLines(context, salesOrder, onlineSalesOrder))
 
         .Bind(salesOrder => {
-          if (onlineSalesOrder.IsRefund) {
+          if (onlineSalesOrder.IsRefund || onlineSalesOrder.IsPosOrder) {
             salesOrder.Complete();
           }
           else {
