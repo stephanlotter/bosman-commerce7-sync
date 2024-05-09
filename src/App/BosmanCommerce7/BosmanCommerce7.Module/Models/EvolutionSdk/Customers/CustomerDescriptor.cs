@@ -12,5 +12,7 @@ namespace BosmanCommerce7.Module.Models.EvolutionSdk.Customers {
     public EvolutionCustomerId? CustomerId { get; init; }
 
     public string? EmailAddress { get; init; }
+
+    public EvolutionCustomerCode? AccountCode { get; init; }
   }
 }

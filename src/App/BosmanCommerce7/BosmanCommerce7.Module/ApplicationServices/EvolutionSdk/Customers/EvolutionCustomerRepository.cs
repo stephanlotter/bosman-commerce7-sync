@@ -16,7 +16,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Customers {
   public class EvolutionCustomerRepository : EvolutionRepositoryBase, IEvolutionCustomerRepository {
 
     public Result<Customer> Get(CustomerDescriptor customerDescriptor) {
-      Result<Customer> Get(EvolutionCustomerId id) {
+      Result<Customer> GetById(EvolutionCustomerId id) {
         try {
           var customer = new Customer(id);
           if (customer == null) {
@@ -30,25 +30,46 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Customers {
         }
       }
 
-      if (customerDescriptor.CustomerId.HasValue) {
-        var c = Get(customerDescriptor.CustomerId.Value);
-        if (c.IsSuccess) { return c; }
-        if (string.IsNullOrWhiteSpace(customerDescriptor.EmailAddress)) {
-          return Result.Failure<Customer>("Cannot find customer by Id and no email address was provided.");
+      Result<Customer> GetByAccountCode(EvolutionCustomerCode? accountCode) {
+        try {
+          var customer = new Customer(accountCode);
+          if (customer == null) {
+            return Result.Failure<Customer>($"Customer with code {accountCode} not found in Evolution");
+          }
+
+          return customer;
+        }
+        catch (Exception ex) {
+          return Result.Failure<Customer>($"Customer with code {accountCode} not found in Evolution. ({ex.Message})");
         }
       }
 
-      if (string.IsNullOrWhiteSpace(customerDescriptor.EmailAddress)) {
-        return Result.Failure<Customer>($"Customer account lookup: Email address may not be empty.");
+      Result<Customer> GetByEmailAddress(string? emailAddress) {
+        if (string.IsNullOrWhiteSpace(emailAddress)) {
+          return Result.Failure<Customer>($"Customer account lookup: Email address may not be empty.");
+        }
+        EvolutionCustomerId? id = GetId("SELECT DCLink FROM Client WHERE ucARwcEmail = @EmailAddress", new { emailAddress });
+
+        if (!id.HasValue) {
+          return Result.Failure<Customer>($"Customer with email address {emailAddress} not found in Wine Club E-mail field (ucARwcEmail)");
+        }
+
+        return GetById(id.Value);
       }
 
-      EvolutionCustomerId? id = GetId("SELECT DCLink FROM Client WHERE ucARwcEmail = @EmailAddress", new { customerDescriptor.EmailAddress });
-
-      if (!id.HasValue) {
-        return Result.Failure<Customer>($"Customer with email address {customerDescriptor.EmailAddress} not found in Wine Club E-mail field (ucARwcEmail)");
+      if (customerDescriptor.CustomerId.HasValue) {
+        var c = GetById(customerDescriptor.CustomerId.Value);
+        if (c.IsSuccess) { return c; }
+        if (string.IsNullOrWhiteSpace(customerDescriptor.EmailAddress) && string.IsNullOrWhiteSpace(customerDescriptor.AccountCode)) {
+          return Result.Failure<Customer>("Cannot find customer by Id and no email address or account code was provided.");
+        }
       }
 
-      return Get(id.Value);
+      if (!string.IsNullOrWhiteSpace(customerDescriptor.AccountCode)) {
+        return GetByAccountCode(customerDescriptor.AccountCode);
+      }
+
+      return GetByEmailAddress(customerDescriptor.EmailAddress);
     }
   }
 }

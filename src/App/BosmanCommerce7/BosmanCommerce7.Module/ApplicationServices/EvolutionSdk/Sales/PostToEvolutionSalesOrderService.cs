@@ -14,12 +14,15 @@ using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Invento
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices.Models;
 using BosmanCommerce7.Module.BusinessObjects.SalesOrders;
+using BosmanCommerce7.Module.BusinessObjects.Settings;
 using BosmanCommerce7.Module.Models;
 using BosmanCommerce7.Module.Models.EvolutionSdk.Customers;
 using BosmanCommerce7.Module.Models.LocalDatabase;
 using CSharpFunctionalExtensions;
+using DevExpress.ExpressApp;
 using Microsoft.Extensions.Logging;
 using Pastel.Evolution;
+using Polly;
 
 namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
@@ -118,36 +121,12 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
     private Result<SalesDocumentBase> CreateSalesOrderHeader(PostToEvolutionSalesOrderContext context, OnlineSalesOrder onlineSalesOrder) {
       return NewSalesOrder()
-
-        .Bind(salesOrder => {
-          var parameters = new CustomerDescriptor { EmailAddress = onlineSalesOrder.EmailAddress };
-          return RepositoryGet(salesOrder, parameters, p => _evolutionCustomerRepository.Get((CustomerDescriptor)p), customer => salesOrder.Customer = customer);
-        })
-
-        .Bind(salesOrder => RepositoryGetFromCode(salesOrder, onlineSalesOrder.ProjectCode, _evolutionProjectRepository.Get, project => salesOrder.Project = project))
-
-        .Bind(salesOrder => {
-          return (onlineSalesOrder.IsPosOrder
-            ? _salesPersonMappingRepository.FindMapping(context.ObjectSpace, onlineSalesOrder.JsonProperties.SalesAssociateName()).Map(a => a?.EvolutionSalesRepCode)
-            : _salesOrdersPostValueStoreService.GetDefaultSalesRepresentativeCode())
-            .Bind(code => RepositoryGetFromCode(salesOrder, code, _evolutionSalesRepresentativeRepository.Get, representative => salesOrder.Representative = representative));
-        })
-
-        .Bind(salesOrder => _salesOrdersPostValueStoreService
-          .GetDefaultDeliveryMethodCode()
-          .Bind(code => RepositoryGetFromCode(salesOrder, code, _evolutionDeliveryMethodRepository.Get, deliveryMethod => salesOrder.DeliveryMethod = deliveryMethod))
-        )
-
-        .Bind(salesOrder => {
-          var deliveryAddress = onlineSalesOrder.ShipToAddress();
-          salesOrder.DeliverTo = deliveryAddress;
-          return Result.Success(salesOrder);
-        })
-
-        .Bind(salesOrder => {
-          salesOrder.DiscountPercent = onlineSalesOrder.IsStoreOrder ? salesOrder.Customer.AutomaticDiscount : 0d;
-          return Result.Success(salesOrder);
-        });
+        .Bind(AssignCustomer)
+        .Bind(AssignProject)
+        .Bind(AssignSalesPerson)
+        .Bind(AssignDeliveryMethod)
+        .Bind(AssignDeliveryAddress)
+        .Bind(AssignDiscountPercent);
 
       Result<SalesDocumentBase> NewSalesOrder() {
         if (onlineSalesOrder.IsRefund) {
@@ -163,6 +142,52 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
           OrderDate = onlineSalesOrder.OrderDate,
           TaxMode = TaxMode.Inclusive
         });
+      }
+
+      Result<SalesDocumentBase> AssignCustomer(SalesDocumentBase salesOrder) {
+        if (onlineSalesOrder.UseAccountCustomer) {
+          var parameters = new CustomerDescriptor { EmailAddress = onlineSalesOrder.EmailAddress };
+          return RepositoryGet(salesOrder, parameters, p => _evolutionCustomerRepository.Get((CustomerDescriptor)p), customer => salesOrder.Customer = customer);
+        }
+
+        return GetWarehouseLocationMapping(onlineSalesOrder.JsonProperties.ShipInventoryLocationId(), context.ObjectSpace)
+          .Bind(warehouseLocationMapping => _salesOrdersPostValueStoreService.GetDefaultCashCustomerCode(warehouseLocationMapping.WarehouseCode!))
+          .Bind(defaultCashCustomerCode => {
+            _logger.LogWarning("No customer assigned. Using default cash customer {cashCustomerAccountCode}. Order Number {OrderNumber}", defaultCashCustomerCode, onlineSalesOrder.OrderNumber);
+
+            onlineSalesOrder.PostLog($"Using default cash customer {defaultCashCustomerCode}");
+            var parameters = new CustomerDescriptor { AccountCode = defaultCashCustomerCode };
+
+            return RepositoryGet(salesOrder, parameters, p => _evolutionCustomerRepository.Get((CustomerDescriptor)p), customer => salesOrder.Customer = customer);
+          });
+      }
+
+      Result<SalesDocumentBase> AssignProject(SalesDocumentBase salesOrder) {
+        return RepositoryGetFromCode(salesOrder, onlineSalesOrder.ProjectCode, _evolutionProjectRepository.Get, project => salesOrder.Project = project);
+      }
+
+      Result<SalesDocumentBase> AssignSalesPerson(SalesDocumentBase salesOrder) {
+        return (onlineSalesOrder.IsPosOrder
+          ? _salesPersonMappingRepository.FindMapping(context.ObjectSpace, onlineSalesOrder.JsonProperties.SalesAssociateName()).Map(a => a?.EvolutionSalesRepCode)
+          : _salesOrdersPostValueStoreService.GetDefaultSalesRepresentativeCode())
+          .Bind(code => RepositoryGetFromCode(salesOrder, code, _evolutionSalesRepresentativeRepository.Get, representative => salesOrder.Representative = representative));
+      }
+
+      Result<SalesDocumentBase> AssignDeliveryMethod(SalesDocumentBase salesOrder) {
+        return _salesOrdersPostValueStoreService
+                  .GetDefaultDeliveryMethodCode()
+                  .Bind(code => RepositoryGetFromCode(salesOrder, code, _evolutionDeliveryMethodRepository.Get, deliveryMethod => salesOrder.DeliveryMethod = deliveryMethod));
+      }
+
+      Result<SalesDocumentBase> AssignDeliveryAddress(SalesDocumentBase salesOrder) {
+        var deliveryAddress = onlineSalesOrder.ShipToAddress();
+        salesOrder.DeliverTo = deliveryAddress;
+        return Result.Success(salesOrder);
+      }
+
+      Result<SalesDocumentBase> AssignDiscountPercent(SalesDocumentBase salesOrder) {
+        salesOrder.DiscountPercent = onlineSalesOrder.IsStoreOrder ? salesOrder.Customer.AutomaticDiscount : 0d;
+        return Result.Success(salesOrder);
       }
     }
 
@@ -202,9 +227,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
           .Bind(salesOrderLine => {
             if (onlineSalesOrder.IsPosOrder) {
-              return _inventoryLocationsLocalCache
-                .GetLocationById(onlineSalesOrder.JsonProperties.ShipInventoryLocationId())
-                .Bind(a => _warehouseLocationMappingRepository.FindMappingByLocationTitle(context.ObjectSpace, a.Title))
+              return GetWarehouseLocationMapping(onlineSalesOrder.JsonProperties.ShipInventoryLocationId(), context.ObjectSpace)
                 .Bind(warehouseMapping => RepositoryGetFromCode(salesOrderLine, warehouseMapping.WarehouseCode, _evolutionWarehouseRepository.Get, warehouse => salesOrderLine.Warehouse = warehouse));
             }
 
@@ -242,7 +265,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
             // TODO: if this item IsLotTracked then we need to allocate lots to this line.
             //salesOrderLine.WarehouseContext.InventoryItem.IsLotTracked
-
 
             if (!string.IsNullOrWhiteSpace(onlineSalesOrderLine.LineNotes)) {
               salesOrderLine.Note = onlineSalesOrderLine.LineNotes;
@@ -300,6 +322,11 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
         salesOrder.Detail.Add(salesOrderLine);
         return Result.Success(salesOrderLine);
       });
+    }
+
+    private Result<WarehouseLocationMapping> GetWarehouseLocationMapping(Commerce7LocationId? inventoryLocationId, IObjectSpace objectSpace) {
+      return _inventoryLocationsLocalCache.GetLocationById(inventoryLocationId)
+             .Bind(a => _warehouseLocationMappingRepository.FindMappingByLocationTitle(objectSpace, a.Title));
     }
 
     private Result<SalesDocumentBase> RepositoryGet<T>(SalesDocumentBase salesOrder, object parameters, Func<object, Result<T>> get, Action<T> onSuccess) {

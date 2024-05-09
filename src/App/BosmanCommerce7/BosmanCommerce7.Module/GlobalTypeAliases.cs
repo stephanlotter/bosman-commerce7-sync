@@ -8,6 +8,7 @@ global using Commerce7InventoryId = System.Guid;
 global using Commerce7InventoryPolicy = System.String;
 
 global using EvolutionCustomerId = System.Int32;
+global using EvolutionCustomerCode = System.String;
 global using EvolutionInventoryItemCode = System.String;
 global using EvolutionInventoryItemId = System.Int32;
 global using EvolutionWarehouseCode = System.String;

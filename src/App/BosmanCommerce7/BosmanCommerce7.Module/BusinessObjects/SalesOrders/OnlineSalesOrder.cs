@@ -99,6 +99,14 @@ namespace BosmanCommerce7.Module.BusinessObjects.SalesOrders {
     [VisibleInListView(false)]
     public bool IsPosOrder => Channel?.Equals("pos", StringComparison.InvariantCultureIgnoreCase) ?? false;
 
+    [VisibleInDetailView(false)]
+    [VisibleInListView(false)]
+    public bool UseAccountCustomer => !UseCashCustomer;
+
+    [VisibleInDetailView(false)]
+    [VisibleInListView(false)]
+    public bool UseCashCustomer => string.IsNullOrWhiteSpace(CustomerOnlineId);
+
     [ModelDefault("AllowEdit", "false")]
     public string? EvolutionSalesOrderNumber {
       get => _evolutionSalesOrderNumber;
