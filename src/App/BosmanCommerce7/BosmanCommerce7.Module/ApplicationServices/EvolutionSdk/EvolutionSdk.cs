@@ -1,10 +1,10 @@
-﻿/* 
+﻿/*
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
  * Date created: 2023-08-21
  * Author	: Stephan J Lotter
- * Notes	: 
- *  
+ * Notes	:
+ *
  */
 
 using System.Text.RegularExpressions;
@@ -68,7 +68,13 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
 
     public void CommitTransaction() {
       if (!DatabaseContext.IsTransactionPending) { return; }
-      DatabaseContext.CommitTran();
+      try {
+        DatabaseContext.CommitTran();
+      }
+      catch {
+        DatabaseContext.RollbackTran();
+        throw;
+      }
     }
 
     public void RollbackTransaction() {
@@ -82,7 +88,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
       var retryCount = 0;
 
       while (true) {
-
         try {
           DatabaseContext.CreateCommonDBConnection(commonDatabaseConnectionString);
           DatabaseContext.SetLicense("DE09110064", "2428759");
@@ -99,7 +104,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
           }
 
           return;
-
         }
         catch (Exception ex) when (Regex.IsMatch(ex.Message, ".*registration.*invalid.*")) {
           throw new Exception("Evolution SDK registration is invalid. Check that Evolution is registered and that the version of the SDK is the same as that of Evolution.");
@@ -112,10 +116,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
 
           retryCount++;
         }
-
       }
-
     }
   }
-
 }

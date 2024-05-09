@@ -75,8 +75,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
           return;
         }
 
-        _postToEvolutionSalesOrderService
-              .Post(postToEvolutionSalesOrderContext, onlineSalesOrder)
+        _postToEvolutionSalesOrderService.Post(postToEvolutionSalesOrderContext, onlineSalesOrder)
               .OnFailureCompensate(err => {
                 RecordPostingError(onlineSalesOrder, err);
                 return Result.Failure<OnlineSalesOrder>(err);

@@ -106,8 +106,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
           var (onlineSalesOrder, salesOrder) = orderDetails;
           if (!onlineSalesOrder.IsPosOrder) { return Result.Success(onlineSalesOrder); }
 
-          return _postToEvolutionCustomerPaymentService
-            .Post(context, orderDetails)
+          return _postToEvolutionCustomerPaymentService.Post(context, orderDetails)
             .Bind(a => _postToEvolutionSalesAssociateTipService.Post(context, a))
             .Bind(a => Result.Success(a.onlineSalesOrder));
         });

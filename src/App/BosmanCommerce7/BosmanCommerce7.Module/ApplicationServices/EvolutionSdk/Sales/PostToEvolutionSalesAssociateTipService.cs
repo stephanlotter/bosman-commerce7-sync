@@ -31,21 +31,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
       _logger.LogInformation("START: Posting {logTransactionType} {logTransactionIdentifier}", logTransactionType, logTransactionIdentifier);
 
-      Result<string> GetTipTransactionCode(string warehouseCode) {
-        var codeKey = $"sales-orders-post-pos-tip-{(onlineSalesOrder!.IsRefund ? "refund" : "receipt")}-transaction-code-{warehouseCode}";
-        return GetCodeFromValueStore(codeKey);
-      }
-
-      Result<string> GetDebitAccountCode(string warehouseCode) {
-        var codeKey = $"sales-orders-post-pos-tip-debit-account-code-{warehouseCode}";
-        return GetCodeFromValueStore(codeKey);
-      }
-
-      Result<string> GetCreditAccountCode(string warehouseCode) {
-        var codeKey = $"sales-orders-post-pos-tip-credit-account-code-{warehouseCode}";
-        return GetCodeFromValueStore(codeKey);
-      }
-
       try {
         var warehouseCodeResult = WarehouseCode(customerDocument);
 
@@ -73,13 +58,13 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
         var transactionDate = customerDocument.OrderDate;
         var evolutionReference = onlineSalesOrder.IsRefund ? customerDocument.Reference : customerDocument.OrderNo;
 
-        Result PostTransaction(Result<string> accountResult, double debitAmount, double creditAmount) {
+        Result AddTransaction(GLBatch batch, Result<string> accountResult, double debitAmount, double creditAmount) {
           if (accountResult.IsFailure) { return accountResult; }
+
+          _logger.LogInformation("Post TIP transaction for: {orderNumber} | Account: {account} | Debit: {debit} | Credit: {credit} ", onlineSalesOrder.OrderNumber, accountResult.Value, debitAmount, creditAmount);
 
           var transaction = new GLTransaction {
             Account = new GLAccount(accountResult.Value),
-            Debit = debitAmount,
-            Credit = creditAmount,
             Date = transactionDate,
             Description = $"POS Tip {onlineSalesOrder.OrderNumber} {evolutionReference} {warehouseCode}",
             ExtOrderNo = $"{onlineSalesOrder.OrderNumber}",
@@ -89,16 +74,31 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
             TransactionCode = new TransactionCode(Pastel.Evolution.Module.GL, transactionCode)
           };
 
-          transaction.Post();
+          if (Math.Abs(debitAmount) >= 0.01) {
+            transaction.Debit = debitAmount;
+          }
+          if (Math.Abs(creditAmount) >= 0.01) {
+            transaction.Credit = creditAmount;
+          }
+
+          batch.Add(transaction);
 
           return Result.Success();
         }
 
+        Result PostBatch(GLBatch batch) {
+          batch.Post();
+          return Result.Success();
+        }
+
+        var batch = new GLBatch();
+
         var debitAccount = onlineSalesOrder.IsRefund ? GetCreditAccountCode(warehouseCode) : GetDebitAccountCode(warehouseCode);
         var creditAccount = onlineSalesOrder.IsRefund ? GetDebitAccountCode(warehouseCode) : GetCreditAccountCode(warehouseCode);
 
-        return PostTransaction(debitAccount, transactionAmountInVat, 0)
-          .Bind(() => PostTransaction(creditAccount, 0, transactionAmountInVat))
+        return AddTransaction(batch, debitAccount, transactionAmountInVat, 0)
+          .Bind(() => AddTransaction(batch, creditAccount, 0, transactionAmountInVat))
+          .Bind(() => PostBatch(batch))
           .Map(() => (onlineSalesOrder, customerDocument));
       }
       catch (Exception ex) {
@@ -107,6 +107,21 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
       }
       finally {
         _logger.LogInformation("END: Posting {logTransactionType} {logTransactionIdentifier}", logTransactionType, logTransactionIdentifier);
+      }
+
+      Result<string> GetTipTransactionCode(string warehouseCode) {
+        var codeKey = $"sales-orders-post-pos-tip-{(onlineSalesOrder!.IsRefund ? "refund" : "receipt")}-transaction-code-{warehouseCode}";
+        return GetCodeFromValueStore(codeKey);
+      }
+
+      Result<string> GetDebitAccountCode(string warehouseCode) {
+        var codeKey = $"sales-orders-post-pos-tip-debit-account-code-{warehouseCode}";
+        return GetCodeFromValueStore(codeKey);
+      }
+
+      Result<string> GetCreditAccountCode(string warehouseCode) {
+        var codeKey = $"sales-orders-post-pos-tip-credit-account-code-{warehouseCode}";
+        return GetCodeFromValueStore(codeKey);
       }
     }
   }
