@@ -89,13 +89,13 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
         .Bind(salesOrder => {
           if (onlineSalesOrder.IsRefund || onlineSalesOrder.IsPosOrder) {
-            salesOrder.Complete();
+            onlineSalesOrder.EvolutionInvoiceNumber = salesOrder.Complete();
           }
           else {
             salesOrder.Save();
           }
 
-          onlineSalesOrder.EvolutionSalesOrderNumber = salesOrder.Reference;
+          onlineSalesOrder.EvolutionSalesOrderNumber = salesOrder.OrderNo;
           onlineSalesOrder.PostingStatus = SalesOrderPostingStatus.Posted;
           onlineSalesOrder.LastErrorMessage = null;
           onlineSalesOrder.RetryCount = 0;

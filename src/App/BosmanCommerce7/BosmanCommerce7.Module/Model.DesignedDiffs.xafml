@@ -40,7 +40,7 @@
     </Items>
   </NavigationItems>
   <SchemaModules>
-    <SchemaModule Name="SystemModule" Version="23.2.3.0" IsNewNode="True" />
+    <SchemaModule Name="SystemModule" Version="23.2.5.0" IsNewNode="True" />
   </SchemaModules>
   <Views>
     <DetailView Id="BundleMapping_DetailView" FreezeLayout="True">
@@ -66,35 +66,36 @@
     <DetailView Id="OnlineSalesOrder_DetailView" FreezeLayout="True" AllowDelete="False" AllowEdit="True" AllowNew="False">
       <Layout IsNewNode="True" Removed="True">
         <LayoutGroup Id="Main" Index="0" ShowCaption="False" RelativeSize="100" IsNewNode="True">
-          <LayoutGroup Id="SimpleEditors" Index="0" ShowCaption="False" RelativeSize="36.89320388349515" Direction="Horizontal" IsNewNode="True">
-            <LayoutGroup Id="OnlineSalesOrder_col1" ShowCaption="False" Index="0" RelativeSize="49.822380106571934" IsNewNode="True">
+          <LayoutGroup Id="SimpleEditors" Index="0" ShowCaption="False" RelativeSize="38.8663967611336" Direction="Horizontal" IsNewNode="True">
+            <LayoutGroup Id="OnlineSalesOrder_col1" ShowCaption="False" Index="0" RelativeSize="49.736147757255935" IsNewNode="True">
               <LayoutGroup Id="Item2" ShowCaption="True" Caption="Customer" CaptionLocation="Top" Index="0" RelativeSize="100" IsNewNode="True">
-                <LayoutItem Id="CustomerOnlineId" ViewItem="CustomerOnlineId" Index="0" RelativeSize="7.6738609112709835" IsNewNode="True" />
-                <LayoutItem Id="EmailAddress" ViewItem="EmailAddress" Index="1" RelativeSize="5.755395683453237" IsNewNode="True" />
-                <LayoutItem Id="ShipToName" ViewItem="ShipToName" Index="2" RelativeSize="5.755395683453237" IsNewNode="True" />
-                <LayoutItem Id="ShipToAddress1" ViewItem="ShipToAddress1" Index="3" RelativeSize="5.755395683453237" IsNewNode="True" />
-                <LayoutItem Id="ShipToAddress2" ViewItem="ShipToAddress2" Index="4" RelativeSize="5.755395683453237" IsNewNode="True" />
-                <LayoutItem Id="ShipToAddressCity" ViewItem="ShipToAddressCity" Index="5" RelativeSize="5.755395683453237" IsNewNode="True" />
-                <LayoutItem Id="ShipToAddressProvince" ViewItem="ShipToAddressProvince" Index="6" RelativeSize="5.755395683453237" IsNewNode="True" />
-                <LayoutItem Id="ShipToAddressCountryCode" ViewItem="ShipToAddressCountryCode" Index="7" RelativeSize="5.755395683453237" IsNewNode="True" />
-                <LayoutItem Id="ShipToAddressPostalCode" ViewItem="ShipToAddressPostalCode" Index="8" RelativeSize="5.755395683453237" IsNewNode="True" />
-                <LayoutItem Id="ShipToPhoneNumber" ViewItem="ShipToPhoneNumber" Index="9" RelativeSize="46.28297362110312" IsNewNode="True" />
+                <LayoutItem Id="CustomerOnlineId" ViewItem="CustomerOnlineId" Index="0" RelativeSize="7.2562358276643995" IsNewNode="True" />
+                <LayoutItem Id="EmailAddress" ViewItem="EmailAddress" Index="1" RelativeSize="5.442176870748299" IsNewNode="True" />
+                <LayoutItem Id="ShipToName" ViewItem="ShipToName" Index="2" RelativeSize="5.442176870748299" IsNewNode="True" />
+                <LayoutItem Id="ShipToAddress1" ViewItem="ShipToAddress1" Index="3" RelativeSize="5.442176870748299" IsNewNode="True" />
+                <LayoutItem Id="ShipToAddress2" ViewItem="ShipToAddress2" Index="4" RelativeSize="5.442176870748299" IsNewNode="True" />
+                <LayoutItem Id="ShipToAddressCity" ViewItem="ShipToAddressCity" Index="5" RelativeSize="5.442176870748299" IsNewNode="True" />
+                <LayoutItem Id="ShipToAddressProvince" ViewItem="ShipToAddressProvince" Index="6" RelativeSize="5.442176870748299" IsNewNode="True" />
+                <LayoutItem Id="ShipToAddressCountryCode" ViewItem="ShipToAddressCountryCode" Index="7" RelativeSize="5.442176870748299" IsNewNode="True" />
+                <LayoutItem Id="ShipToAddressPostalCode" ViewItem="ShipToAddressPostalCode" Index="8" RelativeSize="5.442176870748299" IsNewNode="True" />
+                <LayoutItem Id="ShipToPhoneNumber" ViewItem="ShipToPhoneNumber" Index="9" RelativeSize="49.20634920634921" IsNewNode="True" />
               </LayoutGroup>
             </LayoutGroup>
-            <LayoutGroup Id="OnlineSalesOrder_col2" ShowCaption="False" Index="1" RelativeSize="50.177619893428066" IsNewNode="True">
-              <LayoutGroup Id="Item4" ShowCaption="True" Caption="Order" CaptionLocation="Top" Index="0" RelativeSize="63.37719298245614" IsNewNode="True">
-                <LayoutItem Id="OrderNumber" ViewItem="OrderNumber" Index="0" RelativeSize="12.5" IsNewNode="True" />
-                <LayoutItem Id="OrderValueInVat" ViewItem="OrderValueInVat" Index="1" RelativeSize="9.375" IsNewNode="True" />
-                <LayoutItem Id="OrderDate" ViewItem="OrderDate" Index="2" RelativeSize="9.375" IsNewNode="True" />
-                <LayoutItem Id="OnlineId" ViewItem="OnlineId" Index="3" RelativeSize="9.375" IsNewNode="True" />
-                <LayoutItem Id="Channel" ViewItem="Channel" Index="4" RelativeSize="9.375" IsNewNode="True" />
-                <LayoutItem Id="PurchaseType" ViewItem="PurchaseType" Index="5" RelativeSize="9.375" IsNewNode="True" />
-                <LayoutItem Id="LinkedOnlineId" ViewItem="LinkedOnlineId" Index="6" RelativeSize="9.375" IsNewNode="True" />
-                <LayoutItem Id="LinkedOrderNumber" ViewItem="LinkedOrderNumber" Index="7" RelativeSize="9.375" IsNewNode="True" />
-                <LayoutItem Id="ProjectCode" ViewItem="ProjectCode" Index="8" RelativeSize="9.375" IsNewNode="True" />
-                <LayoutItem Id="EvolutionSalesOrderNumber" ViewItem="EvolutionSalesOrderNumber" Index="9" RelativeSize="12.5" IsNewNode="True" />
+            <LayoutGroup Id="OnlineSalesOrder_col2" ShowCaption="False" Index="1" RelativeSize="50.263852242744065" IsNewNode="True">
+              <LayoutGroup Id="Item4" ShowCaption="True" Caption="Order" CaptionLocation="Top" Index="0" RelativeSize="65.20833333333333" IsNewNode="True">
+                <LayoutItem Id="OrderNumber" ViewItem="OrderNumber" Index="0" RelativeSize="11.428571428571429" IsNewNode="True" />
+                <LayoutItem Id="OrderValueInVat" ViewItem="OrderValueInVat" Index="1" RelativeSize="8.571428571428571" IsNewNode="True" />
+                <LayoutItem Id="OrderDate" ViewItem="OrderDate" Index="2" RelativeSize="8.571428571428571" IsNewNode="True" />
+                <LayoutItem Id="OnlineId" ViewItem="OnlineId" Index="3" RelativeSize="8.571428571428571" IsNewNode="True" />
+                <LayoutItem Id="Channel" ViewItem="Channel" Index="4" RelativeSize="8.571428571428571" IsNewNode="True" />
+                <LayoutItem Id="PurchaseType" ViewItem="PurchaseType" Index="5" RelativeSize="8.571428571428571" IsNewNode="True" />
+                <LayoutItem Id="LinkedOnlineId" ViewItem="LinkedOnlineId" Index="6" RelativeSize="8.571428571428571" IsNewNode="True" />
+                <LayoutItem Id="LinkedOrderNumber" ViewItem="LinkedOrderNumber" Index="7" RelativeSize="8.571428571428571" IsNewNode="True" />
+                <LayoutItem Id="ProjectCode" ViewItem="ProjectCode" Index="8" RelativeSize="8.571428571428571" IsNewNode="True" />
+                <LayoutItem Id="EvolutionSalesOrderNumber" ViewItem="EvolutionSalesOrderNumber" Index="9" RelativeSize="8.571428571428571" IsNewNode="True" />
+                <LayoutItem Id="EvolutionInvoiceNumber" ViewItem="EvolutionInvoiceNumber" Index="10" RelativeSize="11.428571428571429" IsNewNode="True" />
               </LayoutGroup>
-              <LayoutGroup Id="Item3" ShowCaption="True" Caption="Status" CaptionLocation="Top" Index="1" RelativeSize="36.62280701754386" IsNewNode="True">
+              <LayoutGroup Id="Item3" ShowCaption="True" Caption="Status" CaptionLocation="Top" Index="1" RelativeSize="34.791666666666664" IsNewNode="True">
                 <LayoutItem Id="PostingStatus" ViewItem="PostingStatus" Index="0" RelativeSize="23.529411764705884" IsNewNode="True" />
                 <LayoutItem Id="DatePosted" ViewItem="DatePosted" Index="1" RelativeSize="17.647058823529413" IsNewNode="True" />
                 <LayoutItem Id="RetryAfter" ViewItem="RetryAfter" Index="2" RelativeSize="17.647058823529413" IsNewNode="True" />
@@ -103,7 +104,7 @@
               </LayoutGroup>
             </LayoutGroup>
           </LayoutGroup>
-          <TabbedGroup Id="Tabs" Index="1" RelativeSize="63.10679611650485" IsNewNode="True">
+          <TabbedGroup Id="Tabs" Index="1" RelativeSize="61.1336032388664" IsNewNode="True">
             <LayoutGroup Id="SalesOrderLines" Index="0" ShowCaption="True" RelativeSize="100" IsNewNode="True">
               <LayoutItem Id="SalesOrderLines" ViewItem="SalesOrderLines" ShowCaption="False" Index="0" RelativeSize="100" IsNewNode="True" />
             </LayoutGroup>
@@ -121,7 +122,8 @@
       <Columns>
         <ColumnInfo Id="CustomerOnlineId" Index="-1" />
         <ColumnInfo Id="EmailAddress" Index="-1" />
-        <ColumnInfo Id="EvolutionSalesOrderNumber" Index="-1" />
+        <ColumnInfo Id="EvolutionInvoiceNumber" Index="-1" />
+        <ColumnInfo Id="LinkedOnlineId" Index="-1" />
         <ColumnInfo Id="OnlineId" Index="-1" />
         <ColumnInfo Id="OrderDate" Index="-1" />
         <ColumnInfo Id="OrderValueInVat" Index="-1" />
@@ -140,12 +142,14 @@
             <ColumnSummaryItem Id="NumberOfRows" SummaryType="Count" IsNewNode="True" />
           </Summary>
         </ColumnInfo>
-        <ColumnInfo Id="ShipToName" Index="3" />
-        <ColumnInfo Id="RetryAfter" Index="4" SortIndex="0" SortOrder="Ascending" Width="150" />
-        <ColumnInfo Id="PostingStatus" Index="5" SortIndex="-1" SortOrder="None" Width="100" />
-        <ColumnInfo Id="LastErrorMessage" Index="6" />
-        <ColumnInfo Id="DatePosted" Index="7" Width="150" />
-        <ColumnInfo Id="RetryCount" Index="8" Width="90" />
+        <ColumnInfo Id="EvolutionSalesOrderNumber" Index="3" />
+        <ColumnInfo Id="ShipToName" Index="4" />
+        <ColumnInfo Id="RetryAfter" Index="5" SortIndex="0" SortOrder="Ascending" Width="150" />
+        <ColumnInfo Id="PostingStatus" Index="6" SortIndex="-1" SortOrder="None" Width="100" />
+        <ColumnInfo Id="LastErrorMessage" Index="7" />
+        <ColumnInfo Id="DatePosted" Index="8" Width="150" />
+        <ColumnInfo Id="RetryCount" Index="9" Width="90" />
+        <ColumnInfo Id="LinkedOrderNumber" Index="10" />
       </Columns>
       <Filters CurrentFilterId="NewAndRetrying">
         <Filter Id="NewAndRetrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New# Or [PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="0" Caption="New and Retrying" IsNewNode="True" />
@@ -160,7 +164,6 @@
       <Columns IsNewNode="True">
         <ColumnInfo Id="CustomerOnlineId" PropertyName="CustomerOnlineId" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="EmailAddress" PropertyName="EmailAddress" Index="-1" IsNewNode="True" />
-        <ColumnInfo Id="EvolutionSalesOrderNumber" PropertyName="EvolutionSalesOrderNumber" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="IsClubOrder" PropertyName="IsClubOrder" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="IsPosOrder" PropertyName="IsPosOrder" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="IsRefund" PropertyName="IsRefund" Index="-1" IsNewNode="True" />
@@ -186,12 +189,13 @@
             <ColumnSummaryItem Id="NumberOfRows" SummaryType="Count" IsNewNode="True" />
           </Summary>
         </ColumnInfo>
-        <ColumnInfo Id="ShipToName" PropertyName="ShipToName" Index="3" IsNewNode="True" />
-        <ColumnInfo Id="RetryAfter" PropertyName="RetryAfter" Index="4" SortIndex="0" SortOrder="Ascending" Width="150" IsNewNode="True" />
-        <ColumnInfo Id="PostingStatus" PropertyName="PostingStatus" Index="5" Width="100" IsNewNode="True" />
-        <ColumnInfo Id="LastErrorMessage" PropertyName="LastErrorMessage" Index="6" IsNewNode="True" />
-        <ColumnInfo Id="DatePosted" PropertyName="DatePosted" Index="7" Width="150" IsNewNode="True" />
-        <ColumnInfo Id="RetryCount" PropertyName="RetryCount" Index="8" Width="90" IsNewNode="True" />
+        <ColumnInfo Id="EvolutionSalesOrderNumber" PropertyName="EvolutionSalesOrderNumber" Index="3" Width="113" IsNewNode="True" />
+        <ColumnInfo Id="ShipToName" PropertyName="ShipToName" Index="4" IsNewNode="True" />
+        <ColumnInfo Id="RetryAfter" PropertyName="RetryAfter" Index="5" SortIndex="0" SortOrder="Ascending" Width="150" IsNewNode="True" />
+        <ColumnInfo Id="PostingStatus" PropertyName="PostingStatus" Index="6" Width="100" IsNewNode="True" />
+        <ColumnInfo Id="LastErrorMessage" PropertyName="LastErrorMessage" Index="7" IsNewNode="True" />
+        <ColumnInfo Id="DatePosted" PropertyName="DatePosted" Index="8" Width="150" IsNewNode="True" />
+        <ColumnInfo Id="RetryCount" PropertyName="RetryCount" Index="9" Width="90" IsNewNode="True" />
       </Columns>
       <Filters CurrentFilterId="NewAndRetrying" IsNewNode="True">
         <Filter Id="NewAndRetrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New# Or [PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="0" Caption="New and Retrying" IsNewNode="True" />
@@ -232,12 +236,13 @@
             <ColumnSummaryItem Id="NumberOfRows" SummaryType="Count" IsNewNode="True" />
           </Summary>
         </ColumnInfo>
-        <ColumnInfo Id="ShipToName" PropertyName="ShipToName" Index="3" IsNewNode="True" />
-        <ColumnInfo Id="RetryAfter" PropertyName="RetryAfter" Index="4" SortIndex="0" SortOrder="Ascending" Width="150" IsNewNode="True" />
-        <ColumnInfo Id="PostingStatus" PropertyName="PostingStatus" Index="5" Width="100" IsNewNode="True" />
-        <ColumnInfo Id="LastErrorMessage" PropertyName="LastErrorMessage" Index="6" IsNewNode="True" />
-        <ColumnInfo Id="DatePosted" PropertyName="DatePosted" Index="7" Width="150" IsNewNode="True" />
-        <ColumnInfo Id="RetryCount" PropertyName="RetryCount" Index="8" Width="90" IsNewNode="True" />
+        <ColumnInfo Id="EvolutionInvoiceNumber" PropertyName="EvolutionInvoiceNumber" Index="3" Width="129" IsNewNode="True" />
+        <ColumnInfo Id="ShipToName" PropertyName="ShipToName" Index="4" IsNewNode="True" />
+        <ColumnInfo Id="RetryAfter" PropertyName="RetryAfter" Index="5" SortIndex="0" SortOrder="Ascending" Width="150" IsNewNode="True" />
+        <ColumnInfo Id="PostingStatus" PropertyName="PostingStatus" Index="6" Width="100" IsNewNode="True" />
+        <ColumnInfo Id="LastErrorMessage" PropertyName="LastErrorMessage" Index="7" IsNewNode="True" />
+        <ColumnInfo Id="DatePosted" PropertyName="DatePosted" Index="8" Width="150" IsNewNode="True" />
+        <ColumnInfo Id="RetryCount" PropertyName="RetryCount" Index="9" Width="90" IsNewNode="True" />
       </Columns>
       <Filters CurrentFilterId="NewAndRetrying" IsNewNode="True">
         <Filter Id="NewAndRetrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New# Or [PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="0" Caption="New and Retrying" IsNewNode="True" />
