@@ -96,8 +96,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
         var debitAccount = GetDebitAccountCode(warehouseCode);
         var creditAccount = GetCreditAccountCode(warehouseCode);
 
-        return AddTransaction(batch, debitAccount, transactionAmountInVat, 0)
-          .Bind(() => AddTransaction(batch, creditAccount, 0, transactionAmountInVat))
+        return AddTransaction(batch, debitAccount, onlineSalesOrder.IsRefund ? 0 : transactionAmountInVat, onlineSalesOrder.IsRefund ? transactionAmountInVat : 0)
+          .Bind(() => AddTransaction(batch, creditAccount, onlineSalesOrder.IsRefund ? transactionAmountInVat : 0, onlineSalesOrder.IsRefund ? 0 : transactionAmountInVat))
           .Bind(() => PostBatch(batch))
           .Map(() => (onlineSalesOrder, customerDocument));
       }
