@@ -50,7 +50,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.OnlineSalesOrderServices {
 
     public double PaymentAmount() => SuccessTenders().Sum(a => a.AmountTendered);
 
-    public double TipAmount() => _data?.tipTotal ?? 0d;
+    public double TipAmount() => (_data?.tipTotal ?? 0d) / 100;
   }
 
   public record OrderTender {
