@@ -93,9 +93,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
         var batch = new GLBatch();
 
-        //var debitAccount = onlineSalesOrder.IsRefund ? GetCreditAccountCode(warehouseCode) : GetDebitAccountCode(warehouseCode);
-        //var creditAccount = onlineSalesOrder.IsRefund ? GetDebitAccountCode(warehouseCode) : GetCreditAccountCode(warehouseCode);
-
         var debitAccount = GetDebitAccountCode(warehouseCode);
         var creditAccount = GetCreditAccountCode(warehouseCode);
 
