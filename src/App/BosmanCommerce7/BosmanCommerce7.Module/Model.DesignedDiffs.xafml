@@ -146,10 +146,10 @@
         <ColumnInfo Id="ShipToName" Index="4" />
         <ColumnInfo Id="RetryAfter" Index="5" SortIndex="0" SortOrder="Ascending" Width="150" />
         <ColumnInfo Id="PostingStatus" Index="6" SortIndex="-1" SortOrder="None" Width="100" />
-        <ColumnInfo Id="LastErrorMessage" Index="7" />
-        <ColumnInfo Id="DatePosted" Index="8" Width="150" />
-        <ColumnInfo Id="RetryCount" Index="9" Width="90" />
-        <ColumnInfo Id="LinkedOrderNumber" Index="10" />
+        <ColumnInfo Id="DatePosted" Index="7" Width="150" />
+        <ColumnInfo Id="RetryCount" Index="8" Width="90" />
+        <ColumnInfo Id="LinkedOrderNumber" Index="9" Width="100" />
+        <ColumnInfo Id="LastErrorMessage" Index="10" />
       </Columns>
       <Filters CurrentFilterId="NewAndRetrying">
         <Filter Id="NewAndRetrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New# Or [PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="0" Caption="New and Retrying" IsNewNode="True" />
@@ -193,9 +193,9 @@
         <ColumnInfo Id="ShipToName" PropertyName="ShipToName" Index="4" IsNewNode="True" />
         <ColumnInfo Id="RetryAfter" PropertyName="RetryAfter" Index="5" SortIndex="0" SortOrder="Ascending" Width="150" IsNewNode="True" />
         <ColumnInfo Id="PostingStatus" PropertyName="PostingStatus" Index="6" Width="100" IsNewNode="True" />
-        <ColumnInfo Id="LastErrorMessage" PropertyName="LastErrorMessage" Index="7" IsNewNode="True" />
-        <ColumnInfo Id="DatePosted" PropertyName="DatePosted" Index="8" Width="150" IsNewNode="True" />
-        <ColumnInfo Id="RetryCount" PropertyName="RetryCount" Index="9" Width="90" IsNewNode="True" />
+        <ColumnInfo Id="DatePosted" PropertyName="DatePosted" Index="7" Width="150" IsNewNode="True" />
+        <ColumnInfo Id="RetryCount" PropertyName="RetryCount" Index="8" Width="90" IsNewNode="True" />
+        <ColumnInfo Id="LastErrorMessage" PropertyName="LastErrorMessage" Index="9" IsNewNode="True" />
       </Columns>
       <Filters CurrentFilterId="NewAndRetrying" IsNewNode="True">
         <Filter Id="NewAndRetrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New# Or [PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="0" Caption="New and Retrying" IsNewNode="True" />
@@ -240,9 +240,9 @@
         <ColumnInfo Id="ShipToName" PropertyName="ShipToName" Index="4" IsNewNode="True" />
         <ColumnInfo Id="RetryAfter" PropertyName="RetryAfter" Index="5" SortIndex="0" SortOrder="Ascending" Width="150" IsNewNode="True" />
         <ColumnInfo Id="PostingStatus" PropertyName="PostingStatus" Index="6" Width="100" IsNewNode="True" />
-        <ColumnInfo Id="LastErrorMessage" PropertyName="LastErrorMessage" Index="7" IsNewNode="True" />
-        <ColumnInfo Id="DatePosted" PropertyName="DatePosted" Index="8" Width="150" IsNewNode="True" />
-        <ColumnInfo Id="RetryCount" PropertyName="RetryCount" Index="9" Width="90" IsNewNode="True" />
+        <ColumnInfo Id="DatePosted" PropertyName="DatePosted" Index="7" Width="150" IsNewNode="True" />
+        <ColumnInfo Id="RetryCount" PropertyName="RetryCount" Index="8" Width="90" IsNewNode="True" />
+        <ColumnInfo Id="LastErrorMessage" PropertyName="LastErrorMessage" Index="9" IsNewNode="True" />
       </Columns>
       <Filters CurrentFilterId="NewAndRetrying" IsNewNode="True">
         <Filter Id="NewAndRetrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New# Or [PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="0" Caption="New and Retrying" IsNewNode="True" />
