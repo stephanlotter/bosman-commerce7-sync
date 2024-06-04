@@ -7,6 +7,7 @@
  *
  */
 
+using System.Dynamic;
 using BosmanCommerce7.Module.ApplicationServices.AppDataServices;
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices.Models;
@@ -96,8 +97,27 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
               Logger.LogInformation("Sales order received: {orderNumber}", $"{salesOrder.orderNumber}");
             }
 
-            var posProfile = $"{(salesOrder.posProfile?.title ?? "")}";
+            string GetPosProfile(dynamic salesOrder) {
+              try {
+                if (salesOrder.posProfile == null) { return ""; }
+                return salesOrder.posProfile.title;
+              }
+              catch {
+                return "";
+              }
+            }
+
+            var title = GetPosProfile(salesOrder);
+
+            var hasPosProfile = !string.IsNullOrWhiteSpace(title);
+            if (!hasPosProfile) {
+              Logger.LogWarning("Sales order has no posProfile");
+            }
+
+            var posProfile = $"{(hasPosProfile ? salesOrder.posProfile.title : "")}";
             var channel = $"{salesOrder.channel}";
+
+            Logger.LogInformation("Channel:[{channel}]; Pos Profile:[{posProfile}]", channel, posProfile);
 
             if (SkipChannel(channel, channelsToProcess)) {
               if (!_processedOrders.Contains($"{salesOrder.id}")) {
@@ -296,5 +316,13 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
     }
 
     private static string NormalizeItemCode(string? code) => (code ?? "").Trim().ToUpper();
+
+    public static bool DoesPropertyExist(dynamic? o, string name) {
+      if (o == null) { return false; }
+      if (o is ExpandoObject) {
+        return ((IDictionary<string, object>)o).ContainsKey(name);
+      }
+      return o.GetType().GetProperty(name) != null;
+    }
   }
 }
