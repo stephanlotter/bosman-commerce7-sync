@@ -1,16 +1,17 @@
-﻿/* 
+﻿/*
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
  * Date created: 2023-08-17
  * Author	: Stephan J Lotter
- * Notes	: 
- *  
+ * Notes	:
+ *
  */
 
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
 using CSharpFunctionalExtensions;
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersSyncServices {
+
   public class SalesOrdersSyncValueStoreService : ISalesOrdersSyncValueStoreService {
     private readonly IValueStoreRepository _valueStoreRepository;
 
@@ -40,17 +41,22 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
       return _valueStoreRepository.GetValue("sales-orders-sync-shipping-tax-type");
     }
 
-    public Result<string?> GetChannelProjectCode(string? channel) {
+    public Result<string?> GetChannelProjectCode(string? channel, string? posProfile) {
       if (string.IsNullOrWhiteSpace(channel)) { return Result.Failure<string?>("Channel provided is empty."); }
-      var keyName = $"sales-orders-sync-channel-{channel.Trim().ToLower()}-project-code";
+
+      string NormaliseSegment(string? segment) => string.IsNullOrWhiteSpace(segment) ? "" : segment.Trim().ToLower();
+
+      string NormalisePosProfile(string? segment) {
+        var v = NormaliseSegment(segment);
+        return string.IsNullOrWhiteSpace(v) ? "" : $"-{segment}";
+      }
+
+      var keyName = $"sales-orders-sync-channel-{NormaliseSegment(channel)}{NormalisePosProfile(posProfile)}-project-code";
       return _valueStoreRepository
         .GetValue(keyName)
         .Bind(p => string.IsNullOrWhiteSpace(p)
             ? Result.Failure<string?>($"No project code mapping found for channel: '{channel}'. Please add a record to ValueStore for key: {keyName}")
             : Result.Success<string?>(p));
     }
-
   }
-
 }
-

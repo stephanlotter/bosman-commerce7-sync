@@ -22,7 +22,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
     Result<string?> GetShippingTaxType();
 
-    Result<string?> GetChannelProjectCode(string? channel);
+    Result<string?> GetChannelProjectCode(string? channel, string? posProfile);
 
   }
 }

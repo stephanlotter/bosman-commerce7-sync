@@ -77,9 +77,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
           return Result.Success(BuildResult("No new orders"));
         }
 
-        Result<string?> MapChannelToProjectCode(string? channel) {
+        Result<string?> MapChannelToProjectCode(string? channel, string? posProfile) {
           return _salesOrdersSyncValueStoreService
-            .GetChannelProjectCode(channel)
+            .GetChannelProjectCode(channel, posProfile)
             .OnFailureCompensate(error => Result.Failure<string?>($"Unable to map channel to project code: {error}"));
         }
 
@@ -96,6 +96,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
               Logger.LogInformation("Sales order received: {orderNumber}", $"{salesOrder.orderNumber}");
             }
 
+            var posProfile = $"{(salesOrder.posProfile?.title ?? "")}";
             var channel = $"{salesOrder.channel}";
 
             if (SkipChannel(channel, channelsToProcess)) {
@@ -131,7 +132,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
             _appDataFileManager.StoreText("json-sales-orders", $"{localSalesOrder.OrderNumber}.json", localSalesOrder.OrderJson);
             //Logger.LogInformation("{json}", localSalesOrder.OrderJson);
 
-            var channelProjectCode = MapChannelToProjectCode(channel);
+            var channelProjectCode = MapChannelToProjectCode(channel, posProfile);
 
             if (channelProjectCode.IsFailure) { throw new Exception(channelProjectCode.Error); }
 
