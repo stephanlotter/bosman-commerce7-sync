@@ -44,4 +44,9 @@
       <HintPath>..\..\..\EvolutionSdk\CurrentVersion\Pastel.Evolution.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <None Update="UnusableNodes.xml">
+      <DependentUpon>Model.DesignedDiffs.xafml</DependentUpon>
+    </None>
+  </ItemGroup>
 </Project>

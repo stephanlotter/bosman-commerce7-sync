@@ -8,7 +8,7 @@
  */
 
 namespace BosmanCommerce7.Module.Models {
-
+  
   public enum SalesOrderPostingStatus {
     New = 0,
     Posting = 1,

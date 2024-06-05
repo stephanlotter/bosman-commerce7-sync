@@ -55,6 +55,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
     void SetPostingStatus(SalesOrderPostingStatus postingStatus);
 
+    void SetAsPosted();
+
     Address ShipToAddress();
 
     void UpdatePostingWorkflowState(SalesOrderPostingWorkflowState workflowState);

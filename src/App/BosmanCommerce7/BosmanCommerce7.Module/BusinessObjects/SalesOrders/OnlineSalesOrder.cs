@@ -367,7 +367,7 @@ namespace BosmanCommerce7.Module.BusinessObjects.SalesOrders {
     }
 
     public void SetAsPosted() {
-      PostingStatus = SalesOrderPostingStatus.Posted;
+      SetPostingStatus(SalesOrderPostingStatus.Posted);
       DatePosted = DateTime.Now;
       UpdatePostingWorkflowState(SalesOrderPostingWorkflowState.Completed);
       PostLog("Posting complete");

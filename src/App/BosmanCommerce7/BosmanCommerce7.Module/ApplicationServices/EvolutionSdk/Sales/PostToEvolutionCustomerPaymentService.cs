@@ -20,7 +20,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
     public PostToEvolutionCustomerPaymentService(ILogger<PostToEvolutionCustomerPaymentService> logger, IValueStoreRepository valueStoreRepository) : base(logger, valueStoreRepository) {
     }
 
-    public Result<(IOnlineSalesOrder onlineSalesOrder, SalesDocumentBase customerDocument)> Post(PostToEvolutionSalesOrderContext context, (IOnlineSalesOrder onlineSalesOrder, SalesDocumentBase customerDocument) orderDetails) {
+    public Result<(IOnlineSalesOrder onlineSalesOrder, IEvolutionCustomerDocument customerDocument)> Post(PostToEvolutionSalesOrderContext context, (IOnlineSalesOrder onlineSalesOrder, IEvolutionCustomerDocument customerDocument) orderDetails) {
       var (onlineSalesOrder, customerDocument) = orderDetails;
 
       var logTransactionType = onlineSalesOrder.IsRefund ? "customer refund" : "customer receipt";
@@ -36,28 +36,26 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
       }
 
       try {
-        var warehouseCodeResult = WarehouseCode(customerDocument);
-
-        if (warehouseCodeResult.IsFailure) {
+        var warehouseCode = customerDocument.WarehouseCode;
+        if (string.IsNullOrWhiteSpace(warehouseCode)) {
           _logger.LogError("Cannot post {logTransactionType}. No warehouse linked line found on the sales order. {logTransactionIdentifier}", logTransactionType, logTransactionIdentifier);
-          return Result.Failure<(IOnlineSalesOrder onlineSalesOrder, SalesDocumentBase salesOrder)>(warehouseCodeResult.Error);
+          return Result.Failure<(IOnlineSalesOrder onlineSalesOrder, IEvolutionCustomerDocument salesOrder)>("No warehouse linked line found on the sales order");
         }
 
-        var warehouseCode = warehouseCodeResult.Value;
         var transactionCodeResult = GetPaymentTransactionCode(warehouseCode);
 
         if (transactionCodeResult.IsFailure) {
-          return Result.Failure<(IOnlineSalesOrder onlineSalesOrder, SalesDocumentBase salesOrder)>(transactionCodeResult.Error);
+          return Result.Failure<(IOnlineSalesOrder onlineSalesOrder, IEvolutionCustomerDocument salesOrder)>(transactionCodeResult.Error);
         }
 
         var transactionCode = $"{transactionCodeResult.Value}";
         var transactionAmountInVat = Math.Abs(onlineSalesOrder.JsonProperties.PaymentAmount()) - (onlineSalesOrder.IsRefund ? Math.Abs(onlineSalesOrder.JsonProperties.TipAmount()) : 0);
         var transactionDate = customerDocument.OrderDate;
 
-        var evolutionReference = onlineSalesOrder.IsRefund ? customerDocument.Reference : customerDocument.OrderNo;
+        var evolutionReference = onlineSalesOrder.IsRefund ? customerDocument.Reference : customerDocument.OrderNumber;
 
         var receipt = new CustomerTransaction {
-          Customer = new Customer(customerDocument.Customer.ID),
+          Customer = new Customer(customerDocument.CustomerId),
           Amount = transactionAmountInVat,
           Date = transactionDate,
           Description = $"POS Order payment {onlineSalesOrder.OrderNumber} {evolutionReference} {warehouseCode}",
@@ -66,8 +64,11 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
           Reference2 = $"{onlineSalesOrder.JsonProperties.SalesAssociateName()}",
           Reference = evolutionReference,
           TransactionCode = new TransactionCode(Pastel.Evolution.Module.AR, transactionCode),
-          Project = orderDetails.customerDocument.Project,
         };
+
+        if (orderDetails.customerDocument.ProjectId.HasValue) {
+          receipt.Project = new Project(orderDetails.customerDocument.ProjectId!.Value);
+        }
 
         receipt.Post();
 
@@ -75,7 +76,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
       }
       catch (Exception ex) {
         _logger.LogError(ex, "While posting {logTransactionType} {logTransactionIdentifier}", logTransactionType, logTransactionIdentifier);
-        return Result.Failure<(IOnlineSalesOrder onlineSalesOrder, SalesDocumentBase salesOrder)>(ex.Message);
+        return Result.Failure<(IOnlineSalesOrder onlineSalesOrder, IEvolutionCustomerDocument salesOrder)>(ex.Message);
       }
       finally {
         _logger.LogInformation("END: Posting {logTransactionType} {logTransactionIdentifier}", logTransactionType, logTransactionIdentifier);

@@ -160,13 +160,15 @@
         <ColumnInfo Id="LinkedOrderNumber" Index="10" Width="100" />
         <ColumnInfo Id="LastErrorMessage" Index="11" Width="450" />
       </Columns>
-      <Filters CurrentFilterId="NewAndRetrying">
-        <Filter Id="NewAndRetrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New# Or [PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="0" Caption="New and Retrying" IsNewNode="True" />
-        <Filter Id="New" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New#" Index="1" IsNewNode="True" />
-        <Filter Id="Retrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="2" IsNewNode="True" />
-        <Filter Id="Posted" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Posted#" Index="3" IsNewNode="True" />
-        <Filter Id="Failed" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Failed#" Index="4" IsNewNode="True" />
-        <Filter Id="All" Index="5" IsNewNode="True" />
+      <Filters CurrentFilterId="NewPostingAndRetrying">
+        <Filter Id="NewPostingAndRetrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New# Or [PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Posting# Or [PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="0" Caption="New, Posting and Retrying" IsNewNode="True" />
+        <Filter Id="NewAndRetrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New# Or [PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="1" Caption="New and Retrying" IsNewNode="True" />
+        <Filter Id="New" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New#" Index="2" IsNewNode="True" />
+        <Filter Id="Posting" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Posting#" Index="3" IsNewNode="True" />
+        <Filter Id="Retrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="4" IsNewNode="True" />
+        <Filter Id="Posted" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Posted#" Index="5" IsNewNode="True" />
+        <Filter Id="Failed" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Failed#" Index="6" IsNewNode="True" />
+        <Filter Id="All" Index="7" IsNewNode="True" />
       </Filters>
     </ListView>
     <ListView Id="OnlineSalesOrder_ListView_Club" ClassName="BosmanCommerce7.Module.BusinessObjects.SalesOrders.OnlineSalesOrder" AllowDelete="False" AllowLink="False" AllowNew="False" IsFooterVisible="True" Criteria="[Channel] = 'club'" IsNewNode="True">
@@ -210,10 +212,10 @@
       <Filters CurrentFilterId="NewAndRetrying" IsNewNode="True">
         <Filter Id="NewAndRetrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New# Or [PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="0" Caption="New and Retrying" IsNewNode="True" />
         <Filter Id="New" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New#" Index="1" IsNewNode="True" />
-        <Filter Id="Retrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="2" IsNewNode="True" />
-        <Filter Id="Posted" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Posted#" Index="3" IsNewNode="True" />
-        <Filter Id="Failed" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Failed#" Index="4" IsNewNode="True" />
-        <Filter Id="All" Index="5" IsNewNode="True" />
+        <Filter Id="Retrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="3" IsNewNode="True" />
+        <Filter Id="Posted" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Posted#" Index="4" IsNewNode="True" />
+        <Filter Id="Failed" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Failed#" Index="5" IsNewNode="True" />
+        <Filter Id="All" Index="6" IsNewNode="True" />
       </Filters>
     </ListView>
     <ListView Id="OnlineSalesOrder_ListView_POS" ClassName="BosmanCommerce7.Module.BusinessObjects.SalesOrders.OnlineSalesOrder" AllowDelete="False" AllowLink="False" AllowNew="False" IsFooterVisible="True" Criteria="[Channel] = 'pos'" IsNewNode="True">
@@ -255,13 +257,14 @@
         <ColumnInfo Id="RetryCount" PropertyName="RetryCount" Index="9" Width="90" IsNewNode="True" />
         <ColumnInfo Id="LastErrorMessage" PropertyName="LastErrorMessage" Index="10" Width="450" IsNewNode="True" />
       </Columns>
-      <Filters CurrentFilterId="NewAndRetrying" IsNewNode="True">
-        <Filter Id="NewAndRetrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New# Or [PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="0" Caption="New and Retrying" IsNewNode="True" />
+      <Filters CurrentFilterId="NewPostingAndRetrying" IsNewNode="True">
+        <Filter Id="NewPostingAndRetrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New# Or [PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Posting# Or [PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="0" Caption="New, Posting and Retrying" IsNewNode="True" />
         <Filter Id="New" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New#" Index="1" IsNewNode="True" />
-        <Filter Id="Retrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="2" IsNewNode="True" />
-        <Filter Id="Posted" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Posted#" Index="3" IsNewNode="True" />
-        <Filter Id="Failed" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Failed#" Index="4" IsNewNode="True" />
-        <Filter Id="All" Index="5" IsNewNode="True" />
+        <Filter Id="Posting" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Posting#" Index="2" IsNewNode="True" />
+        <Filter Id="Retrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="3" IsNewNode="True" />
+        <Filter Id="Posted" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Posted#" Index="4" IsNewNode="True" />
+        <Filter Id="Failed" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Failed#" Index="5" IsNewNode="True" />
+        <Filter Id="All" Index="6" IsNewNode="True" />
       </Filters>
     </ListView>
     <ListView Id="OnlineSalesOrder_SalesOrderLines_ListView" AllowDelete="False" AllowLink="False" AllowNew="False">
@@ -278,7 +281,12 @@
         <ColumnInfo Id="Oid" Index="7" />
       </Columns>
     </ListView>
-    <ListView Id="OnlineSalesOrder_SalesOrderProcessingLogs_ListView" AllowDelete="False" AllowLink="False" AllowNew="False" />
+    <ListView Id="OnlineSalesOrder_SalesOrderProcessingLogs_ListView" AllowDelete="False" AllowLink="False" AllowNew="False">
+      <Columns>
+        <ColumnInfo Id="ShortDescription" SortIndex="-1" SortOrder="None" />
+        <ColumnInfo Id="EntryDate" SortIndex="0" SortOrder="Descending" Width="271" />
+      </Columns>
+    </ListView>
     <DetailView Id="OnlineSalesOrderLine_DetailView" FreezeLayout="True" AllowDelete="False" AllowEdit="False" AllowNew="False">
       <Layout IsNewNode="True" Removed="True">
         <LayoutGroup Id="Main" Index="0" ShowCaption="False" RelativeSize="100" IsNewNode="True">

@@ -74,13 +74,23 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
       try {
         Logger.LogInformation("Start online sales order workflow. Order Number {OrderNumber}: Current state: {onlineSalesOrder.PostingWorkflowState}", onlineSalesOrder.OrderNumber, onlineSalesOrder.PostingWorkflowState);
 
+        if (onlineSalesOrder.PostingStatus == SalesOrderPostingStatus.Retrying) {
+          onlineSalesOrder.SetPostingStatus(SalesOrderPostingStatus.Posting);
+        }
+
         switch (onlineSalesOrder.PostingWorkflowState) {
           case SalesOrderPostingWorkflowState.New:
             return _salesOrdersPostService.Post(postToEvolutionSalesOrderContext, onlineSalesOrder)
-                  .OnFailureCompensate(err => {
-                    RecordPostingError(onlineSalesOrder, err);
-                    return Result.Failure<IOnlineSalesOrder>(err);
-                  });
+              .Map(x => {
+                if (!x.IsPosOrder) {
+                  x.SetAsPosted();
+                }
+                return x;
+              })
+              .OnFailureCompensate(err => {
+                RecordPostingError(onlineSalesOrder, err);
+                return Result.Failure<IOnlineSalesOrder>(err);
+              });
 
           case SalesOrderPostingWorkflowState.OrderPosted:
             return _salesOrderCustomerPaymentPostService.Post(postToEvolutionSalesOrderContext, onlineSalesOrder)

@@ -34,7 +34,7 @@ namespace BosmanCommerce7.Module.Controllers {
     }
 
     protected override void CreateActions() {
-      var criteria = "PostingStatus".InCriteriaOperator(SalesOrderPostingStatus.New, SalesOrderPostingStatus.Retrying, SalesOrderPostingStatus.Failed).ToCriteriaString();
+      var criteria = "PostingStatus".InCriteriaOperator(SalesOrderPostingStatus.New, SalesOrderPostingStatus.Posting, SalesOrderPostingStatus.Retrying, SalesOrderPostingStatus.Failed).ToCriteriaString();
       var action = NewAction("Post now", (s, e) => { Execute(); },
         selectionDependencyType: SelectionDependencyType.Independent,
         targetObjectsCriteria: criteria);

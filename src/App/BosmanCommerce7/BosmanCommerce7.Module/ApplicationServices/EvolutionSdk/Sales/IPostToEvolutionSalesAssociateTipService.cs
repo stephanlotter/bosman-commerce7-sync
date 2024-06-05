@@ -9,12 +9,11 @@
 
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices.Models;
 using CSharpFunctionalExtensions;
-using Pastel.Evolution;
 
 namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
   public interface IPostToEvolutionSalesAssociateTipService {
 
-    Result<(IOnlineSalesOrder onlineSalesOrder, SalesDocumentBase salesOrder)> Post(PostToEvolutionSalesOrderContext context, (IOnlineSalesOrder onlineSalesOrder, SalesDocumentBase salesOrder) orderDetails);
+    Result<(IOnlineSalesOrder onlineSalesOrder, IEvolutionCustomerDocument customerDocument)> Post(PostToEvolutionSalesOrderContext context, (IOnlineSalesOrder onlineSalesOrder, IEvolutionCustomerDocument customerDocument) orderDetails);
   }
 }
