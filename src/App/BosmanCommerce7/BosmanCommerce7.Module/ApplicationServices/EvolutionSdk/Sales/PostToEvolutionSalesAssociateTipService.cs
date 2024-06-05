@@ -71,7 +71,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
             OrderNo = evolutionReference,
             Reference2 = $"{onlineSalesOrder.JsonProperties.SalesAssociateName}",
             Reference = evolutionReference,
-            TransactionCode = new TransactionCode(Pastel.Evolution.Module.GL, transactionCode)
+            TransactionCode = new TransactionCode(Pastel.Evolution.Module.GL, transactionCode),
+            Project = orderDetails.salesOrder.Project,
           };
 
           if (Math.Abs(debitAmount) >= 0.01) {
