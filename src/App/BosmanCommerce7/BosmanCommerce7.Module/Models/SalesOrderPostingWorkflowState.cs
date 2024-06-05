@@ -1,7 +1,7 @@
 ﻿/*
  * Copyright (C) Neurasoft Consulting cc.  All rights reserved.
  * www.neurasoft.co.za
- * Date created: 2023-08-18
+ * Date created: 2024-06-05
  * Author	: Stephan J Lotter
  * Notes	:
  *
@@ -9,11 +9,10 @@
 
 namespace BosmanCommerce7.Module.Models {
 
-  public enum SalesOrderPostingStatus {
+  public enum SalesOrderPostingWorkflowState {
     New = 0,
-    Retrying = 10,
-    Posted = 100,
-    Skipped = 110,
-    Failed = 200
+    OrderPosted = 10,
+    PaymentPosted = 20,
+    TipPosted = 30
   }
 }

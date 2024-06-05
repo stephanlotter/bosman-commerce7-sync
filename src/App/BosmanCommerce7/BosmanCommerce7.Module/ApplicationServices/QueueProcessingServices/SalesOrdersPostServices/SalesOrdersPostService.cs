@@ -33,6 +33,14 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
     public Result<SalesOrdersPostResult> Execute(SalesOrdersPostContext context) {
       _errorCount = 0;
 
+      /*
+      This needs to be broken up into a workflow:
+        - Post the sales order/invoice/credit note
+        - Post the payment
+        - Post the tip
+      Each step in the workflow should be a separate process that can be retried.
+       */
+
       return LocalObjectSpaceEvolutionSdkProvider.WrapInObjectSpaceEvolutionSdkTransaction((objectSpace, _) => {
         var onlineSalesOrders = GetOnlineSalesOrders(objectSpace, context);
 

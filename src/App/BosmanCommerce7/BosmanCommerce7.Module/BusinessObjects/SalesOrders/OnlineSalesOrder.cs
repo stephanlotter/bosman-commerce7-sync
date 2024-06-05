@@ -46,6 +46,7 @@ namespace BosmanCommerce7.Module.BusinessObjects.SalesOrders {
     private string? _lastErrorMessage;
     private string? _orderJson;
     private SalesOrderPostingStatus _postingStatus;
+    private SalesOrderPostingWorkflowState _postingWorkflowState;
     private int _retryCount;
     private DateTime? _retryAfter;
     private DateTime? _datePosted;
@@ -204,6 +205,12 @@ namespace BosmanCommerce7.Module.BusinessObjects.SalesOrders {
     }
 
     [ModelDefault("AllowEdit", "false")]
+    public SalesOrderPostingWorkflowState PostingWorkflowState {
+      get => _postingWorkflowState;
+      set => SetPropertyValue(nameof(PostingWorkflowState), ref _postingWorkflowState, value);
+    }
+
+    [ModelDefault("AllowEdit", "false")]
     public int RetryCount {
       get => _retryCount;
       set => SetPropertyValue(nameof(RetryCount), ref _retryCount, value);
@@ -244,6 +251,12 @@ namespace BosmanCommerce7.Module.BusinessObjects.SalesOrders {
     [Browsable(false)]
     public bool IsStoreOrder => Channel?.Equals("web", StringComparison.InvariantCultureIgnoreCase) ?? false;
 
+    [VisibleInListView(false)]
+    public double PaymentAmount => JsonProperties.PaymentAmount();
+
+    [VisibleInListView(false)]
+    public double TipAmount => JsonProperties.TipAmount();
+
     [Association("OnlineSalesOrder-OnlineSalesOrderLine")]
     [Aggregated]
     [ModelDefault("AllowEdit", "false")]
@@ -260,6 +273,7 @@ namespace BosmanCommerce7.Module.BusinessObjects.SalesOrders {
     public override void AfterConstruction() {
       base.AfterConstruction();
       PostingStatus = SalesOrderPostingStatus.New;
+      PostingWorkflowState = SalesOrderPostingWorkflowState.New;
       RetryAfter = DateTime.Now;
     }
 
