@@ -69,7 +69,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
             Description = $"POS Tip {onlineSalesOrder.OrderNumber} {evolutionReference} {warehouseCode}",
             ExtOrderNo = $"{onlineSalesOrder.OrderNumber}",
             OrderNo = evolutionReference,
-            Reference2 = $"{onlineSalesOrder.JsonProperties.SalesAssociateName}",
+            Reference2 = $"{onlineSalesOrder.JsonProperties.SalesAssociateName()}",
             Reference = evolutionReference,
             TransactionCode = new TransactionCode(Pastel.Evolution.Module.GL, transactionCode),
             Project = orderDetails.salesOrder.Project,
