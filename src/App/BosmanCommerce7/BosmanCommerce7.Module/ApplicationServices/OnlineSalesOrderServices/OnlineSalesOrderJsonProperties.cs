@@ -20,7 +20,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.OnlineSalesOrderServices {
       _data = JsonConvert.DeserializeObject<dynamic>(json);
     }
 
-    public string? SalesAssociateName() => _data?.salesAssociate?.name;
+    public string? SalesAssociateName() => $"{_data?.salesAssociate?.name}";
 
     private IEnumerable<OrderTender> SuccessTenders() => Tenders().Where(a => a.ChargeStatus.Equals("success", StringComparison.InvariantCultureIgnoreCase));
 
