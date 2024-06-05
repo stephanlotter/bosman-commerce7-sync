@@ -7,7 +7,7 @@
  *
  */
 
-using BosmanCommerce7.Module.BusinessObjects.SalesOrders;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices.Models;
 using CSharpFunctionalExtensions;
 using Pastel.Evolution;
 
@@ -15,7 +15,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
   public abstract class SalesOrderSubTransactionPostServiceBase {
 
-    protected Result<SalesDocumentBase> LoadSalesOrder(OnlineSalesOrder onlineSalesOrder) {
+    protected Result<SalesDocumentBase> LoadSalesOrder(IOnlineSalesOrder onlineSalesOrder) {
       if (onlineSalesOrder.IsRefund) {
         var id = CreditNote.Find($"InvNumber = '{onlineSalesOrder.EvolutionInvoiceNumber}'");
         return Result.Success((SalesDocumentBase)new CreditNote(id));

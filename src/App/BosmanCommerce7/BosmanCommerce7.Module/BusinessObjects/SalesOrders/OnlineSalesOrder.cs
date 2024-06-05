@@ -9,6 +9,7 @@
 
 using System.ComponentModel;
 using BosmanCommerce7.Module.ApplicationServices.OnlineSalesOrderServices;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices.Models;
 using BosmanCommerce7.Module.Extensions;
 using BosmanCommerce7.Module.Models;
 using DevExpress.ExpressApp.Model;
@@ -21,7 +22,7 @@ namespace BosmanCommerce7.Module.BusinessObjects.SalesOrders {
   [DefaultClassOptions]
   [NavigationItem(true)]
   [DefaultProperty(nameof(OrderNumber))]
-  public class OnlineSalesOrder : XPObject {
+  public class OnlineSalesOrder : XPObject, IOnlineSalesOrder {
     private string? _customerId;
     private string? _emailAddress;
     private string? _onlineId;
@@ -302,6 +303,12 @@ namespace BosmanCommerce7.Module.BusinessObjects.SalesOrders {
       RetryAfter = DateTime.Now;
       RetryCount = 0;
       PostingStatus = SalesOrderPostingStatus.New;
+
+      // IMPORTANT NOTE:
+      // PostingWorkflowState must not be reset.
+      // The retry is for the current workflow step only.
+      // PostingWorkflowState = SalesOrderPostingWorkflowState.New;
+
       LastErrorMessage = null;
     }
 
@@ -353,6 +360,25 @@ namespace BosmanCommerce7.Module.BusinessObjects.SalesOrders {
       PostingWorkflowState = workflowState;
       LastErrorMessage = null;
       RetryCount = 0;
+    }
+
+    public void SetPostingStatus(SalesOrderPostingStatus postingStatus) {
+      PostingStatus = postingStatus;
+    }
+
+    public void SetAsPosted() {
+      PostingStatus = SalesOrderPostingStatus.Posted;
+      DatePosted = DateTime.Now;
+      UpdatePostingWorkflowState(SalesOrderPostingWorkflowState.Completed);
+      PostLog("Posting complete");
+    }
+
+    public void SetEvolutionInvoiceNumber(string value) {
+      EvolutionInvoiceNumber = value;
+    }
+
+    public void SetEvolutionSalesOrderNumber(string value) {
+      EvolutionSalesOrderNumber = value;
     }
   }
 }

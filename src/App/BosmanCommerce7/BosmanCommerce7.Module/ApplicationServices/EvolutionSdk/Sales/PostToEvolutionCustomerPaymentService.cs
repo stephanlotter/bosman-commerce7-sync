@@ -9,7 +9,6 @@
 
 using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices.Models;
-using BosmanCommerce7.Module.BusinessObjects.SalesOrders;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Pastel.Evolution;
@@ -21,7 +20,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
     public PostToEvolutionCustomerPaymentService(ILogger<PostToEvolutionCustomerPaymentService> logger, IValueStoreRepository valueStoreRepository) : base(logger, valueStoreRepository) {
     }
 
-    public Result<(OnlineSalesOrder onlineSalesOrder, SalesDocumentBase customerDocument)> Post(PostToEvolutionSalesOrderContext context, (OnlineSalesOrder onlineSalesOrder, SalesDocumentBase customerDocument) orderDetails) {
+    public Result<(IOnlineSalesOrder onlineSalesOrder, SalesDocumentBase customerDocument)> Post(PostToEvolutionSalesOrderContext context, (IOnlineSalesOrder onlineSalesOrder, SalesDocumentBase customerDocument) orderDetails) {
       var (onlineSalesOrder, customerDocument) = orderDetails;
 
       var logTransactionType = onlineSalesOrder.IsRefund ? "customer refund" : "customer receipt";
@@ -41,14 +40,14 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
         if (warehouseCodeResult.IsFailure) {
           _logger.LogError("Cannot post {logTransactionType}. No warehouse linked line found on the sales order. {logTransactionIdentifier}", logTransactionType, logTransactionIdentifier);
-          return Result.Failure<(OnlineSalesOrder onlineSalesOrder, SalesDocumentBase salesOrder)>(warehouseCodeResult.Error);
+          return Result.Failure<(IOnlineSalesOrder onlineSalesOrder, SalesDocumentBase salesOrder)>(warehouseCodeResult.Error);
         }
 
         var warehouseCode = warehouseCodeResult.Value;
         var transactionCodeResult = GetPaymentTransactionCode(warehouseCode);
 
         if (transactionCodeResult.IsFailure) {
-          return Result.Failure<(OnlineSalesOrder onlineSalesOrder, SalesDocumentBase salesOrder)>(transactionCodeResult.Error);
+          return Result.Failure<(IOnlineSalesOrder onlineSalesOrder, SalesDocumentBase salesOrder)>(transactionCodeResult.Error);
         }
 
         var transactionCode = $"{transactionCodeResult.Value}";
@@ -76,7 +75,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
       }
       catch (Exception ex) {
         _logger.LogError(ex, "While posting {logTransactionType} {logTransactionIdentifier}", logTransactionType, logTransactionIdentifier);
-        return Result.Failure<(OnlineSalesOrder onlineSalesOrder, SalesDocumentBase salesOrder)>(ex.Message);
+        return Result.Failure<(IOnlineSalesOrder onlineSalesOrder, SalesDocumentBase salesOrder)>(ex.Message);
       }
       finally {
         _logger.LogInformation("END: Posting {logTransactionType} {logTransactionIdentifier}", logTransactionType, logTransactionIdentifier);

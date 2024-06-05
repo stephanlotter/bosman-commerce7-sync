@@ -74,7 +74,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
       _evolutionGeneralLedgerAccountRepository = evolutionGeneralLedgerAccountRepository;
     }
 
-    public Result<OnlineSalesOrder> Post(PostToEvolutionSalesOrderContext context, OnlineSalesOrder onlineSalesOrder) {
+    public Result<IOnlineSalesOrder> Post(PostToEvolutionSalesOrderContext context, IOnlineSalesOrder onlineSalesOrder) {
       var logTransactionType = onlineSalesOrder.IsRefund ? "sales order refund" : "sales order";
       var logTransactionIdentifier = onlineSalesOrder.IsRefund
         ? $"[Posting Sales Order][POS Reference:{onlineSalesOrder.OrderNumber}][POS Refunded Order Reference:{onlineSalesOrder.LinkedOrderNumber}]"
@@ -89,13 +89,14 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
         .Bind(salesOrder => {
           if (onlineSalesOrder.IsRefund || onlineSalesOrder.IsPosOrder) {
-            onlineSalesOrder.EvolutionInvoiceNumber = salesOrder.Complete();
+            var invoiceNumber = salesOrder.Complete();
+            onlineSalesOrder.SetEvolutionInvoiceNumber(invoiceNumber);
           }
           else {
             salesOrder.Save();
           }
 
-          onlineSalesOrder.EvolutionSalesOrderNumber = salesOrder.OrderNo;
+          onlineSalesOrder.SetEvolutionSalesOrderNumber(salesOrder.OrderNo);
           return Result.Success((onlineSalesOrder, salesOrder));
         })
         .Bind(orderDetails => {
@@ -105,14 +106,14 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
       }
       catch (Exception ex) {
         _logger.LogError(ex, "While posting {logTransactionType} {logTransactionIdentifier}", logTransactionType, logTransactionIdentifier);
-        return Result.Failure<OnlineSalesOrder>(ex.Message);
+        return Result.Failure<IOnlineSalesOrder>(ex.Message);
       }
       finally {
         _logger.LogInformation("END: Posting {logTransactionType} {logTransactionIdentifier}", logTransactionType, logTransactionIdentifier);
       }
     }
 
-    private Result<SalesDocumentBase> CreateSalesOrderHeader(PostToEvolutionSalesOrderContext context, OnlineSalesOrder onlineSalesOrder) {
+    private Result<SalesDocumentBase> CreateSalesOrderHeader(PostToEvolutionSalesOrderContext context, IOnlineSalesOrder onlineSalesOrder) {
       return NewSalesOrder()
         .Bind(AssignCustomer)
         .Bind(AssignProject)
@@ -184,7 +185,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
       }
     }
 
-    private Result<SalesDocumentBase> AddSalesOrderLines(PostToEvolutionSalesOrderContext context, SalesDocumentBase salesOrder, OnlineSalesOrder onlineSalesOrder) {
+    private Result<SalesDocumentBase> AddSalesOrderLines(PostToEvolutionSalesOrderContext context, SalesDocumentBase salesOrder, IOnlineSalesOrder onlineSalesOrder) {
       foreach (var onlineSalesOrderLine in onlineSalesOrder.SalesOrderLines.OrderBy(a => a.LineType)) {
         var result = onlineSalesOrderLine.LineType switch {
           SalesOrderLineType.Inventory => AddSalesOrderInventoryLine(context, salesOrder, onlineSalesOrder, onlineSalesOrderLine),
@@ -198,7 +199,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
       return Result.Success(salesOrder);
     }
 
-    private Result<SalesDocumentBase> AddSalesOrderInventoryLine(PostToEvolutionSalesOrderContext context, SalesDocumentBase salesOrder, OnlineSalesOrder onlineSalesOrder, OnlineSalesOrderLine onlineSalesOrderLine) {
+    private Result<SalesDocumentBase> AddSalesOrderInventoryLine(PostToEvolutionSalesOrderContext context, SalesDocumentBase salesOrder, IOnlineSalesOrder onlineSalesOrder, OnlineSalesOrderLine onlineSalesOrderLine) {
       try {
         if (string.IsNullOrWhiteSpace(onlineSalesOrderLine.Sku)) {
           return Result.Failure<SalesDocumentBase>($"Sku on line with Oid {onlineSalesOrderLine.Oid} is blank");
@@ -273,7 +274,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
       }
     }
 
-    private Result<SalesDocumentBase> AddSalesOrderGeneralLedgerLine(PostToEvolutionSalesOrderContext context, SalesDocumentBase salesOrder, OnlineSalesOrder onlineSalesOrder, OnlineSalesOrderLine onlineSalesOrderLine) {
+    private Result<SalesDocumentBase> AddSalesOrderGeneralLedgerLine(PostToEvolutionSalesOrderContext context, SalesDocumentBase salesOrder, IOnlineSalesOrder onlineSalesOrder, OnlineSalesOrderLine onlineSalesOrderLine) {
       try {
         return NewSalesOrderLine(salesOrder)
 

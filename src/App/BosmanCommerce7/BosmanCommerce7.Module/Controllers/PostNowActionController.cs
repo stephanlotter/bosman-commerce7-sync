@@ -17,10 +17,9 @@ using DevExpress.ExpressApp;
 using DevExpress.ExpressApp.Actions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BosmanCommerce7.Module.Controllers
-{
+namespace BosmanCommerce7.Module.Controllers {
 
-    public class PostNowActionController : ActionControllerBase {
+  public class PostNowActionController : ActionControllerBase {
     private readonly IServiceProvider? _serviceProvider;
 
     public PostNowActionController() {
@@ -52,7 +51,7 @@ namespace BosmanCommerce7.Module.Controllers
       var service = _serviceProvider!.GetService<ISalesOrdersPostWorkflowService>();
       var context = new SalesOrdersPostContext(criteria);
 
-      service!
+      var _ = service!
         .Execute(context)
         .Tap(() => { ShowSuccessMessage(); })
         .TapError(ShowErrorMessage);

@@ -13,6 +13,7 @@ namespace BosmanCommerce7.Module.Models {
     New = 0,
     OrderPosted = 10,
     PaymentPosted = 20,
-    TipPosted = 30
+    TipPosted = 30,
+    Completed = 100,
   }
 }

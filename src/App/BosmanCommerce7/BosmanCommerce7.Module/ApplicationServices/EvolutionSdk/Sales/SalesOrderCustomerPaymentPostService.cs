@@ -8,7 +8,6 @@
  */
 
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices.Models;
-using BosmanCommerce7.Module.BusinessObjects.SalesOrders;
 using BosmanCommerce7.Module.Models;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
@@ -25,10 +24,10 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
       _postToEvolutionCustomerPaymentService = postToEvolutionCustomerPaymentService;
     }
 
-    public Result<OnlineSalesOrder> Post(PostToEvolutionSalesOrderContext context, OnlineSalesOrder onlineSalesOrder) {
+    public Result<IOnlineSalesOrder> Post(PostToEvolutionSalesOrderContext context, IOnlineSalesOrder onlineSalesOrder) {
       try {
         if (!onlineSalesOrder.IsPosOrder) {
-          onlineSalesOrder.PostingWorkflowState = SalesOrderPostingWorkflowState.PaymentPosted;
+          onlineSalesOrder.UpdatePostingWorkflowState(SalesOrderPostingWorkflowState.PaymentPosted);
           return Result.Success(onlineSalesOrder);
         }
 
@@ -41,7 +40,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
             return _postToEvolutionCustomerPaymentService.Post(context, orderDetails)
               .Bind(a => {
                 onlineSalesOrder.UpdatePostingWorkflowState(SalesOrderPostingWorkflowState.PaymentPosted);
-                onlineSalesOrder.PostLog("Customer payment posted to Evolution");
+                onlineSalesOrder.PostLog($"Customer payment{(onlineSalesOrder.IsRefund ? " refund" : "")} posted to Evolution");
                 return Result.Success(a.onlineSalesOrder);
               });
           });
@@ -49,7 +48,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
       catch (Exception ex) {
         _logger.LogError(ex, "Error posting CUSTOMER PAYMENT Online Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
         onlineSalesOrder.PostLog(ex.Message, ex);
-        return Result.Failure<OnlineSalesOrder>(ex.Message);
+        return Result.Failure<IOnlineSalesOrder>(ex.Message);
       }
     }
   }

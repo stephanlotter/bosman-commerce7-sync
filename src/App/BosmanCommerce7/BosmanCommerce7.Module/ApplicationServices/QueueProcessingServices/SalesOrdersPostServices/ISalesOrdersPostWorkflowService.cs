@@ -14,6 +14,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
   public interface ISalesOrdersPostWorkflowService {
 
-    Result<SalesOrdersPostResult> Execute(SalesOrdersPostContext context);
+    Result Execute(SalesOrdersPostContext context);
   }
 }

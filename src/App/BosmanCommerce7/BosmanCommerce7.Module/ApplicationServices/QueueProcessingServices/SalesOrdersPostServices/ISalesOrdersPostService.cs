@@ -7,14 +7,8 @@
  *
  */
 
-using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices.Models;
-using BosmanCommerce7.Module.BusinessObjects.SalesOrders;
-using CSharpFunctionalExtensions;
-
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices {
 
-  public interface ISalesOrdersPostService {
-
-    Result<OnlineSalesOrder> Post(PostToEvolutionSalesOrderContext context, OnlineSalesOrder onlineSalesOrder);
+  public interface ISalesOrdersPostService : ISalesOrdersPostServiceBase {
   }
 }

@@ -21,7 +21,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
     protected override void ProcessQueue() {
       var context = new SalesOrdersPostContext();
-      var result = _salesOrdersPostWorkflowService.Execute(context);
+      var _ = _salesOrdersPostWorkflowService.Execute(context);
     }
   }
 }

@@ -22,101 +22,96 @@ using Microsoft.Extensions.Logging;
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices {
 
   public class SalesOrdersPostWorkflowService : SyncServiceBase, ISalesOrdersPostWorkflowService {
-    private readonly IPostToEvolutionSalesOrderService _postSalesOrderService;
-    private readonly ISalesOrderCustomerPaymentPostService _postSalesOrderCustomerPaymentService;
-    private readonly ISalesOrderTipPostService _postSalesOrderTipService;
+    private readonly ISalesOrdersPostService _salesOrdersPostService;
+    private readonly ISalesOrderCustomerPaymentPostService _salesOrderCustomerPaymentPostService;
+    private readonly ISalesOrderTipPostService _salesOrderTipPostService;
 
     public SalesOrdersPostWorkflowService(ILogger<SalesOrdersPostService> logger,
       ILocalObjectSpaceEvolutionSdkProvider localObjectSpaceEvolutionSdkProvider,
-      IPostToEvolutionSalesOrderService postToEvolutionSalesOrderService,
-      ISalesOrderCustomerPaymentPostService postToEvolutionSalesOrderCustomerPaymentService,
-      ISalesOrderTipPostService postToEvolutionSalesOrderTipService)
+      ISalesOrdersPostService salesOrdersPostService,
+      ISalesOrderCustomerPaymentPostService salesOrderCustomerPaymentPostService,
+      ISalesOrderTipPostService salesOrderTipPostService)
       : base(logger, localObjectSpaceEvolutionSdkProvider) {
-      _postSalesOrderService = postToEvolutionSalesOrderService;
-      _postSalesOrderCustomerPaymentService = postToEvolutionSalesOrderCustomerPaymentService;
-      _postSalesOrderTipService = postToEvolutionSalesOrderTipService;
+      _salesOrdersPostService = salesOrdersPostService;
+      _salesOrderCustomerPaymentPostService = salesOrderCustomerPaymentPostService;
+      _salesOrderTipPostService = salesOrderTipPostService;
     }
 
-    public Result<SalesOrdersPostResult> Execute(SalesOrdersPostContext context) {
+    public Result Execute(SalesOrdersPostContext context) {
       _errorCount = 0;
-
-      /*
-      This needs to be broken up into a workflow:
-        - Post the sales order/invoice/credit note
-        - Post the payment
-        - Post the tip
-      Each step in the workflow should be a separate process that can be retried.
-      Each step must be in its own transaction.
-
-      When the final workflow step is done set: 
-      - onlineSalesOrder.PostingStatus = SalesOrderPostingStatus.Posted;
-      - onlineSalesOrder.DatePosted = DateTime.Now;
-       */
 
       var onlineSalesOrdersResult = LocalObjectSpaceEvolutionSdkProvider.WrapInObjectSpaceTransaction<List<OnlineSalesOrder>>(objectSpace => {
         return GetOnlineSalesOrders(objectSpace, context);
       });
 
       if (onlineSalesOrdersResult.IsFailure) {
-        return Result.Failure<SalesOrdersPostResult>(onlineSalesOrdersResult.Error);
+        return Result.Failure(onlineSalesOrdersResult.Error);
       }
 
       var onlineSalesOrders = onlineSalesOrdersResult.Value;
       if (!onlineSalesOrders.Any()) {
         Logger.LogDebug("No sales orders to post");
-        return Result.Success(BuildResult());
+        return Result.Success();
       }
 
-      var salesOrderPostingResult = LocalObjectSpaceEvolutionSdkProvider.WrapInObjectSpaceEvolutionSdkTransaction((objectSpace, _) => {
-        var postToEvolutionSalesOrderContext = new PostToEvolutionSalesOrderContext {
-          ObjectSpace = objectSpace
-        };
+      var results = new List<Result>();
 
-        foreach (var onlineSalesOrder in onlineSalesOrders) {
-          PostOnlineSalesOrder(LoadOnlineSalesOrder(objectSpace, onlineSalesOrder.Oid), postToEvolutionSalesOrderContext);
-        }
+      foreach (var onlineSalesOrder in onlineSalesOrders) {
+        var processingResult = LocalObjectSpaceEvolutionSdkProvider.WrapInObjectSpaceEvolutionSdkTransaction((objectSpace, _) => {
+          var postToEvolutionSalesOrderContext = new PostToEvolutionSalesOrderContext {
+            ObjectSpace = objectSpace
+          };
 
-        return _errorCount == 0 ? Result.Success(BuildResult()) : Result.Failure<SalesOrdersPostResult>($"Completed with {_errorCount} errors.");
-      });
-
-      return salesOrderPostingResult;
-
-      SalesOrdersPostResult BuildResult() {
-        return new SalesOrdersPostResult { };
+          return ProcessOnlineSalesOrder(LoadOnlineSalesOrder(objectSpace, onlineSalesOrder.Oid), postToEvolutionSalesOrderContext);
+        });
+        results.Add(processingResult);
       }
+
+      return _errorCount == 0 ? Result.Success() : Result.Failure($"Completed with {_errorCount} errors.");
     }
 
-    private void PostOnlineSalesOrder(OnlineSalesOrder onlineSalesOrder, PostToEvolutionSalesOrderContext postToEvolutionSalesOrderContext) {
+    private Result ProcessOnlineSalesOrder(OnlineSalesOrder onlineSalesOrder, PostToEvolutionSalesOrderContext postToEvolutionSalesOrderContext) {
       try {
-        Logger.LogInformation("Start posting online sales order. Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
+        Logger.LogInformation("Start online sales order workflow. Order Number {OrderNumber}: Current state: {onlineSalesOrder.PostingWorkflowState}", onlineSalesOrder.OrderNumber, onlineSalesOrder.PostingWorkflowState);
 
-        if (onlineSalesOrder.IsRefund && onlineSalesOrder.IsClubOrder) {
-          Logger.LogInformation("Skipping club order refund. Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
-          onlineSalesOrder.PostLog("Skipping club order refund.");
-          onlineSalesOrder.PostingStatus = SalesOrderPostingStatus.Skipped;
-          return;
+        switch (onlineSalesOrder.PostingWorkflowState) {
+          case SalesOrderPostingWorkflowState.New:
+            return _salesOrdersPostService.Post(postToEvolutionSalesOrderContext, onlineSalesOrder)
+                  .OnFailureCompensate(err => {
+                    RecordPostingError(onlineSalesOrder, err);
+                    return Result.Failure<IOnlineSalesOrder>(err);
+                  });
+
+          case SalesOrderPostingWorkflowState.OrderPosted:
+            return _salesOrderCustomerPaymentPostService.Post(postToEvolutionSalesOrderContext, onlineSalesOrder)
+                  .OnFailureCompensate(err => {
+                    RecordPostingError(onlineSalesOrder, err);
+                    return Result.Failure<IOnlineSalesOrder>(err);
+                  });
+
+          case SalesOrderPostingWorkflowState.PaymentPosted:
+            return _salesOrderTipPostService.Post(postToEvolutionSalesOrderContext, onlineSalesOrder)
+                  .OnFailureCompensate(err => {
+                    RecordPostingError(onlineSalesOrder, err);
+                    return Result.Failure<IOnlineSalesOrder>(err);
+                  });
+
+          case SalesOrderPostingWorkflowState.TipPosted:
+            onlineSalesOrder.SetAsPosted();
+            return Result.Success();
+
+          default:
+            throw new ArgumentOutOfRangeException();
         }
-
-        if (!onlineSalesOrder.UseCashCustomer && string.IsNullOrWhiteSpace(onlineSalesOrder.EmailAddress)) {
-          Logger.LogError("Email Address is empty. Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
-          onlineSalesOrder.PostLog("Email Address is empty.");
-          onlineSalesOrder.PostingStatus = SalesOrderPostingStatus.Failed;
-          return;
-        }
-
-        _postSalesOrderService.Post(postToEvolutionSalesOrderContext, onlineSalesOrder)
-              .OnFailureCompensate(err => {
-                RecordPostingError(onlineSalesOrder, err);
-                return Result.Failure<OnlineSalesOrder>(err);
-              });
       }
       catch (Exception ex) {
         onlineSalesOrder.PostLog(ex.Message, ex);
         RecordPostingError(onlineSalesOrder, ex.Message);
+        return Result.Failure(ex.Message);
       }
       finally {
         onlineSalesOrder.Save();
-        Logger.LogInformation("End posting online sales order. Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
+        Logger.LogInformation("End online sales order workflow. Order Number {OrderNumber}: New state: {onlineSalesOrder.PostingWorkflowState}", onlineSalesOrder.OrderNumber, onlineSalesOrder.PostingWorkflowState);
       }
     }
 
