@@ -66,7 +66,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
           OrderNo = evolutionReference,
           Reference2 = $"{onlineSalesOrder.LinkedOrderNumber}",
           Reference = evolutionReference,
-          TransactionCode = new TransactionCode(Pastel.Evolution.Module.AR, transactionCode)
+          TransactionCode = new TransactionCode(Pastel.Evolution.Module.AR, transactionCode),
+          Project = orderDetails.customerDocument.Project,
         };
 
         receipt.Post();

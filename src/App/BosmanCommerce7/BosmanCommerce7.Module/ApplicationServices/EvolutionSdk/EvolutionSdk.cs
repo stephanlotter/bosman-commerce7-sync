@@ -29,9 +29,12 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
 
         var result = func(new DatabaseConnection(DatabaseContext.DBConnection, DatabaseContext.DBTransaction));
 
-        result
-          .Tap(() => { CommitTransaction(); })
-          .TapError(() => { RollbackTransaction(); });
+        if (result.IsSuccess) {
+          CommitTransaction();
+        }
+        else {
+          RollbackTransaction();
+        }
 
         return result;
       }
@@ -47,9 +50,12 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk {
 
         var result = func(new DatabaseConnection(DatabaseContext.DBConnection, DatabaseContext.DBTransaction));
 
-        result
-          .Tap(() => { CommitTransaction(); })
-          .TapError(() => { RollbackTransaction(); });
+        if (result.IsSuccess) {
+          CommitTransaction();
+        }
+        else {
+          RollbackTransaction();
+        }
 
         return result;
       }
