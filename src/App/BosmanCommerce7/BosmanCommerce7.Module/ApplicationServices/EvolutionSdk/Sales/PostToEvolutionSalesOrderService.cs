@@ -22,7 +22,6 @@ using CSharpFunctionalExtensions;
 using DevExpress.ExpressApp;
 using Microsoft.Extensions.Logging;
 using Pastel.Evolution;
-using Polly;
 
 namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
@@ -42,8 +41,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
     private readonly IEvolutionWarehouseRepository _evolutionWarehouseRepository;
     private readonly IEvolutionPriceListRepository _evolutionPriceListRepository;
     private readonly IEvolutionGeneralLedgerAccountRepository _evolutionGeneralLedgerAccountRepository;
-    private readonly IPostToEvolutionCustomerPaymentService _postToEvolutionCustomerPaymentService;
-    private readonly IPostToEvolutionSalesAssociateTipService _postToEvolutionSalesAssociateTipService;
 
     public PostToEvolutionSalesOrderService(ILogger<PostToEvolutionSalesOrderService> logger,
       ISalesOrdersPostValueStoreService salesOrdersPostValueStoreService,
@@ -59,9 +56,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
       IEvolutionInventoryItemRepository evolutionInventoryItemRepository,
       IEvolutionWarehouseRepository evolutionWarehouseRepository,
       IEvolutionPriceListRepository evolutionPriceListRepository,
-      IEvolutionGeneralLedgerAccountRepository evolutionGeneralLedgerAccountRepository,
-      IPostToEvolutionCustomerPaymentService postToEvolutionCustomerPaymentService,
-      IPostToEvolutionSalesAssociateTipService postToEvolutionSalesAssociateTipService) {
+      IEvolutionGeneralLedgerAccountRepository evolutionGeneralLedgerAccountRepository) {
       _logger = logger;
       _salesOrdersPostValueStoreService = salesOrdersPostValueStoreService;
       _bundleMappingRepository = bundleMappingRepository;
@@ -77,11 +72,16 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
       _evolutionWarehouseRepository = evolutionWarehouseRepository;
       _evolutionPriceListRepository = evolutionPriceListRepository;
       _evolutionGeneralLedgerAccountRepository = evolutionGeneralLedgerAccountRepository;
-      _postToEvolutionCustomerPaymentService = postToEvolutionCustomerPaymentService;
-      _postToEvolutionSalesAssociateTipService = postToEvolutionSalesAssociateTipService;
     }
 
     public Result<OnlineSalesOrder> Post(PostToEvolutionSalesOrderContext context, OnlineSalesOrder onlineSalesOrder) {
+      var logTransactionType = onlineSalesOrder.IsRefund ? "sales order refund" : "sales order";
+      var logTransactionIdentifier = onlineSalesOrder.IsRefund
+        ? $"[Posting Sales Order][POS Reference:{onlineSalesOrder.OrderNumber}][POS Refunded Order Reference:{onlineSalesOrder.LinkedOrderNumber}]"
+        : $"[Posting Sales Order][POS Reference:{onlineSalesOrder.OrderNumber}]";
+
+      _logger.LogInformation("START: Posting {logTransactionType} {logTransactionIdentifier}", logTransactionType, logTransactionIdentifier);
+
       try {
         return CreateSalesOrderHeader(context, onlineSalesOrder)
 
@@ -96,24 +96,19 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
           }
 
           onlineSalesOrder.EvolutionSalesOrderNumber = salesOrder.OrderNo;
-          onlineSalesOrder.PostingStatus = SalesOrderPostingStatus.Posted;
-          onlineSalesOrder.LastErrorMessage = null;
-          onlineSalesOrder.RetryCount = 0;
-          onlineSalesOrder.DatePosted = DateTime.Now;
           return Result.Success((onlineSalesOrder, salesOrder));
         })
         .Bind(orderDetails => {
           var (onlineSalesOrder, salesOrder) = orderDetails;
-          if (!onlineSalesOrder.IsPosOrder) { return Result.Success(onlineSalesOrder); }
-
-          return _postToEvolutionCustomerPaymentService.Post(context, orderDetails)
-            .Bind(a => _postToEvolutionSalesAssociateTipService.Post(context, a))
-            .Bind(a => Result.Success(a.onlineSalesOrder));
+          return Result.Success(onlineSalesOrder);
         });
       }
       catch (Exception ex) {
-        _logger.LogError(ex, "Error posting sales order Online Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
+        _logger.LogError(ex, "While posting {logTransactionType} {logTransactionIdentifier}", logTransactionType, logTransactionIdentifier);
         return Result.Failure<OnlineSalesOrder>(ex.Message);
+      }
+      finally {
+        _logger.LogInformation("END: Posting {logTransactionType} {logTransactionIdentifier}", logTransactionType, logTransactionIdentifier);
       }
     }
 
@@ -260,9 +255,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
             if (!onlineSalesOrder.IsRefund) {
               salesOrderLine.Reserved = Math.Min(salesOrderLine.WarehouseContext.QtyFree, onlineSalesOrderLine.Quantity);
             }
-
-            // TODO: if this item IsLotTracked then we need to allocate lots to this line.
-            //salesOrderLine.WarehouseContext.InventoryItem.IsLotTracked
 
             if (!string.IsNullOrWhiteSpace(onlineSalesOrderLine.LineNotes)) {
               salesOrderLine.Note = onlineSalesOrderLine.LineNotes;

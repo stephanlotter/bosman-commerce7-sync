@@ -348,5 +348,11 @@ namespace BosmanCommerce7.Module.BusinessObjects.SalesOrders {
           GetLine(4),
           Normalize(ShipToAddressPostalCode));
     }
+
+    public void UpdatePostingWorkflowState(SalesOrderPostingWorkflowState workflowState) {
+      PostingWorkflowState = workflowState;
+      LastErrorMessage = null;
+      RetryCount = 0;
+    }
   }
 }

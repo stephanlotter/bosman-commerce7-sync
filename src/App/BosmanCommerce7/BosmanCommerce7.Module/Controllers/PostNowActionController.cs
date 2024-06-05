@@ -49,7 +49,7 @@ namespace BosmanCommerce7.Module.Controllers
         ? "Oid".MapArrayToInOperator(selectedSalesOrders.Select(a => a.Oid).ToArray())
         : null;
 
-      var service = _serviceProvider!.GetService<ISalesOrdersPostService>();
+      var service = _serviceProvider!.GetService<ISalesOrdersPostWorkflowService>();
       var context = new SalesOrdersPostContext(criteria);
 
       service!
