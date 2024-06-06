@@ -50,8 +50,8 @@ if exists(select 1 from ValueStore where lower(KeyName) = lower(@keyName))
 
     public Result<string?> GetValue(string keyName, string? defaultValue = null) {
       const string sql = @"
-if exists(select 1 from ValueStore where lower(KeyName) = lower(@keyName))
-  select KeyValue from ValueStore where lower(KeyName) = lower(@keyName)
+if exists(select 1 from ValueStore where lower(KeyName) = ltrim(rtrim(lower(@keyName))))
+  select KeyValue from ValueStore where lower(KeyName) = ltrim(rtrim(lower(@keyName)))
 else
   select @defaultValue;
 ";

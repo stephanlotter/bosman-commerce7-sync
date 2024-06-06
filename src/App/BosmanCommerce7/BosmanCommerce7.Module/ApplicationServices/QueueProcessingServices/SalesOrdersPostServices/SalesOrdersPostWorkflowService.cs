@@ -125,6 +125,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
         return Result.Success(onlineSalesOrder);
       }
       catch (Exception ex) {
+        Logger.LogError(ex, "Error posting SALES ORDER Online Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
         onlineSalesOrder.PostLog(ex.Message, ex);
         RecordPostingError(onlineSalesOrder, ex.Message);
         return Result.Failure<IOnlineSalesOrder>(ex.Message);

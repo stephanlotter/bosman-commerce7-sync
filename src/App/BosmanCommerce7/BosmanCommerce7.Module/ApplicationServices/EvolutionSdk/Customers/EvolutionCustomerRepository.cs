@@ -10,6 +10,7 @@
 using BosmanCommerce7.Module.Models.EvolutionSdk.Customers;
 using CSharpFunctionalExtensions;
 using Pastel.Evolution;
+using Serilog;
 
 namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Customers {
 
@@ -26,6 +27,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Customers {
           return customer;
         }
         catch (Exception ex) {
+          Log.Error(ex, $"Error getting customer with id {id} from Evolution.");
           return Result.Failure<Customer>($"Customer with id {id} not found in Evolution. ({ex.Message})");
         }
       }
@@ -40,6 +42,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Customers {
           return customer;
         }
         catch (Exception ex) {
+          Log.Error(ex, $"Error getting customer with code {accountCode} from Evolution.");
           return Result.Failure<Customer>($"Customer with code {accountCode} not found in Evolution. ({ex.Message})");
         }
       }

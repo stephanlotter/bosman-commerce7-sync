@@ -48,7 +48,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
       string NormalisePosProfile(string? segment) {
         var v = NormaliseSegment(segment);
-        return string.IsNullOrWhiteSpace(v) ? "" : $"-{segment}";
+        return string.IsNullOrWhiteSpace(v) ? "" : $"-{v}";
       }
 
       var keyName = $"sales-orders-sync-channel-{NormaliseSegment(channel)}{NormalisePosProfile(posProfile)}-project-code";

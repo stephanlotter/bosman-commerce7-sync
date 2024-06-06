@@ -9,6 +9,7 @@
 
 using BosmanCommerce7.Module.ApplicationServices.AppDataServices;
 using CSharpFunctionalExtensions;
+using Serilog;
 
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices {
 
@@ -40,6 +41,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices {
         return Maybe<TC>.From((TC)v);
       }
       catch {
+        Log.Error($"Error GetLocalId {evolutionId} for type {typeof(TC)}");
         DeleteMapping(evolutionId);
 
         return Maybe<TC>.None;

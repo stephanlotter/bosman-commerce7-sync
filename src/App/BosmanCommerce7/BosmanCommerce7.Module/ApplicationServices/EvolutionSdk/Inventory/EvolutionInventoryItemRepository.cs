@@ -10,6 +10,7 @@
 using BosmanCommerce7.Module.Models.EvolutionSdk.Inventory;
 using CSharpFunctionalExtensions;
 using Pastel.Evolution;
+using Serilog;
 
 namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Inventory {
 
@@ -40,6 +41,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Inventory {
           return customer;
         }
         catch (Exception ex) {
+          Log.Error(ex, $"Error getting inventory item with id {id} from Evolution.");
           return Result.Failure<InventoryItem>($"Inventory item with id {id} not found in Evolution. ({ex.Message})");
         }
       }
