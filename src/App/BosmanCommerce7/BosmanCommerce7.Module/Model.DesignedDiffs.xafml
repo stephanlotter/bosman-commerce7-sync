@@ -3,13 +3,17 @@
   <BOModel>
     <Class Name="BosmanCommerce7.Module.BusinessObjects.SalesOrders.OnlineSalesOrder">
       <AppearanceRules>
-        <AppearanceRule Id="PostingStatus:Cancelled" Priority="0" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Cancelled#" TargetItems="PostingStatus" BackColor="Gray" FontColor="White" FontStyle="Bold" IsNewNode="True" />
-        <AppearanceRule Id="PostingStatus:Failed" Priority="0" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Failed#" TargetItems="PostingStatus" BackColor="255, 128, 128" FontColor="White" FontStyle="Bold" IsNewNode="True" />
-        <AppearanceRule Id="PostingStatus:New" Priority="0" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New#" TargetItems="PostingStatus" BackColor="128, 255, 255" FontColor="Black" FontStyle="Bold" IsNewNode="True" />
-        <AppearanceRule Id="PostingStatus:Posted" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Posted#" TargetItems="PostingStatus" BackColor="Green" FontColor="White" FontStyle="Bold" IsNewNode="True" />
-        <AppearanceRule Id="PostingStatus:Retrying" Priority="0" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" TargetItems="PostingStatus" BackColor="255, 128, 0" FontColor="White" FontStyle="Bold" IsNewNode="True" />
-        <AppearanceRule Id="PostingStatus:Skipped" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Skipped#" TargetItems="PostingStatus" BackColor="Gray" FontColor="White" FontStyle="Bold" IsNewNode="True" />
-        <AppearanceRule Id="PurchaseType:Refund" Criteria="[IsRefund] = True" TargetItems="PurchaseType" BackColor="255, 128, 128" FontColor="White" FontStyle="Bold" IsNewNode="True" />
+        <AppearanceRule Id="PostingStatus:Cancelled" Priority="0" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Cancelled#" TargetItems="PostingStatus" BackColor="Gray" FontColor="White" FontStyle="Bold" Index="0" IsNewNode="True" />
+        <AppearanceRule Id="PostingStatus:Failed" Priority="0" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Failed#" TargetItems="PostingStatus" BackColor="255, 128, 128" FontColor="White" FontStyle="Bold" Index="1" IsNewNode="True" />
+        <AppearanceRule Id="PostingStatus:New" Priority="0" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New#" TargetItems="PostingStatus" BackColor="128, 255, 255" FontColor="Black" FontStyle="Bold" Index="2" IsNewNode="True" />
+        <AppearanceRule Id="PostingStatus:Posted" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Posted#" TargetItems="PostingStatus" BackColor="Green" FontColor="White" FontStyle="Bold" Index="3" IsNewNode="True" />
+        <AppearanceRule Id="PostingStatus:Posting" Priority="0" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Posting#" TargetItems="PostingStatus" BackColor="255, 255, 192" FontColor="Black" FontStyle="Bold" Index="4" IsNewNode="True" />
+        <AppearanceRule Id="PostingStatus:Retrying" Priority="0" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" TargetItems="PostingStatus" BackColor="255, 128, 0" FontColor="White" FontStyle="Bold" Index="5" IsNewNode="True" />
+        <AppearanceRule Id="PostingStatus:Skipped" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Skipped#" TargetItems="PostingStatus" BackColor="Gray" FontColor="White" FontStyle="Bold" Index="6" IsNewNode="True" />
+        <AppearanceRule Id="PostingWorkflowState:New" Criteria="[PostingWorkflowState] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingWorkflowState,New#" TargetItems="PostingWorkflowState" BackColor="128, 255, 255" FontColor="Black" FontStyle="Bold" Index="7" IsNewNode="True" />
+        <AppearanceRule Id="PostingWorkflowState:Posting" Criteria="Not [PostingWorkflowState] In (##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingWorkflowState,New#, ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingWorkflowState,Completed#)" TargetItems="PostingWorkflowState" BackColor="255, 255, 192" FontColor="Black" FontStyle="Bold" Index="8" IsNewNode="True" />
+        <AppearanceRule Id="PostingWorkflowState:Completed" Priority="0" Criteria="[PostingWorkflowState] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingWorkflowState,Completed#" TargetItems="PostingWorkflowState" BackColor="Green" FontColor="255, 255, 255" FontStyle="Bold" Index="9" IsNewNode="True" />
+        <AppearanceRule Id="PurchaseType:Refund" Criteria="[IsRefund] = True" TargetItems="PurchaseType" BackColor="255, 128, 128" FontColor="White" FontStyle="Bold" Index="10" IsNewNode="True" />
       </AppearanceRules>
     </Class>
   </BOModel>
@@ -131,7 +135,6 @@
       <Columns>
         <ColumnInfo Id="CustomerOnlineId" Index="-1" />
         <ColumnInfo Id="EmailAddress" Index="-1" />
-        <ColumnInfo Id="EvolutionInvoiceNumber" Index="-1" />
         <ColumnInfo Id="LinkedOnlineId" Index="-1" />
         <ColumnInfo Id="OnlineId" Index="-1" />
         <ColumnInfo Id="OrderDate" Index="-1" />
@@ -143,22 +146,23 @@
         <ColumnInfo Id="ShipToAddressCountryCode" Index="-1" />
         <ColumnInfo Id="ShipToAddressPostalCode" Index="-1" />
         <ColumnInfo Id="ShipToAddressProvince" Index="-1" />
+        <ColumnInfo Id="ShipToName" Index="-1" MaxLength="150" Width="150" />
         <ColumnInfo Id="ShipToPhoneNumber" Index="-1" />
-        <ColumnInfo Id="Channel" Index="0" Width="100" />
-        <ColumnInfo Id="PurchaseType" Index="1" Width="150" />
-        <ColumnInfo Id="OrderNumber" Index="2" SortIndex="0" SortOrder="Descending" Width="150">
+        <ColumnInfo Id="OrderNumber" Index="0" SortIndex="0" SortOrder="Descending" Width="150">
           <Summary>
             <ColumnSummaryItem Id="NumberOfRows" SummaryType="Count" IsNewNode="True" />
           </Summary>
         </ColumnInfo>
-        <ColumnInfo Id="EvolutionSalesOrderNumber" Index="3" Width="150" />
-        <ColumnInfo Id="ShipToName" Index="4" MaxLength="150" Width="150" />
-        <ColumnInfo Id="RetryAfter" Index="5" SortIndex="-1" SortOrder="None" Width="150" />
-        <ColumnInfo Id="PostingStatus" Index="6" SortIndex="-1" SortOrder="None" Width="100" />
-        <ColumnInfo Id="PostingWorkflowState" Index="7" />
+        <ColumnInfo Id="Channel" Index="1" Width="100" />
+        <ColumnInfo Id="PurchaseType" Index="2" Width="150" />
+        <ColumnInfo Id="PostingStatus" Index="3" SortIndex="-1" SortOrder="None" Width="100" />
+        <ColumnInfo Id="PostingWorkflowState" Index="4" Width="150" />
+        <ColumnInfo Id="EvolutionSalesOrderNumber" Index="5" Width="150" />
+        <ColumnInfo Id="EvolutionInvoiceNumber" Index="6" />
+        <ColumnInfo Id="LinkedOrderNumber" Index="7" Width="100" />
         <ColumnInfo Id="DatePosted" Index="8" Width="150" />
-        <ColumnInfo Id="RetryCount" Index="9" Width="90" />
-        <ColumnInfo Id="LinkedOrderNumber" Index="10" Width="100" />
+        <ColumnInfo Id="RetryAfter" Index="9" SortIndex="-1" SortOrder="None" Width="150" />
+        <ColumnInfo Id="RetryCount" Index="10" Width="90" />
         <ColumnInfo Id="LastErrorMessage" Index="11" Width="450" />
       </Columns>
       <Filters CurrentFilterId="NewPostingAndRetrying">
@@ -180,7 +184,6 @@
         <ColumnInfo Id="IsPosOrder" PropertyName="IsPosOrder" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="IsRefund" PropertyName="IsRefund" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="LinkedOnlineId" PropertyName="LinkedOnlineId" Index="-1" IsNewNode="True" />
-        <ColumnInfo Id="LinkedOrderNumber" PropertyName="LinkedOrderNumber" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="Oid" PropertyName="Oid" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="OnlineId" PropertyName="OnlineId" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="OrderDate" PropertyName="OrderDate" Index="-1" IsNewNode="True" />
@@ -193,20 +196,21 @@
         <ColumnInfo Id="ShipToAddressCountryCode" PropertyName="ShipToAddressCountryCode" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="ShipToAddressPostalCode" PropertyName="ShipToAddressPostalCode" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="ShipToAddressProvince" PropertyName="ShipToAddressProvince" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ShipToName" PropertyName="ShipToName" Index="-1" Width="150" IsNewNode="True" />
         <ColumnInfo Id="ShipToPhoneNumber" PropertyName="ShipToPhoneNumber" Index="-1" IsNewNode="True" />
-        <ColumnInfo Id="Channel" PropertyName="Channel" Index="0" Width="100" IsNewNode="True" />
-        <ColumnInfo Id="PurchaseType" PropertyName="PurchaseType" Index="1" Width="150" IsNewNode="True" />
-        <ColumnInfo Id="OrderNumber" PropertyName="OrderNumber" Index="2" Width="150" SortIndex="0" SortOrder="Descending" IsNewNode="True">
+        <ColumnInfo Id="OrderNumber" PropertyName="OrderNumber" Index="0" Width="150" SortIndex="0" SortOrder="Descending" IsNewNode="True">
           <Summary IsNewNode="True">
             <ColumnSummaryItem Id="NumberOfRows" SummaryType="Count" IsNewNode="True" />
           </Summary>
         </ColumnInfo>
-        <ColumnInfo Id="EvolutionSalesOrderNumber" PropertyName="EvolutionSalesOrderNumber" Index="3" Width="150" IsNewNode="True" />
-        <ColumnInfo Id="ShipToName" PropertyName="ShipToName" Index="4" Width="150" IsNewNode="True" />
-        <ColumnInfo Id="RetryAfter" PropertyName="RetryAfter" Index="5" SortIndex="-1" SortOrder="None" Width="150" IsNewNode="True" />
-        <ColumnInfo Id="PostingStatus" PropertyName="PostingStatus" Index="6" Width="100" IsNewNode="True" />
-        <ColumnInfo Id="PostingWorkflowState" Index="7" PropertyName="PostingWorkflowState" View="" IsNewNode="True" />
-        <ColumnInfo Id="DatePosted" PropertyName="DatePosted" Index="8" Width="150" IsNewNode="True" />
+        <ColumnInfo Id="Channel" PropertyName="Channel" Index="1" Width="100" IsNewNode="True" />
+        <ColumnInfo Id="PurchaseType" PropertyName="PurchaseType" Index="2" Width="150" IsNewNode="True" />
+        <ColumnInfo Id="PostingStatus" PropertyName="PostingStatus" Index="3" Width="100" IsNewNode="True" />
+        <ColumnInfo Id="PostingWorkflowState" Index="4" PropertyName="PostingWorkflowState" View="" Width="150" IsNewNode="True" />
+        <ColumnInfo Id="EvolutionSalesOrderNumber" PropertyName="EvolutionSalesOrderNumber" Index="5" Width="150" IsNewNode="True" />
+        <ColumnInfo Id="LinkedOrderNumber" PropertyName="LinkedOrderNumber" Index="6" IsNewNode="True" />
+        <ColumnInfo Id="DatePosted" PropertyName="DatePosted" Index="7" Width="150" IsNewNode="True" />
+        <ColumnInfo Id="RetryAfter" PropertyName="RetryAfter" Index="8" SortIndex="-1" SortOrder="None" Width="150" IsNewNode="True" />
         <ColumnInfo Id="RetryCount" PropertyName="RetryCount" Index="9" Width="90" IsNewNode="True" />
         <ColumnInfo Id="LastErrorMessage" PropertyName="LastErrorMessage" Index="10" Width="450" IsNewNode="True" />
       </Columns>
@@ -229,7 +233,6 @@
         <ColumnInfo Id="IsPosOrder" PropertyName="IsPosOrder" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="IsRefund" PropertyName="IsRefund" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="LinkedOnlineId" PropertyName="LinkedOnlineId" Index="-1" IsNewNode="True" />
-        <ColumnInfo Id="LinkedOrderNumber" PropertyName="LinkedOrderNumber" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="Oid" PropertyName="Oid" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="OnlineId" PropertyName="OnlineId" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="OrderDate" PropertyName="OrderDate" Index="-1" IsNewNode="True" />
@@ -242,20 +245,21 @@
         <ColumnInfo Id="ShipToAddressCountryCode" PropertyName="ShipToAddressCountryCode" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="ShipToAddressPostalCode" PropertyName="ShipToAddressPostalCode" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="ShipToAddressProvince" PropertyName="ShipToAddressProvince" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ShipToName" PropertyName="ShipToName" Index="-1" Width="150" IsNewNode="True" />
         <ColumnInfo Id="ShipToPhoneNumber" PropertyName="ShipToPhoneNumber" Index="-1" IsNewNode="True" />
-        <ColumnInfo Id="Channel" PropertyName="Channel" Index="0" Width="100" IsNewNode="True" />
-        <ColumnInfo Id="PurchaseType" PropertyName="PurchaseType" Index="1" Width="150" IsNewNode="True" />
-        <ColumnInfo Id="OrderNumber" PropertyName="OrderNumber" Index="2" Width="150" SortIndex="0" SortOrder="Descending" IsNewNode="True">
+        <ColumnInfo Id="OrderNumber" PropertyName="OrderNumber" Index="0" Width="150" SortIndex="0" SortOrder="Descending" IsNewNode="True">
           <Summary IsNewNode="True">
             <ColumnSummaryItem Id="NumberOfRows" SummaryType="Count" IsNewNode="True" />
           </Summary>
         </ColumnInfo>
-        <ColumnInfo Id="EvolutionInvoiceNumber" PropertyName="EvolutionInvoiceNumber" Index="3" Width="150" IsNewNode="True" />
-        <ColumnInfo Id="ShipToName" PropertyName="ShipToName" Index="4" Width="150" IsNewNode="True" />
-        <ColumnInfo Id="RetryAfter" PropertyName="RetryAfter" Index="5" SortIndex="-1" SortOrder="None" Width="150" IsNewNode="True" />
-        <ColumnInfo Id="PostingStatus" PropertyName="PostingStatus" Index="6" Width="100" IsNewNode="True" />
-        <ColumnInfo Id="PostingWorkflowState" Index="7" PropertyName="PostingWorkflowState" View="" IsNewNode="True" />
-        <ColumnInfo Id="DatePosted" PropertyName="DatePosted" Index="8" Width="150" IsNewNode="True" />
+        <ColumnInfo Id="Channel" PropertyName="Channel" Index="1" Width="100" IsNewNode="True" />
+        <ColumnInfo Id="PurchaseType" PropertyName="PurchaseType" Index="2" Width="150" IsNewNode="True" />
+        <ColumnInfo Id="PostingStatus" PropertyName="PostingStatus" Index="3" Width="100" IsNewNode="True" />
+        <ColumnInfo Id="PostingWorkflowState" Index="4" PropertyName="PostingWorkflowState" View="" Width="100" IsNewNode="True" />
+        <ColumnInfo Id="EvolutionInvoiceNumber" PropertyName="EvolutionInvoiceNumber" Index="5" Width="150" IsNewNode="True" />
+        <ColumnInfo Id="LinkedOrderNumber" PropertyName="LinkedOrderNumber" Index="6" IsNewNode="True" />
+        <ColumnInfo Id="DatePosted" PropertyName="DatePosted" Index="7" Width="150" IsNewNode="True" />
+        <ColumnInfo Id="RetryAfter" PropertyName="RetryAfter" Index="8" SortIndex="-1" SortOrder="None" Width="150" IsNewNode="True" />
         <ColumnInfo Id="RetryCount" PropertyName="RetryCount" Index="9" Width="90" IsNewNode="True" />
         <ColumnInfo Id="LastErrorMessage" PropertyName="LastErrorMessage" Index="10" Width="450" IsNewNode="True" />
       </Columns>
