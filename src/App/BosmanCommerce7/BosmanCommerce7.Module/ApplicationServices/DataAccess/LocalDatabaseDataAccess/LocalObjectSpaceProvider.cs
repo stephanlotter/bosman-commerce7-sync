@@ -8,6 +8,7 @@
  */
 
 using System.Data.SqlClient;
+using BosmanCommerce7.Module.BusinessObjects.Customers;
 using BosmanCommerce7.Module.BusinessObjects.InventoryItems;
 using BosmanCommerce7.Module.BusinessObjects.SalesOrders;
 using BosmanCommerce7.Module.BusinessObjects.Settings;
@@ -81,9 +82,20 @@ namespace BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDat
 
     private static void RegisterClasses(XPObjectSpaceProvider osp) {
       osp.TypesInfo.RegisterEntity(typeof(OnlineSalesOrder));
-      osp.TypesInfo.RegisterEntity(typeof(InventoryLevelsUpdateQueue));
-      osp.TypesInfo.RegisterEntity(typeof(WarehouseLocationMapping));
-    }
 
+      osp.TypesInfo.RegisterEntity(typeof(CustomerUpdateQueue));
+      osp.TypesInfo.RegisterEntity(typeof(CustomerUpdateQueueLog));
+
+      osp.TypesInfo.RegisterEntity(typeof(InventoryLevelsUpdateQueue));
+      osp.TypesInfo.RegisterEntity(typeof(InventoryItemsUpdateQueue));
+      osp.TypesInfo.RegisterEntity(typeof(InventoryLevelsUpdateQueueLog));
+      osp.TypesInfo.RegisterEntity(typeof(InventoryItemsUpdateQueueLog));
+
+      osp.TypesInfo.RegisterEntity(typeof(BundleMapping));
+      osp.TypesInfo.RegisterEntity(typeof(SalesPersonMapping));
+      osp.TypesInfo.RegisterEntity(typeof(TaxMapping));
+      osp.TypesInfo.RegisterEntity(typeof(WarehouseLocationMapping));
+      osp.TypesInfo.RegisterEntity(typeof(WarehousePostalCodeMapping));
+    }
   }
 }
