@@ -52,6 +52,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
     bool IsClubOrder { get; }
 
     bool UseCashCustomer { get; }
+
     int RetryCount { get; set; }
 
     void PostLog(string shortDescription, string? details = null);
@@ -71,5 +72,9 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
     void SetEvolutionSalesOrderNumber(string value);
 
     void Save();
+
+    DateTime TransactionDate();
+
+    DateTime TransactionOrderDate();
   }
 }

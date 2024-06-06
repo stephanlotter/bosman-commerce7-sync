@@ -89,6 +89,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
         .Bind(salesOrder => {
           if (onlineSalesOrder.IsRefund || onlineSalesOrder.IsPosOrder) {
+            salesOrder.InvoiceDate = onlineSalesOrder.TransactionDate();
             var invoiceNumber = salesOrder.Complete();
             onlineSalesOrder.SetEvolutionInvoiceNumber(invoiceNumber);
           }
@@ -126,14 +127,14 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
         if (onlineSalesOrder.IsRefund) {
           return Result.Success((SalesDocumentBase)new CreditNote {
             ExternalOrderNo = $"{onlineSalesOrder.OrderNumber}",
-            OrderDate = onlineSalesOrder.OrderDate,
+            OrderDate = onlineSalesOrder.TransactionDate(),
             TaxMode = TaxMode.Inclusive
           });
         }
 
         return Result.Success((SalesDocumentBase)new SalesOrder {
           ExternalOrderNo = $"{onlineSalesOrder.OrderNumber}",
-          OrderDate = onlineSalesOrder.OrderDate,
+          OrderDate = onlineSalesOrder.TransactionOrderDate(),
           TaxMode = TaxMode.Inclusive
         });
       }

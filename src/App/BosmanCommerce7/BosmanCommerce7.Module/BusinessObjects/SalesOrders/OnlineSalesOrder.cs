@@ -279,6 +279,14 @@ namespace BosmanCommerce7.Module.BusinessObjects.SalesOrders {
       RetryAfter = DateTime.Now;
     }
 
+    public DateTime TransactionDate() {
+      return OrderDate;
+    }
+
+    public DateTime TransactionOrderDate() {
+      return OrderDate;
+    }
+
     public void PostLog(string shortDescription, Exception ex) {
       PostLog(shortDescription, ExceptionFunctions.GetMessages(ex));
     }

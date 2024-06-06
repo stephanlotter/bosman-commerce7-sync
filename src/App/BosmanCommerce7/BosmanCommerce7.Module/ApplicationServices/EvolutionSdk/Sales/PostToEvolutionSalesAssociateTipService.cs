@@ -52,7 +52,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
           return Result.Success((onlineSalesOrder, customerDocument));
         }
 
-        var transactionDate = customerDocument.OrderDate;
+        var transactionDate = onlineSalesOrder.TransactionDate();
         var evolutionReference = onlineSalesOrder.IsRefund ? customerDocument.Reference : customerDocument.OrderNumber;
 
         Result AddTransaction(GLBatch batch, Result<string> accountResult, double debitAmount, double creditAmount) {

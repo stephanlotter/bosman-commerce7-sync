@@ -50,7 +50,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
         var transactionCode = $"{transactionCodeResult.Value}";
         var transactionAmountInVat = Math.Abs(onlineSalesOrder.JsonProperties.PaymentAmount()) - (onlineSalesOrder.IsRefund ? Math.Abs(onlineSalesOrder.JsonProperties.TipAmount()) : 0);
-        var transactionDate = customerDocument.OrderDate;
+        var transactionDate = onlineSalesOrder.TransactionDate();
 
         var evolutionReference = onlineSalesOrder.IsRefund ? customerDocument.Reference : customerDocument.OrderNumber;
 
