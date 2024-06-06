@@ -97,8 +97,18 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
         var debitAccount = GetDebitAccountCode(warehouseCode);
         var creditAccount = GetCreditAccountCode(warehouseCode);
 
-        return AddTransaction(batch, debitAccount, onlineSalesOrder.IsRefund ? 0 : transactionAmountInVat, onlineSalesOrder.IsRefund ? transactionAmountInVat : 0)
-          .Bind(() => AddTransaction(batch, creditAccount, onlineSalesOrder.IsRefund ? transactionAmountInVat : 0, onlineSalesOrder.IsRefund ? 0 : transactionAmountInVat))
+        Result RaiseTip() {
+          return AddTransaction(batch, debitAccount, onlineSalesOrder.IsRefund ? 0 : transactionAmountInVat, onlineSalesOrder.IsRefund ? transactionAmountInVat : 0)
+          .Bind(() => AddTransaction(batch, creditAccount, onlineSalesOrder.IsRefund ? transactionAmountInVat : 0, onlineSalesOrder.IsRefund ? 0 : transactionAmountInVat));
+        }
+
+        Result ReverseTip() {
+          return AddTransaction(batch, creditAccount, onlineSalesOrder.IsRefund ? 0 : transactionAmountInVat, onlineSalesOrder.IsRefund ? transactionAmountInVat : 0)
+          .Bind(() => AddTransaction(batch, debitAccount, onlineSalesOrder.IsRefund ? transactionAmountInVat : 0, onlineSalesOrder.IsRefund ? 0 : transactionAmountInVat));
+        }
+
+        return RaiseTip()
+          .Bind(() => ReverseTip())
           .Bind(() => PostBatch(batch))
           .Map(() => (onlineSalesOrder, customerDocument));
       }
