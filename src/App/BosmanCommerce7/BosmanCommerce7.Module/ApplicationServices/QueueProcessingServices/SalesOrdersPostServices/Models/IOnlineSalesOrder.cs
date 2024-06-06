@@ -21,6 +21,10 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
     int? OrderNumber { get; }
 
+    SalesOrderPostingStatus PostingStatus { get; }
+
+    SalesOrderPostingWorkflowState PostingWorkflowState { get; }
+
     OnlineSalesOrderJsonProperties JsonProperties { get; }
 
     int? LinkedOrderNumber { get; }
@@ -48,6 +52,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
     bool IsClubOrder { get; }
 
     bool UseCashCustomer { get; }
+    int RetryCount { get; set; }
 
     void PostLog(string shortDescription, string? details = null);
 
@@ -64,5 +69,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
     void SetEvolutionInvoiceNumber(string value);
 
     void SetEvolutionSalesOrderNumber(string value);
+
+    void Save();
   }
 }

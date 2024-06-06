@@ -112,11 +112,11 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices {
         }
         else {
           queueItem.RetryCount++;
-          queueItem.Status = queueItem.RetryCount < MaxRetryCount ? QueueProcessingStatus.Retrying : QueueProcessingStatus.Failed;
+          queueItem.Status = queueItem.RetryCount < RetryPolicy.MaxRetryCount ? QueueProcessingStatus.Retrying : QueueProcessingStatus.Failed;
         }
 
         if (queueItem.Status != QueueProcessingStatus.Failed) {
-          queueItem.RetryAfter = GetRetryAfter(queueItem.RetryCount);
+          queueItem.RetryAfter = RetryPolicy.GetRetryAfter(queueItem.RetryCount);
         }
       }
       else {

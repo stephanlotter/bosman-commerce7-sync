@@ -1,9 +1,15 @@
+declare @c7OrderNumber nvarchar(20) = '2036',
+		@c7RefundOrderNumber nvarchar(20) = '2037'
+		;
+
+
+
 select top 100 'PostAR', *
 	from PostAR
 	where 1 = 1
 		--and TxDate = '2024-02-05'
 		--and AutoIdx > 8
-		and ExtOrderNum in ('1511', '1512')
+		and ExtOrderNum in (@c7OrderNumber, @c7RefundOrderNumber)
 	order by AutoIdx desc
 
 select top 100 'PostGL', *
@@ -11,7 +17,7 @@ select top 100 'PostGL', *
 	where 1 = 1
 		--and TxDate = '2024-02-05'
 		--and AutoIdx > 25
-		and ExtOrderNum in ('1511', '1512')
+		and ExtOrderNum in (@c7OrderNumber, @c7RefundOrderNumber)
 		--and Description like '%tip%'
 	order by AutoIdx desc
 
@@ -76,4 +82,4 @@ select i.AutoIndex,
 	  join InvNum i
 		  on i.AutoIndex = l.iInvoiceID
 	where 1 = 1
-		and i.ExtOrderNum in ('1511', '1512')
+		and i.ExtOrderNum in (@c7OrderNumber, @c7RefundOrderNumber)

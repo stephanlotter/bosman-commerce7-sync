@@ -57,20 +57,29 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
       var results = new List<Result>();
 
       foreach (var onlineSalesOrder in onlineSalesOrders) {
-        var processingResult = LocalObjectSpaceEvolutionSdkProvider.WrapInObjectSpaceEvolutionSdkTransaction((objectSpace, _) => {
-          var postToEvolutionSalesOrderContext = new PostToEvolutionSalesOrderContext {
-            ObjectSpace = objectSpace
-          };
+        var workflowActive = true;
+        while (workflowActive) {
+          var processingResult = LocalObjectSpaceEvolutionSdkProvider.WrapInObjectSpaceEvolutionSdkTransaction((objectSpace, _) => {
+            var postToEvolutionSalesOrderContext = new PostToEvolutionSalesOrderContext {
+              ObjectSpace = objectSpace
+            };
 
-          return ProcessOnlineSalesOrder(LoadOnlineSalesOrder(objectSpace, onlineSalesOrder.Oid), postToEvolutionSalesOrderContext);
-        });
-        results.Add(processingResult);
+            return ProcessOnlineSalesOrder(LoadOnlineSalesOrder(objectSpace, onlineSalesOrder.Oid), postToEvolutionSalesOrderContext);
+          });
+          results.Add(processingResult);
+
+          workflowActive = processingResult.IsSuccess && IsStillPosting(processingResult.Value);
+        }
       }
 
       return _errorCount == 0 ? Result.Success() : Result.Failure($"Completed with {_errorCount} errors.");
+
+      static bool IsStillPosting(IOnlineSalesOrder onlineSalesOrder) {
+        return onlineSalesOrder.PostingStatus == SalesOrderPostingStatus.Posting && onlineSalesOrder.PostingWorkflowState != SalesOrderPostingWorkflowState.Completed;
+      }
     }
 
-    private Result ProcessOnlineSalesOrder(OnlineSalesOrder onlineSalesOrder, PostToEvolutionSalesOrderContext postToEvolutionSalesOrderContext) {
+    private Result<IOnlineSalesOrder> ProcessOnlineSalesOrder(IOnlineSalesOrder onlineSalesOrder, PostToEvolutionSalesOrderContext postToEvolutionSalesOrderContext) {
       try {
         Logger.LogInformation("Start online sales order workflow. Order Number {OrderNumber}: Current state: {onlineSalesOrder.PostingWorkflowState}", onlineSalesOrder.OrderNumber, onlineSalesOrder.PostingWorkflowState);
 
@@ -108,16 +117,17 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
 
           case SalesOrderPostingWorkflowState.TipPosted:
             onlineSalesOrder.SetAsPosted();
-            return Result.Success();
+            break;
 
           default:
             throw new ArgumentOutOfRangeException();
         }
+        return Result.Success(onlineSalesOrder);
       }
       catch (Exception ex) {
         onlineSalesOrder.PostLog(ex.Message, ex);
         RecordPostingError(onlineSalesOrder, ex.Message);
-        return Result.Failure(ex.Message);
+        return Result.Failure<IOnlineSalesOrder>(ex.Message);
       }
       finally {
         onlineSalesOrder.Save();
@@ -151,20 +161,18 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
       return CriteriaOperator.And(criteriaPostingStatus, criteriaRetryAfter);
     }
 
-    private void RecordPostingError(OnlineSalesOrder onlineSalesOrder, string error) {
+    private void RecordPostingError(IOnlineSalesOrder onlineSalesOrder, string error) {
       _errorCount++;
       Logger.LogError("Error posting sales order Online Order Number {OrderNumber}", onlineSalesOrder.OrderNumber);
       Logger.LogError("{error}", error);
 
       onlineSalesOrder.PostLog(error);
 
-      if (onlineSalesOrder.RetryCount < MaxRetryCount) {
-        onlineSalesOrder.PostingStatus = SalesOrderPostingStatus.Retrying;
-        onlineSalesOrder.RetryCount++;
-        onlineSalesOrder.RetryAfter = GetRetryAfter(onlineSalesOrder.RetryCount);
+      if (onlineSalesOrder.RetryCount < RetryPolicy.MaxRetryCount) {
+        onlineSalesOrder.SetPostingStatus(SalesOrderPostingStatus.Retrying);
       }
       else {
-        onlineSalesOrder.PostingStatus = SalesOrderPostingStatus.Failed;
+        onlineSalesOrder.SetPostingStatus(SalesOrderPostingStatus.Failed);
       }
     }
   }

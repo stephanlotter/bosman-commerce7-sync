@@ -9,6 +9,7 @@
 
 using System.ComponentModel;
 using BosmanCommerce7.Module.ApplicationServices.OnlineSalesOrderServices;
+using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices;
 using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices.Models;
 using BosmanCommerce7.Module.Extensions;
 using BosmanCommerce7.Module.Models;
@@ -364,6 +365,11 @@ namespace BosmanCommerce7.Module.BusinessObjects.SalesOrders {
 
     public void SetPostingStatus(SalesOrderPostingStatus postingStatus) {
       PostingStatus = postingStatus;
+
+      if (postingStatus == SalesOrderPostingStatus.Retrying) {
+        RetryCount++;
+        RetryAfter = RetryPolicy.GetRetryAfter(RetryCount);
+      }
     }
 
     public void SetAsPosted() {

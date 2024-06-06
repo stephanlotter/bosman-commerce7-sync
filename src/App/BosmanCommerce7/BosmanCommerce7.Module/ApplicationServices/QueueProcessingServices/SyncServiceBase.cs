@@ -13,7 +13,6 @@ using Microsoft.Extensions.Logging;
 namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices {
 
   public abstract class SyncServiceBase {
-    protected const int MaxRetryCount = 6;
     protected int _errorCount;
     protected readonly ILocalObjectSpaceEvolutionSdkProvider LocalObjectSpaceEvolutionSdkProvider;
 
@@ -22,20 +21,6 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices {
     public SyncServiceBase(ILogger logger, ILocalObjectSpaceEvolutionSdkProvider localObjectSpaceEvolutionSdkProvider) {
       Logger = logger;
       LocalObjectSpaceEvolutionSdkProvider = localObjectSpaceEvolutionSdkProvider;
-    }
-
-    protected DateTime GetRetryAfter(int retryCount) {
-      var minutes = retryCount switch {
-        1 => 1,
-        2 => 2,
-        3 => 5,
-        4 => 10,
-        5 => 15,
-        6 => 30,
-        _ => 30
-      };
-
-      return DateTime.Now.AddMinutes(minutes);
     }
   }
 }
