@@ -24,7 +24,7 @@ namespace BosmanCommerce7.Module.Controllers {
 
     public PostNowActionController() {
       TargetObjectType = typeof(OnlineSalesOrder);
-      TargetViewType = ViewType.ListView;
+      TargetViewType = ViewType.Any;
       TargetViewNesting = Nesting.Root;
     }
 

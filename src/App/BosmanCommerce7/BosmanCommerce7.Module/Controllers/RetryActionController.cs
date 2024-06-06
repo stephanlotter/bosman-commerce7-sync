@@ -17,16 +17,15 @@ using DevExpress.ExpressApp.Actions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace BosmanCommerce7.Module.Controllers
-{
+namespace BosmanCommerce7.Module.Controllers {
 
-    public class RetryActionController : ActionControllerBase {
+  public class RetryActionController : ActionControllerBase {
     private readonly IServiceProvider? _serviceProvider;
     private readonly ILogger<SalesOrdersPostService>? _logger;
 
     public RetryActionController() {
       TargetObjectType = typeof(OnlineSalesOrder);
-      TargetViewType = ViewType.ListView;
+      TargetViewType = ViewType.Any;
       TargetViewNesting = Nesting.Root;
     }
 
