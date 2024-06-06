@@ -41,16 +41,25 @@ namespace BosmanCommerce7.Module.Controllers {
 
     private void Execute() {
       var userHasSelectedSalesOrders = View.SelectedObjects.Count > 0;
+
+      if (!userHasSelectedSalesOrders) {
+        ShowErrorMessage("No sales orders selected.");
+        return;
+      }
+
       var selectedSalesOrders = userHasSelectedSalesOrders ? View.SelectedObjects.Cast<OnlineSalesOrder>().ToList() : new List<OnlineSalesOrder>();
 
       var localObjectSpaceProvider = _serviceProvider!.GetService<ILocalObjectSpaceProvider>()!;
 
       localObjectSpaceProvider.WrapInObjectSpaceTransaction(objectSpace => {
         foreach (var selectedSalesOrder in selectedSalesOrders) {
-          selectedSalesOrder.SetAsCancelled();
-          selectedSalesOrder.Save();
+          var onlineSalesOrder = objectSpace.FindByOid<OnlineSalesOrder>(selectedSalesOrder.Oid);
+          onlineSalesOrder.SetAsCancelled();
+          onlineSalesOrder.Save();
         }
       });
+
+      ShowSuccessMessage("Selected sales orders cancelled.");
 
       View.RefreshView();
     }
