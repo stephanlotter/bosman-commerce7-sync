@@ -3,6 +3,7 @@
   <BOModel>
     <Class Name="BosmanCommerce7.Module.BusinessObjects.SalesOrders.OnlineSalesOrder">
       <AppearanceRules>
+        <AppearanceRule Id="PostingStatus:Cancelled" Priority="0" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Cancelled#" TargetItems="PostingStatus" BackColor="Gray" FontColor="White" FontStyle="Bold" IsNewNode="True" />
         <AppearanceRule Id="PostingStatus:Failed" Priority="0" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Failed#" TargetItems="PostingStatus" BackColor="255, 128, 128" FontColor="White" FontStyle="Bold" IsNewNode="True" />
         <AppearanceRule Id="PostingStatus:New" Priority="0" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New#" TargetItems="PostingStatus" BackColor="128, 255, 255" FontColor="Black" FontStyle="Bold" IsNewNode="True" />
         <AppearanceRule Id="PostingStatus:Posted" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Posted#" TargetItems="PostingStatus" BackColor="Green" FontColor="White" FontStyle="Bold" IsNewNode="True" />
