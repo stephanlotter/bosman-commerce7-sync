@@ -16,6 +16,7 @@ using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
+using Nuke.Common.Tools.Git;
 using Nuke.Common.Utilities.Collections;
 using Serilog;
 
@@ -127,5 +128,8 @@ internal class Build : NukeBuild {
   private Target Publish => _ => _
       .DependsOn(ZipOutput)
       .Executes(() => {
+        GitTasks.Git("add -A .", workingDirectory: RootDirectory);
+        GitTasks.Git($"commit -q -m \"Deployed v{VersionString}\"", workingDirectory: RootDirectory);
+        GitTasks.Git("push -q", workingDirectory: RootDirectory);
       });
 }
