@@ -7,8 +7,7 @@
  *
  */
 
-using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices;
-using BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.SalesOrdersPostServices.Models;
+using BosmanCommerce7.Module.ApplicationServices.DataAccess.LocalDatabaseDataAccess;
 using BosmanCommerce7.Module.BusinessObjects.SalesOrders;
 using BosmanCommerce7.Module.Extensions;
 using BosmanCommerce7.Module.Models;
@@ -19,24 +18,24 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BosmanCommerce7.Module.Controllers {
 
-  public class PostNowActionController : ActionControllerBase {
+  public class CancelPostingActionController : ActionControllerBase {
     private readonly IServiceProvider? _serviceProvider;
 
-    public PostNowActionController() {
+    public CancelPostingActionController() {
       TargetObjectType = typeof(OnlineSalesOrder);
       TargetViewType = ViewType.ListView;
       TargetViewNesting = Nesting.Root;
     }
 
     [ActivatorUtilitiesConstructor]
-    public PostNowActionController(IServiceProvider serviceProvider) : this() {
+    public CancelPostingActionController(IServiceProvider serviceProvider) : this() {
       _serviceProvider = serviceProvider;
     }
 
     protected override void CreateActions() {
-      var criteria = "PostingStatus".InCriteriaOperator(SalesOrderPostingStatus.New, SalesOrderPostingStatus.Posting, SalesOrderPostingStatus.Retrying, SalesOrderPostingStatus.Cancelled, SalesOrderPostingStatus.Failed).ToCriteriaString();
-      var action = NewAction("Post now", (s, e) => { Execute(); },
-        selectionDependencyType: SelectionDependencyType.Independent,
+      var criteria = "PostingStatus".InCriteriaOperator(SalesOrderPostingStatus.New, SalesOrderPostingStatus.Retrying).ToCriteriaString();
+      var action = NewAction("Cancel Posting", (s, e) => { Execute(); },
+        selectionDependencyType: SelectionDependencyType.RequireMultipleObjects,
         targetObjectsCriteria: criteria);
     }
 
@@ -44,17 +43,14 @@ namespace BosmanCommerce7.Module.Controllers {
       var userHasSelectedSalesOrders = View.SelectedObjects.Count > 0;
       var selectedSalesOrders = userHasSelectedSalesOrders ? View.SelectedObjects.Cast<OnlineSalesOrder>().ToList() : new List<OnlineSalesOrder>();
 
-      var criteria = userHasSelectedSalesOrders
-        ? "Oid".MapArrayToInOperator(selectedSalesOrders.Select(a => a.Oid).ToArray())
-        : null;
+      var localObjectSpaceProvider = _serviceProvider!.GetService<ILocalObjectSpaceProvider>()!;
 
-      var service = _serviceProvider!.GetService<ISalesOrdersPostWorkflowService>();
-      var context = new SalesOrdersPostContext(criteria);
-
-      var _ = service!
-        .Execute(context)
-        .Tap(() => { ShowSuccessMessage(); })
-        .TapError(ShowErrorMessage);
+      localObjectSpaceProvider.WrapInObjectSpaceTransaction(objectSpace => {
+        foreach (var selectedSalesOrder in selectedSalesOrders) {
+          selectedSalesOrder.SetAsCancelled();
+          selectedSalesOrder.Save();
+        }
+      });
 
       View.RefreshView();
     }

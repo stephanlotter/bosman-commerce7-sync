@@ -387,6 +387,12 @@ namespace BosmanCommerce7.Module.BusinessObjects.SalesOrders {
       PostLog("Posting complete");
     }
 
+    public void SetAsCancelled() {
+      SetPostingStatus(SalesOrderPostingStatus.Cancelled);
+      UpdatePostingWorkflowState(SalesOrderPostingWorkflowState.Completed);
+      PostLog("Posting cancelled");
+    }
+
     public void SetEvolutionInvoiceNumber(string value) {
       EvolutionInvoiceNumber = value;
     }

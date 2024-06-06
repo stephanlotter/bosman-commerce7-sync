@@ -212,8 +212,9 @@
       <Filters CurrentFilterId="NewAndRetrying" IsNewNode="True">
         <Filter Id="NewAndRetrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New# Or [PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="0" Caption="New and Retrying" IsNewNode="True" />
         <Filter Id="New" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,New#" Index="1" IsNewNode="True" />
-        <Filter Id="Retrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="3" IsNewNode="True" />
-        <Filter Id="Posted" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Posted#" Index="4" IsNewNode="True" />
+        <Filter Id="Retrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="2" IsNewNode="True" />
+        <Filter Id="Posted" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Posted#" Index="3" IsNewNode="True" />
+        <Filter Id="Cancelled" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Cancelled#" Index="4" IsNewNode="True" />
         <Filter Id="Failed" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Failed#" Index="5" IsNewNode="True" />
         <Filter Id="All" Index="6" IsNewNode="True" />
       </Filters>
@@ -263,8 +264,9 @@
         <Filter Id="Posting" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Posting#" Index="2" IsNewNode="True" />
         <Filter Id="Retrying" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Retrying#" Index="3" IsNewNode="True" />
         <Filter Id="Posted" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Posted#" Index="4" IsNewNode="True" />
-        <Filter Id="Failed" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Failed#" Index="5" IsNewNode="True" />
-        <Filter Id="All" Index="6" IsNewNode="True" />
+        <Filter Id="Cancelled" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Cancelled#" Index="5" IsNewNode="True" />
+        <Filter Id="Failed" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Failed#" Index="6" IsNewNode="True" />
+        <Filter Id="All" Index="7" IsNewNode="True" />
       </Filters>
     </ListView>
     <ListView Id="OnlineSalesOrder_SalesOrderLines_ListView" AllowDelete="False" AllowLink="False" AllowNew="False">
