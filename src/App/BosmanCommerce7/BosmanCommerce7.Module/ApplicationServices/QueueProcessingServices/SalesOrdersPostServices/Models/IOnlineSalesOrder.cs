@@ -76,5 +76,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
     DateTime TransactionDate();
 
     DateTime TransactionOrderDate();
+
+    string TransactionLinkedOrderNumnber();
   }
 }

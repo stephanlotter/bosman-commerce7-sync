@@ -287,6 +287,10 @@ namespace BosmanCommerce7.Module.BusinessObjects.SalesOrders {
       return OrderDate;
     }
 
+    public string TransactionLinkedOrderNumnber() {
+      return IsRefund ? $" ON: {LinkedOrderNumber}" : "";
+    }
+
     public void PostLog(string shortDescription, Exception ex) {
       PostLog(shortDescription, ExceptionFunctions.GetMessages(ex));
     }

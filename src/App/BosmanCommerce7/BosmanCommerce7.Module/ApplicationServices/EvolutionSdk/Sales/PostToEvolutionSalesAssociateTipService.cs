@@ -54,6 +54,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
 
         var transactionDate = onlineSalesOrder.TransactionDate();
         var evolutionReference = onlineSalesOrder.IsRefund ? customerDocument.Reference : customerDocument.OrderNumber;
+        var linkedOnlineOrderNumber = onlineSalesOrder.TransactionLinkedOrderNumnber();
 
         Result AddTransaction(GLBatch batch, Result<string> accountResult, double debitAmount, double creditAmount) {
           if (accountResult.IsFailure) { return accountResult; }
@@ -63,7 +64,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
           var transaction = new GLTransaction {
             Account = new GLAccount(accountResult.Value),
             Date = transactionDate,
-            Description = $"POS Tip {onlineSalesOrder.OrderNumber} {evolutionReference} {warehouseCode}",
+            Description = $"POS Tip {onlineSalesOrder.OrderNumber} {evolutionReference} {warehouseCode}{linkedOnlineOrderNumber}",
             ExtOrderNo = $"{onlineSalesOrder.OrderNumber}",
             OrderNo = evolutionReference,
             Reference2 = $"{onlineSalesOrder.JsonProperties.SalesAssociateName()}",

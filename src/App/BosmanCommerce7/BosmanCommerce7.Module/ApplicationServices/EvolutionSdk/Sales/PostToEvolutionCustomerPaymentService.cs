@@ -53,12 +53,13 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
         var transactionDate = onlineSalesOrder.TransactionDate();
 
         var evolutionReference = onlineSalesOrder.IsRefund ? customerDocument.Reference : customerDocument.OrderNumber;
+        var linkedOnlineOrderNumber = onlineSalesOrder.TransactionLinkedOrderNumnber();
 
         var receipt = new CustomerTransaction {
           Customer = new Customer(customerDocument.CustomerId),
           Amount = transactionAmountInVat,
           Date = transactionDate,
-          Description = $"POS Order payment {onlineSalesOrder.OrderNumber} {evolutionReference} {warehouseCode}",
+          Description = $"POS Order payment {onlineSalesOrder.OrderNumber} {evolutionReference} {warehouseCode}{linkedOnlineOrderNumber}",
           ExtOrderNo = $"{onlineSalesOrder.OrderNumber}",
           OrderNo = evolutionReference,
           Reference2 = $"{onlineSalesOrder.JsonProperties.SalesAssociateName()}",
