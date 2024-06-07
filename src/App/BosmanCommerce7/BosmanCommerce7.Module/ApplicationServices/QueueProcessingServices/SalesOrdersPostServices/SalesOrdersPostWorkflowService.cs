@@ -120,7 +120,7 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices.Sal
             break;
 
           default:
-            throw new ArgumentOutOfRangeException();
+            throw new ArgumentOutOfRangeException($"PostingWorkflowState not implemented: {onlineSalesOrder.PostingWorkflowState}");
         }
         return Result.Success(onlineSalesOrder);
       }

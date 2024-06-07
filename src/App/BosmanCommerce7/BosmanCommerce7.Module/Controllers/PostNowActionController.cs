@@ -13,6 +13,7 @@ using BosmanCommerce7.Module.BusinessObjects.SalesOrders;
 using BosmanCommerce7.Module.Extensions;
 using BosmanCommerce7.Module.Models;
 using CSharpFunctionalExtensions;
+using DevExpress.Data.Filtering;
 using DevExpress.ExpressApp;
 using DevExpress.ExpressApp.Actions;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,7 +35,9 @@ namespace BosmanCommerce7.Module.Controllers {
     }
 
     protected override void CreateActions() {
-      var criteria = "PostingStatus".InCriteriaOperator(SalesOrderPostingStatus.New, SalesOrderPostingStatus.Posting, SalesOrderPostingStatus.Retrying, SalesOrderPostingStatus.Cancelled, SalesOrderPostingStatus.Failed).ToCriteriaString();
+      var criteriaPostingStatus = "PostingStatus".InCriteriaOperator(SalesOrderPostingStatus.New, SalesOrderPostingStatus.Posting, SalesOrderPostingStatus.Retrying, SalesOrderPostingStatus.Cancelled, SalesOrderPostingStatus.Failed);
+      var criteriaPostingWorkflowState = "PostingWorkflowState".InCriteriaOperator(SalesOrderPostingWorkflowState.Completed).Not();
+      var criteria = CriteriaOperator.And(criteriaPostingStatus, criteriaPostingWorkflowState).ToCriteriaString();
       var action = NewAction("Post now", (s, e) => { Execute(); },
         selectionDependencyType: SelectionDependencyType.Independent,
         targetObjectsCriteria: criteria);
