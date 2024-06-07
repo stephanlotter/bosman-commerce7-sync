@@ -12,7 +12,7 @@
         <AppearanceRule Id="PostingStatus:Skipped" Criteria="[PostingStatus] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingStatus,Skipped#" TargetItems="PostingStatus" BackColor="Gray" FontColor="White" FontStyle="Bold" Index="6" IsNewNode="True" />
         <AppearanceRule Id="PostingWorkflowState:New" Criteria="[PostingWorkflowState] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingWorkflowState,New#" TargetItems="PostingWorkflowState" BackColor="128, 255, 255" FontColor="Black" FontStyle="Bold" Index="7" IsNewNode="True" />
         <AppearanceRule Id="PostingWorkflowState:Posting" Criteria="Not [PostingWorkflowState] In (##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingWorkflowState,New#, ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingWorkflowState,Completed#)" TargetItems="PostingWorkflowState" BackColor="255, 255, 192" FontColor="Black" FontStyle="Bold" Index="8" IsNewNode="True" />
-        <AppearanceRule Id="PostingWorkflowState:Completed" Priority="0" Criteria="[PostingWorkflowState] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingWorkflowState,Completed#" TargetItems="PostingWorkflowState" BackColor="Green" FontColor="255, 255, 255" FontStyle="Bold" Index="9" IsNewNode="True" />
+        <AppearanceRule Id="PostingWorkflowState:Completed" Priority="0" Criteria="[PostingWorkflowState] = ##Enum#BosmanCommerce7.Module.Models.SalesOrderPostingWorkflowState,Completed#" TargetItems="PostingWorkflowState" BackColor="Green" FontColor="White" FontStyle="Bold" Index="9" IsNewNode="True" />
         <AppearanceRule Id="PurchaseType:Refund" Criteria="[IsRefund] = True" TargetItems="PurchaseType" BackColor="255, 128, 128" FontColor="White" FontStyle="Bold" Index="10" IsNewNode="True" />
       </AppearanceRules>
     </Class>
@@ -24,17 +24,17 @@
           <Item Id="@d18733e5-bbb9-4176-831a-2b4aad58f610" Caption="Club Orders" Index="0" ViewId="OnlineSalesOrder_ListView_Club" IsNewNode="True" />
           <Item Id="@0a472dc3-e79d-4e4f-815b-900b5c895170" Caption="POS Orders" Index="1" ViewId="OnlineSalesOrder_ListView_POS" IsNewNode="True" />
           <Item Id="OnlineSalesOrder_ListView" Index="2" Caption="All Orders" />
-          <Item Id="InventoryLevelsUpdateQueue_ListView" Index="3" Caption="Inventory Level Updates" />
-          <Item Id="InventoryItemsUpdateQueue_ListView" Index="4" Caption="Inventory Item Updates" />
-          <Item Id="CustomerUpdateQueue_ListView" Index="5" Caption="Customer Updates" />
+          <Item Id="InventoryLevelsUpdateQueue_ListView" Index="3" Caption="Inventory Level Updates" Visible="False" />
+          <Item Id="InventoryItemsUpdateQueue_ListView" Index="4" Caption="Inventory Item Updates" Visible="False" />
+          <Item Id="CustomerUpdateQueue_ListView" Index="5" Caption="Customer Updates" Visible="False" />
         </Items>
       </Item>
       <Item Id="Logs" Index="1">
         <Items>
           <Item Id="OnlineSalesOrderProcessingLog_ListView" Index="0" Caption="Online Sales Orders" />
-          <Item Id="InventoryLevelsUpdateQueueLog_ListView" Index="1" Caption="Inventory Level Updates" />
-          <Item Id="CustomerUpdateQueueLog_ListView" Index="2" Caption="Customer Updates" />
-          <Item Id="InventoryItemsUpdateQueueLog_ListView" Index="3" Caption="Inventory Item Updates" />
+          <Item Id="InventoryLevelsUpdateQueueLog_ListView" Index="1" Caption="Inventory Level Updates" Visible="False" />
+          <Item Id="CustomerUpdateQueueLog_ListView" Index="2" Caption="Customer Updates" Visible="False" />
+          <Item Id="InventoryItemsUpdateQueueLog_ListView" Index="3" Caption="Inventory Item Updates" Visible="False" />
         </Items>
       </Item>
       <Item Id="System" Index="2">
