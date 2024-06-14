@@ -280,7 +280,7 @@
         <ColumnInfo Id="OnlineId" Index="-1" />
         <ColumnInfo Id="OnlineTaxType" Index="-1" />
         <ColumnInfo Id="LineType" Index="0" SortIndex="0" SortOrder="Ascending" Width="140" />
-        <ColumnInfo Id="Sku" Index="1" SortIndex="1" SortOrder="Ascending" Width="140" />
+        <ColumnInfo Id="Sku" Index="1" SortIndex="1" SortOrder="Ascending" Width="160" />
         <ColumnInfo Id="LineDescription" Index="2" SortIndex="-1" SortOrder="None" Width="500" />
         <ColumnInfo Id="Quantity" Index="3" Width="100" />
         <ColumnInfo Id="TaxAmount" Index="4" Width="100" />
