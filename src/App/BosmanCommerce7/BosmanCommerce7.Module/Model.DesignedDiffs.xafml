@@ -294,7 +294,7 @@
         <ColumnInfo Id="EntryDate" SortIndex="0" SortOrder="Descending" Width="271" />
       </Columns>
     </ListView>
-    <DetailView Id="OnlineSalesOrderLine_DetailView" FreezeLayout="True" AllowDelete="False" AllowEdit="False" AllowNew="False">
+    <DetailView Id="OnlineSalesOrderLine_DetailView" FreezeLayout="True" AllowDelete="False" AllowEdit="True" AllowNew="False">
       <Layout IsNewNode="True" Removed="True">
         <LayoutGroup Id="Main" Index="0" ShowCaption="False" RelativeSize="100" IsNewNode="True">
           <LayoutGroup Id="SimpleEditors" Index="0" ShowCaption="False" RelativeSize="10.850202429149798" Direction="Horizontal" IsNewNode="True">
