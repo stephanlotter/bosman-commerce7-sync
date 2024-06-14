@@ -48,13 +48,11 @@ namespace BosmanCommerce7.Module.BusinessObjects.SalesOrders {
     }
 
     [Size(20)]
-    [ModelDefault("AllowEdit", "false")]
     public string? Sku {
       get => _sku;
       set => SetPropertyValue(nameof(Sku), ref _sku, value);
     }
 
-    [ModelDefault("AllowEdit", "false")]
     public string? LineDescription {
       get => _lineDescription;
       set => SetPropertyValue(nameof(LineDescription), ref _lineDescription, value);

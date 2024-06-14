@@ -261,7 +261,6 @@ namespace BosmanCommerce7.Module.BusinessObjects.SalesOrders {
 
     [Association("OnlineSalesOrder-OnlineSalesOrderLine")]
     [Aggregated]
-    [ModelDefault("AllowEdit", "false")]
     public XPCollection<OnlineSalesOrderLine> SalesOrderLines => GetCollection<OnlineSalesOrderLine>(nameof(SalesOrderLines));
 
     [Association("OnlineSalesOrder-OnlineSalesOrderProcessingLog")]
