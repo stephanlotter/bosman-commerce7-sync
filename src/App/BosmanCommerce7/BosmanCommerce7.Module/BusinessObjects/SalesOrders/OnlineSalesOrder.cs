@@ -109,7 +109,7 @@ namespace BosmanCommerce7.Module.BusinessObjects.SalesOrders {
 
     [VisibleInDetailView(false)]
     [VisibleInListView(false)]
-    public bool UseCashCustomer => string.IsNullOrWhiteSpace(CustomerOnlineId);
+    public bool UseCashCustomer => string.IsNullOrWhiteSpace(CustomerOnlineId) || string.IsNullOrWhiteSpace(EmailAddress);
 
     [ModelDefault("AllowEdit", "false")]
     public string? EvolutionSalesOrderNumber {

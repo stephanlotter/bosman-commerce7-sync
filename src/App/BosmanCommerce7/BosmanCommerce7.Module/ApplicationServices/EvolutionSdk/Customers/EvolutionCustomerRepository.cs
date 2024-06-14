@@ -17,6 +17,20 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Customers {
   public class EvolutionCustomerRepository : EvolutionRepositoryBase, IEvolutionCustomerRepository {
 
     public Result<Customer> Get(CustomerDescriptor customerDescriptor) {
+      if (customerDescriptor.CustomerId.HasValue) {
+        var c = GetById(customerDescriptor.CustomerId.Value);
+        if (c.IsSuccess) { return c; }
+        if (string.IsNullOrWhiteSpace(customerDescriptor.EmailAddress) && string.IsNullOrWhiteSpace(customerDescriptor.AccountCode)) {
+          return Result.Failure<Customer>("Cannot find customer by Id and no email address or account code was provided.");
+        }
+      }
+
+      if (!string.IsNullOrWhiteSpace(customerDescriptor.AccountCode)) {
+        return GetByAccountCode(customerDescriptor.AccountCode);
+      }
+
+      return GetByEmailAddress(customerDescriptor.EmailAddress);
+
       Result<Customer> GetById(EvolutionCustomerId id) {
         try {
           var customer = new Customer(id);
@@ -51,28 +65,14 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Customers {
         if (string.IsNullOrWhiteSpace(emailAddress)) {
           return Result.Failure<Customer>($"Customer account lookup: Email address may not be empty.");
         }
-        EvolutionCustomerId? id = GetId("SELECT DCLink FROM Client WHERE ucARwcEmail = @EmailAddress", new { emailAddress });
+        EvolutionCustomerId? id = GetId("SELECT DCLink FROM Client WHERE ucARwcEmail = @EmailAddress or EMail like '%' + @EmailAddress + '%'", new { emailAddress });
 
         if (!id.HasValue) {
-          return Result.Failure<Customer>($"Customer with email address {emailAddress} not found in Wine Club E-mail field (ucARwcEmail)");
+          return Result.Failure<Customer>($"Customer with email address {emailAddress} not found in Email address or Wine Club E-mail field (ucARwcEmail)");
         }
 
         return GetById(id.Value);
       }
-
-      if (customerDescriptor.CustomerId.HasValue) {
-        var c = GetById(customerDescriptor.CustomerId.Value);
-        if (c.IsSuccess) { return c; }
-        if (string.IsNullOrWhiteSpace(customerDescriptor.EmailAddress) && string.IsNullOrWhiteSpace(customerDescriptor.AccountCode)) {
-          return Result.Failure<Customer>("Cannot find customer by Id and no email address or account code was provided.");
-        }
-      }
-
-      if (!string.IsNullOrWhiteSpace(customerDescriptor.AccountCode)) {
-        return GetByAccountCode(customerDescriptor.AccountCode);
-      }
-
-      return GetByEmailAddress(customerDescriptor.EmailAddress);
     }
   }
 }

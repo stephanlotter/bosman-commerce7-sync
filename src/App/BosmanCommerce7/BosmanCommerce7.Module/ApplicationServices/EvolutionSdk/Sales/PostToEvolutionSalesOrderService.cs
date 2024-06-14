@@ -142,7 +142,8 @@ namespace BosmanCommerce7.Module.ApplicationServices.EvolutionSdk.Sales {
       Result<SalesDocumentBase> AssignCustomer(SalesDocumentBase salesOrder) {
         if (onlineSalesOrder.UseAccountCustomer) {
           var parameters = new CustomerDescriptor { EmailAddress = onlineSalesOrder.EmailAddress };
-          return RepositoryGet(salesOrder, parameters, p => _evolutionCustomerRepository.Get((CustomerDescriptor)p), customer => salesOrder.Customer = customer);
+          var assignAccountCustomerResult = RepositoryGet(salesOrder, parameters, p => _evolutionCustomerRepository.Get((CustomerDescriptor)p), customer => salesOrder.Customer = customer);
+          if (salesOrder.Customer != null && assignAccountCustomerResult.IsSuccess) { return assignAccountCustomerResult; }
         }
 
         return GetWarehouseLocationMapping(onlineSalesOrder.JsonProperties.ShipInventoryLocationId(), context.ObjectSpace)
