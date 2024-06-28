@@ -13,12 +13,12 @@ namespace BosmanCommerce7.Module.ApplicationServices.QueueProcessingServices {
 
     public static DateTime GetRetryAfter(int retryCount) {
       var minutes = retryCount switch {
-        1 => 1,
-        2 => 2,
-        3 => 5,
-        4 => 10,
-        5 => 15,
-        6 => 30,
+        1 => 10,
+        2 => 12,
+        3 => 15,
+        4 => 30,
+        5 => 45,
+        6 => 60,
         _ => 30
       };
 
